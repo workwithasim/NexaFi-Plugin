@@ -422,6 +422,70 @@ class NexaFi_Admin {
     }
 
     /**
+     * Render Unified Modern Top Navigation Bar
+     *
+     * @param string $active_tab Current active tab slug.
+     */
+    public function render_top_navigation( $active_tab = 'applications' ) {
+        $tabs = array(
+            'applications'    => array(
+                'label' => __( 'Applications', 'contact-form' ),
+                'url'   => admin_url( 'admin.php?page=nexafi-financing' ),
+                'icon'  => 'dashicons-clipboard',
+            ),
+            'representatives' => array(
+                'label' => __( 'Representatives', 'contact-form' ),
+                'url'   => admin_url( 'admin.php?page=nexafi-representatives' ),
+                'icon'  => 'dashicons-id-alt',
+            ),
+            'email-logs'      => array(
+                'label' => __( 'Email Logs', 'contact-form' ),
+                'url'   => admin_url( 'admin.php?page=nexafi-email-logs' ),
+                'icon'  => 'dashicons-email-alt',
+            ),
+            'reports'         => array(
+                'label' => __( 'Reports', 'contact-form' ),
+                'url'   => admin_url( 'admin.php?page=nexafi-reports' ),
+                'icon'  => 'dashicons-chart-area',
+            ),
+            'settings'        => array(
+                'label' => __( 'Settings', 'contact-form' ),
+                'url'   => admin_url( 'admin.php?page=nexafi-settings' ),
+                'icon'  => 'dashicons-admin-settings',
+            ),
+        );
+
+        $form_page_url = get_option( 'nexafi_form_page_url', home_url( '/form/' ) );
+        ?>
+        <header class="nexafi-topnav">
+            <div class="nexafi-topnav__brand">
+                <div class="nexafi-topnav__logo">
+                    <span class="dashicons dashicons-money-alt"></span>
+                    <span class="nexafi-topnav__brand-name">NexaFi</span>
+                </div>
+                <span class="nexafi-topnav__version">v<?php echo esc_html( NEXAFI_CF_VERSION ); ?></span>
+            </div>
+
+            <nav class="nexafi-topnav__menu" aria-label="<?php esc_attr_e( 'NexaFi Navigation', 'contact-form' ); ?>">
+                <?php foreach ( $tabs as $slug => $tab ) : ?>
+                    <a href="<?php echo esc_url( $tab['url'] ); ?>" class="nexafi-navlink <?php echo $slug === $active_tab ? 'nexafi-navlink--active' : ''; ?>">
+                        <span class="dashicons <?php echo esc_attr( $tab['icon'] ); ?>"></span>
+                        <span><?php echo esc_html( $tab['label'] ); ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </nav>
+
+            <div class="nexafi-topnav__actions">
+                <a href="<?php echo esc_url( $form_page_url ); ?>" target="_blank" rel="noopener noreferrer" class="nexafi-topnav__ext-link" title="<?php esc_attr_e( 'Open Public Patient Form', 'contact-form' ); ?>">
+                    <span class="dashicons dashicons-external"></span>
+                    <span><?php esc_html_e( 'View Form', 'contact-form' ); ?></span>
+                </a>
+            </div>
+        </header>
+        <?php
+    }
+
+    /**
      * RENDER PAGE 1: Applications
      */
     public function render_applications_page() {
@@ -466,6 +530,7 @@ class NexaFi_Admin {
 
         ?>
         <div class="wrap nexafi-admin-wrap">
+            <?php $this->render_top_navigation( 'applications' ); ?>
             <div class="nexafi-admin-header">
                 <div class="nexafi-admin-title-box">
                     <h1 class="wp-heading-inline">
@@ -703,6 +768,7 @@ class NexaFi_Admin {
 
         ?>
         <div class="wrap nexafi-admin-wrap">
+            <?php $this->render_top_navigation( 'representatives' ); ?>
             <div class="nexafi-admin-header">
                 <div>
                     <h1 class="wp-heading-inline"><span class="nexafi-brand-text">GDG</span> Representative Management</h1>
@@ -920,6 +986,7 @@ class NexaFi_Admin {
         $cleared = isset( $_GET['cleared'] );
         ?>
         <div class="wrap nexafi-admin-wrap">
+            <?php $this->render_top_navigation( 'email-logs' ); ?>
             <div class="nexafi-admin-header">
                 <div class="nexafi-admin-title-box">
                     <h1 class="wp-heading-inline"><span class="nexafi-brand-text">NexaFi</span> Email Delivery Logs</h1>
@@ -1103,8 +1170,13 @@ class NexaFi_Admin {
 
         ?>
         <div class="wrap nexafi-admin-wrap">
-            <h1 class="wp-heading-inline"><span class="nexafi-brand-text">NexaFi</span> Reports &amp; Analytics</h1>
-            <p class="description">Real-time breakdown of applications, authorized financing totals, and GDG representative performance.</p>
+            <?php $this->render_top_navigation( 'reports' ); ?>
+            <div class="nexafi-admin-header">
+                <div>
+                    <h1 class="wp-heading-inline"><span class="nexafi-brand-text">NexaFi</span> Reports &amp; Analytics</h1>
+                    <p class="description"><?php esc_html_e( 'Real-time breakdown of applications, authorized financing totals, and GDG representative performance.', 'contact-form' ); ?></p>
+                </div>
+            </div>
 
             <!-- Key Financial Performance Metrics -->
             <div class="nexafi-stat-cards-grid" style="margin-top: 20px;">
@@ -1230,7 +1302,13 @@ class NexaFi_Admin {
 
         ?>
         <div class="wrap nexafi-admin-wrap">
-            <h1 class="wp-heading-inline"><span class="nexafi-brand-text">NexaFi</span> Financing &amp; Policy Settings</h1>
+            <?php $this->render_top_navigation( 'settings' ); ?>
+            <div class="nexafi-admin-header">
+                <div>
+                    <h1 class="wp-heading-inline"><span class="nexafi-brand-text">NexaFi</span> Financing &amp; Policy Settings</h1>
+                    <p class="description"><?php esc_html_e( 'Configure automated financing parameters, calculation percentages, and customer policies.', 'contact-form' ); ?></p>
+                </div>
+            </div>
 
             <?php
             // phpcs:disable WordPress.Security.NonceVerification.Recommended

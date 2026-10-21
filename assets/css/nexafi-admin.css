@@ -2,210 +2,669 @@
  * NexaFi Admin Dashboard Stylesheet
  *
  * Professional fintech admin UI for NexaFi / GDG Smiles.
+ * Inspired by modern dashboard design principles: clean navy top navigation,
+ * elevated cards, polished inputs, accessible high-contrast badges, and full responsiveness.
+ *
+ * 100% Conflict-free: Every selector is strictly scoped inside .nexafi-admin-wrap
+ * or prefixed with .nexafi-*, never modifying core WordPress admin elements.
  *
  * @package NexaFi_Financing
  */
 
+/* ==========================================================================
+   1. Design System & CSS Variables (Scoped to NexaFi Wrap)
+   ========================================================================== */
+
 .nexafi-admin-wrap {
-  margin-top: 20px;
+  --nexafi-navy: #0b1e3b;
+  --nexafi-navy-dark: #06152b;
+  --nexafi-navy-soft: #162f56;
+  --nexafi-navy-glow: rgba(11, 30, 59, 0.12);
+  --nexafi-blue: #1d72f2;
+  --nexafi-blue-hover: #155bc2;
+  --nexafi-blue-light: #eff6ff;
+  --nexafi-blue-glow: rgba(29, 114, 242, 0.25);
+  --nexafi-cyan: #00d2ff;
+  --nexafi-emerald: #10b981;
+  --nexafi-emerald-soft: #ecfdf5;
+  --nexafi-amber: #f59e0b;
+  --nexafi-amber-soft: #fffbeb;
+  --nexafi-rose: #ef4444;
+  --nexafi-rose-soft: #fef2f2;
+  --nexafi-purple: #8b5cf6;
+  --nexafi-purple-soft: #f5f3ff;
+  --nexafi-ink: #0f172a;
+  --nexafi-ink-secondary: #334155;
+  --nexafi-muted: #64748b;
+  --nexafi-border: #e2e8f0;
+  --nexafi-border-light: #f1f5f9;
+  --nexafi-surface: #ffffff;
+  --nexafi-surface-alt: #f8fafc;
+  --nexafi-radius: 10px;
+  --nexafi-radius-sm: 6px;
+  --nexafi-radius-lg: 14px;
+  --nexafi-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --nexafi-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --nexafi-shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08);
+  --nexafi-shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.12);
+
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  color: var(--nexafi-ink);
+  margin-top: 14px;
+  margin-right: 20px;
+  box-sizing: border-box;
 }
 
-.nexafi-brand-text {
-  color: #0b275b;
+.nexafi-admin-wrap *,
+.nexafi-admin-wrap *::before,
+.nexafi-admin-wrap *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   2. Top Navigation Bar (.nexafi-topnav)
+   ========================================================================== */
+
+.nexafi-admin-wrap .nexafi-topnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--nexafi-navy-dark);
+  background: linear-gradient(135deg, var(--nexafi-navy-dark) 0%, var(--nexafi-navy-soft) 100%);
+  border-radius: var(--nexafi-radius);
+  padding: 8px 16px;
+  margin: 0 0 20px 0;
+  box-shadow: 0 4px 16px rgba(6, 21, 43, 0.2);
+  min-height: 58px;
+}
+
+.nexafi-admin-wrap .nexafi-topnav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.nexafi-admin-wrap .nexafi-topnav__logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  text-decoration: none;
+}
+
+.nexafi-admin-wrap .nexafi-topnav__logo .dashicons {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  color: var(--nexafi-cyan);
+}
+
+.nexafi-admin-wrap .nexafi-topnav__brand-name {
+  background: linear-gradient(135deg, #ffffff 40%, var(--nexafi-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nexafi-admin-wrap .nexafi-topnav__version {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nexafi-admin-wrap .nexafi-topnav__menu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.nexafi-admin-wrap .nexafi-navlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 12px;
+  border-radius: var(--nexafi-radius-sm);
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.nexafi-admin-wrap .nexafi-navlink .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  color: #64748b;
+  transition: color 0.15s ease;
+}
+
+.nexafi-admin-wrap .nexafi-navlink:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nexafi-admin-wrap .nexafi-navlink:hover .dashicons {
+  color: var(--nexafi-cyan);
+}
+
+.nexafi-admin-wrap .nexafi-navlink--active,
+.nexafi-admin-wrap .nexafi-navlink--active:hover {
+  color: #ffffff;
+  background: var(--nexafi-blue);
+  box-shadow: 0 2px 8px rgba(29, 114, 242, 0.4);
+  font-weight: 600;
+}
+
+.nexafi-admin-wrap .nexafi-navlink--active .dashicons {
+  color: #ffffff;
+}
+
+.nexafi-admin-wrap .nexafi-topnav__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.nexafi-admin-wrap .nexafi-topnav__ext-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--nexafi-radius-sm);
+  transition: all 0.15s ease;
+}
+
+.nexafi-admin-wrap .nexafi-topnav__ext-link:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.nexafi-admin-wrap .nexafi-topnav__ext-link .dashicons {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+}
+
+/* ==========================================================================
+   3. Page Header & Actions
+   ========================================================================== */
+
+.nexafi-admin-wrap .nexafi-admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 4px;
+}
+
+.nexafi-admin-wrap .nexafi-admin-title-box h1,
+.nexafi-admin-wrap h1.wp-heading-inline {
+  color: var(--nexafi-ink);
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+  line-height: 1.3;
+}
+
+.nexafi-admin-wrap .nexafi-brand-text {
+  color: var(--nexafi-blue);
   font-weight: 800;
 }
 
-.nexafi-admin-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
-  padding-top: 4px;
+.nexafi-admin-wrap .nexafi-admin-badge-count {
+  display: inline-block;
+  background: var(--nexafi-border-light);
+  color: var(--nexafi-muted);
+  border: 1px solid var(--nexafi-border);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-left: 10px;
+  vertical-align: middle;
 }
 
-.nexafi-admin-actions {
+.nexafi-admin-wrap .nexafi-admin-actions {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 16px;
-  align-self: flex-end;
+  flex-wrap: wrap;
 }
 
-.nexafi-export-btn {
+.nexafi-admin-wrap .description {
+  color: var(--nexafi-muted);
+  font-size: 13.5px;
+  margin: 6px 0 16px;
+}
+
+/* ==========================================================================
+   4. Buttons & Interactive Controls
+   ========================================================================== */
+
+.nexafi-admin-wrap .button,
+.nexafi-admin-wrap .nexafi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--nexafi-radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1;
+  transition: all 0.15s ease;
+  box-shadow: var(--nexafi-shadow-xs);
+}
+
+.nexafi-admin-wrap .button-primary,
+.nexafi-admin-wrap .nexafi-btn--primary {
+  background: var(--nexafi-blue) !important;
+  border: 1px solid var(--nexafi-blue) !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+.nexafi-admin-wrap .button-primary:hover,
+.nexafi-admin-wrap .nexafi-btn--primary:hover {
+  background: var(--nexafi-blue-hover) !important;
+  border-color: var(--nexafi-blue-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 114, 242, 0.3) !important;
+}
+
+.nexafi-admin-wrap .button-secondary,
+.nexafi-admin-wrap .nexafi-btn--secondary {
+  background: #ffffff !important;
+  border: 1px solid var(--nexafi-border) !important;
+  color: var(--nexafi-ink-secondary) !important;
+}
+
+.nexafi-admin-wrap .button-secondary:hover,
+.nexafi-admin-wrap .nexafi-btn--secondary:hover {
+  background: var(--nexafi-surface-alt) !important;
+  border-color: #cbd5e1 !important;
+  color: var(--nexafi-ink) !important;
+  transform: translateY(-1px);
+}
+
+.nexafi-admin-wrap .nexafi-export-btn {
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
-  height: 36px !important;
-  line-height: 34px !important;
+  height: 38px !important;
   padding: 0 16px !important;
   font-size: 13px !important;
   font-weight: 600 !important;
-  border-radius: 6px !important;
-  margin-top: 8px !important;
+  border-radius: var(--nexafi-radius-sm) !important;
 }
 
-.nexafi-admin-badge-count {
-  display: inline-block;
-  background: #e2e8f0;
-  color: #475569;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 999px;
-  margin-left: 8px;
-  vertical-align: middle;
-}
+/* ==========================================================================
+   5. Stat Cards Grid (.nexafi-stat-cards-grid)
+   ========================================================================== */
 
-/* Stat Cards */
-.nexafi-stat-cards-grid {
+.nexafi-admin-wrap .nexafi-stat-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-  margin-bottom: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.nexafi-stat-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+.nexafi-admin-wrap .nexafi-stat-card {
+  background: var(--nexafi-surface);
+  border: 1px solid var(--nexafi-border);
+  border-radius: var(--nexafi-radius);
+  padding: 18px 20px;
+  box-shadow: var(--nexafi-shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.nexafi-stat-label {
-  font-size: 12px;
+.nexafi-admin-wrap .nexafi-stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--nexafi-border);
+  transition: background 0.15s ease;
+}
+
+.nexafi-admin-wrap .nexafi-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--nexafi-shadow-md);
+  border-color: #cbd5e1;
+}
+
+.nexafi-admin-wrap .nexafi-stat-label {
+  font-size: 11.5px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--nexafi-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
-.nexafi-stat-val {
+.nexafi-admin-wrap .nexafi-stat-val {
   font-size: 26px;
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 800;
+  color: var(--nexafi-ink);
   line-height: 1.1;
+  letter-spacing: -0.5px;
 }
 
-.nexafi-stat-green .nexafi-stat-val { color: #10b981; }
-.nexafi-stat-blue .nexafi-stat-val { color: #1d72f2; }
-.nexafi-stat-amber .nexafi-stat-val { color: #f59e0b; }
-.nexafi-stat-purple .nexafi-stat-val { color: #8b5cf6; }
+.nexafi-admin-wrap .nexafi-sub-meta {
+  font-size: 12px;
+  color: var(--nexafi-muted);
+  margin-top: 6px;
+  font-weight: 500;
+}
 
-/* Filter Bar */
-.nexafi-filter-bar {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+/* Color Accent Modifiers for Stat Cards */
+.nexafi-admin-wrap .nexafi-stat-green::before { background: var(--nexafi-emerald); }
+.nexafi-admin-wrap .nexafi-stat-green .nexafi-stat-val { color: var(--nexafi-emerald); }
+
+.nexafi-admin-wrap .nexafi-stat-blue::before { background: var(--nexafi-blue); }
+.nexafi-admin-wrap .nexafi-stat-blue .nexafi-stat-val { color: var(--nexafi-blue); }
+
+.nexafi-admin-wrap .nexafi-stat-amber::before { background: var(--nexafi-amber); }
+.nexafi-admin-wrap .nexafi-stat-amber .nexafi-stat-val { color: var(--nexafi-amber); }
+
+.nexafi-admin-wrap .nexafi-stat-purple::before { background: var(--nexafi-purple); }
+.nexafi-admin-wrap .nexafi-stat-purple .nexafi-stat-val { color: var(--nexafi-purple); }
+
+/* ==========================================================================
+   6. Filter Bar & Form Controls
+   ========================================================================== */
+
+.nexafi-admin-wrap .nexafi-filter-bar {
+  background: var(--nexafi-surface);
+  border: 1px solid var(--nexafi-border);
+  border-radius: var(--nexafi-radius);
   padding: 14px 18px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
+  box-shadow: var(--nexafi-shadow-xs);
 }
 
-.nexafi-filter-inputs {
+.nexafi-admin-wrap .nexafi-filter-inputs {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-.nexafi-admin-input,
-.nexafi-admin-select,
-.nexafi-admin-input-date {
-  height: 34px !important;
+.nexafi-admin-wrap input[type="text"],
+.nexafi-admin-wrap input[type="number"],
+.nexafi-admin-wrap input[type="email"],
+.nexafi-admin-wrap input[type="date"],
+.nexafi-admin-wrap input[type="search"],
+.nexafi-admin-wrap select,
+.nexafi-admin-wrap textarea,
+.nexafi-admin-wrap .nexafi-admin-input,
+.nexafi-admin-wrap .nexafi-admin-select,
+.nexafi-admin-wrap .nexafi-admin-input-date {
+  border: 1px solid var(--nexafi-border) !important;
+  border-radius: var(--nexafi-radius-sm) !important;
+  height: 38px !important;
+  padding: 6px 12px !important;
   font-size: 13px !important;
-}
-
-.nexafi-admin-input {
-  min-width: 240px;
-  flex: 1;
-}
-
-/* Tables */
-.nexafi-table-container {
-  background: #ffffff;
-  border: 1px solid #c3c4c7;
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.nexafi-apps-table {
-  min-width: 1040px;
-  width: 100%;
-}
-
-.nexafi-apps-table th,
-.nexafi-apps-table td {
-  vertical-align: middle !important;
-}
-
-.nexafi-sub-meta {
-  font-size: 12px;
-  color: #64748b;
-  margin-top: 2px;
-}
-
-.nexafi-badge {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.nexafi-badge-success { background: #d1fae5; color: #065f46; }
-.nexafi-badge-info    { background: #dbeafe; color: #1e40af; }
-.nexafi-badge-warning { background: #fef3c7; color: #92400e; }
-.nexafi-badge-danger  { background: #fee2e2; color: #991b1b; }
-.nexafi-badge-blue    { background: #eff6ff; color: #1d72f2; }
-
-.nexafi-rep-tag {
-  display: inline-block;
-  background: #f1f5f9;
-  color: #0b275b;
-  font-family: monospace;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 4px;
-  border: 1px solid #e2e8f0;
-}
-
-.nexafi-quick-status-select {
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  height: 32px !important;
-  line-height: 28px !important;
-  padding: 2px 30px 2px 10px !important;
-  min-width: 140px !important;
-  width: 140px !important;
-  max-width: 100% !important;
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 6px !important;
+  color: var(--nexafi-ink) !important;
   background-color: #ffffff !important;
-  color: #1e293b !important;
-  background-position: right 8px center !important;
-  box-sizing: border-box !important;
-  cursor: pointer;
-  white-space: nowrap !important;
-  vertical-align: middle;
+  box-shadow: none !important;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.nexafi-quick-status-select:focus {
-  border-color: #1d72f2 !important;
-  box-shadow: 0 0 0 2px rgba(29, 114, 242, 0.2) !important;
+.nexafi-admin-wrap textarea {
+  height: auto !important;
+  min-height: 80px !important;
+}
+
+.nexafi-admin-wrap input:focus,
+.nexafi-admin-wrap select:focus,
+.nexafi-admin-wrap textarea:focus,
+.nexafi-admin-wrap .nexafi-admin-input:focus,
+.nexafi-admin-wrap .nexafi-admin-select:focus {
+  border-color: var(--nexafi-blue) !important;
+  box-shadow: 0 0 0 3px var(--nexafi-blue-glow) !important;
   outline: none !important;
 }
 
-/* Modal Window */
+.nexafi-admin-wrap .nexafi-admin-input {
+  min-width: 260px;
+  flex: 1;
+}
+
+.nexafi-admin-wrap select,
+.nexafi-admin-wrap .nexafi-admin-select {
+  padding-right: 28px !important;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   7. Tables & Card Containers
+   ========================================================================== */
+
+.nexafi-admin-wrap .nexafi-table-container,
+.nexafi-admin-wrap .nexafi-table-responsive {
+  background: var(--nexafi-surface);
+  border: 1px solid var(--nexafi-border);
+  border-radius: var(--nexafi-radius);
+  box-shadow: var(--nexafi-shadow-xs);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 24px;
+}
+
+.nexafi-admin-wrap table.wp-list-table,
+.nexafi-admin-wrap .nexafi-apps-table,
+.nexafi-admin-wrap .nexafi-reps-table {
+  width: 100%;
+  border: none;
+  box-shadow: none;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+}
+
+.nexafi-admin-wrap table.wp-list-table th,
+.nexafi-admin-wrap .nexafi-apps-table th {
+  background: var(--nexafi-surface-alt);
+  color: var(--nexafi-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 14px;
+  border-top: none;
+  border-bottom: 1px solid var(--nexafi-border);
+  border-left: none;
+  border-right: none;
+}
+
+.nexafi-admin-wrap table.wp-list-table td,
+.nexafi-admin-wrap .nexafi-apps-table td {
+  padding: 13px 14px;
+  font-size: 13px;
+  color: var(--nexafi-ink);
+  border-bottom: 1px solid var(--nexafi-border-light);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  vertical-align: middle;
+}
+
+.nexafi-admin-wrap table.wp-list-table tr:hover td {
+  background-color: #f8fafc !important;
+}
+
+.nexafi-admin-wrap table.wp-list-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ==========================================================================
+   8. Status Badges & Tags
+   ========================================================================== */
+
+.nexafi-admin-wrap .nexafi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  line-height: 1;
+}
+
+.nexafi-admin-wrap .nexafi-badge-success {
+  background: var(--nexafi-emerald-soft);
+  color: #065f46;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.nexafi-admin-wrap .nexafi-badge-info,
+.nexafi-admin-wrap .nexafi-badge-blue {
+  background: var(--nexafi-blue-light);
+  color: #1e40af;
+  border: 1px solid rgba(29, 114, 242, 0.2);
+}
+
+.nexafi-admin-wrap .nexafi-badge-warning {
+  background: var(--nexafi-amber-soft);
+  color: #92400e;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.nexafi-admin-wrap .nexafi-badge-danger {
+  background: var(--nexafi-rose-soft);
+  color: #991b1b;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.nexafi-admin-wrap .nexafi-rep-tag {
+  display: inline-block;
+  background: var(--nexafi-surface-alt);
+  color: var(--nexafi-navy);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--nexafi-radius-sm);
+  border: 1px solid var(--nexafi-border);
+}
+
+.nexafi-admin-wrap .nexafi-quick-status-select {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  height: 32px !important;
+  line-height: 28px !important;
+  padding: 2px 28px 2px 10px !important;
+  min-width: 140px !important;
+  border: 1px solid var(--nexafi-border) !important;
+  border-radius: var(--nexafi-radius-sm) !important;
+  background-color: #ffffff !important;
+  color: var(--nexafi-ink) !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nexafi-admin-wrap .nexafi-quick-status-select:focus {
+  border-color: var(--nexafi-blue) !important;
+  box-shadow: 0 0 0 2px var(--nexafi-blue-glow) !important;
+}
+
+/* ==========================================================================
+   9. Settings Box & Form Tables
+   ========================================================================== */
+
+.nexafi-admin-wrap .nexafi-settings-box {
+  background: var(--nexafi-surface);
+  border: 1px solid var(--nexafi-border);
+  border-radius: var(--nexafi-radius);
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--nexafi-shadow-xs);
+}
+
+.nexafi-admin-wrap .nexafi-settings-box h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--nexafi-navy);
+  margin: 0 0 4px 0;
+  padding: 0;
+}
+
+.nexafi-admin-wrap .nexafi-settings-box .form-table th {
+  font-weight: 600;
+  color: var(--nexafi-ink-secondary);
+  padding: 16px 10px 16px 0;
+  width: 260px;
+}
+
+.nexafi-admin-wrap .nexafi-settings-box .form-table td {
+  padding: 14px 10px;
+}
+
+/* ==========================================================================
+   10. Representatives Screen Custom Controls
+   ========================================================================== */
+
+.nexafi-admin-wrap .nexafi-rep-avatar-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--nexafi-border);
+  display: block;
+}
+
+.nexafi-admin-wrap .nexafi-rep-placeholder-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--nexafi-border-light);
+  border: 2px solid var(--nexafi-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--nexafi-muted);
+}
+
+/* ==========================================================================
+   11. Modals (.nexafi-modal)
+   ========================================================================== */
+
 .nexafi-modal {
   position: fixed;
   top: 0;
@@ -216,7 +675,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 20px;
   box-sizing: border-box;
 }
 
@@ -226,588 +685,159 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(2px);
+  background: rgba(6, 21, 43, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .nexafi-modal-dialog {
   position: relative;
   background: #ffffff;
   border-radius: 12px;
-  max-width: 820px;
-  width: 90%;
-  max-height: calc(100vh - 32px);
+  max-width: 840px;
+  width: 95%;
+  max-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--nexafi-shadow-lg);
   z-index: 2;
   overflow: hidden;
-}
-
-.nexafi-modal-dialog > form,
-.nexafi-modal-dialog form {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: calc(100vh - 32px);
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .nexafi-modal-header {
-  padding: 16px 20px;
+  padding: 16px 22px;
+  background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
+  justify-content: space-between;
 }
 
 .nexafi-modal-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #0f172a;
 }
 
 .nexafi-modal-close {
-  background: none;
+  background: transparent;
   border: none;
-  font-size: 24px;
+  color: #64748b;
+  font-size: 20px;
   cursor: pointer;
-  color: #94a3b8;
-  padding: 0;
+  padding: 4px;
   line-height: 1;
+  border-radius: 4px;
 }
 
 .nexafi-modal-close:hover {
   color: #0f172a;
+  background: #e2e8f0;
 }
 
 .nexafi-modal-body {
-  padding: 20px;
+  padding: 22px;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 1;
+  font-size: 13.5px;
+  color: #334155;
 }
 
 .nexafi-modal-footer {
-  padding: 14px 20px;
+  padding: 14px 22px;
+  background: #f8fafc;
   border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-}
-
-.nexafi-modal-footer-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
-  flex-wrap: wrap;
-  margin-left: auto;
 }
 
-.nexafi-modal-footer .button {
-  padding: 7px 18px;
-  height: auto;
-  line-height: 1.4;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
+/* ==========================================================================
+   12. Responsive Design (Tablets & Mobile)
+   ========================================================================== */
 
-.nexafi-modal-footer .nexafi-modal-delete-rep-btn {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626 !important;
-  text-decoration: none;
-}
-
-.nexafi-modal-footer .nexafi-modal-delete-rep-btn:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #b91c1c !important;
-}
-
-.nexafi-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-@media (max-width: 768px) {
-  .nexafi-detail-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.nexafi-form-row {
-  margin-bottom: 14px;
-}
-
-.nexafi-form-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.nexafi-form-col {
-  display: flex;
-  flex-direction: column;
-}
-
-.nexafi-form-col .widefat {
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-@media (max-width: 520px) {
-  .nexafi-form-grid-2 {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-.nexafi-admin-label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 5px;
-  font-size: 13px;
-}
-
-/* Responsive Table Container */
-.nexafi-table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-top: 10px;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-/* Representatives Table & Action Buttons */
-.nexafi-rep-actions-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.nexafi-rep-actions-wrap .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 8px;
-  font-size: 12px;
-  font-weight: 500;
-  height: 28px;
-  line-height: 26px;
-  border-radius: 5px;
-  transition: all 0.15s ease-in-out;
-  white-space: nowrap;
-}
-
-.nexafi-rep-actions-wrap .nexafi-edit-rep-btn {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  color: #1e293b;
-}
-
-.nexafi-rep-actions-wrap .nexafi-edit-rep-btn:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
-  color: #0f172a;
-}
-
-.nexafi-rep-actions-wrap .nexafi-toggle-rep-btn {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #475569;
-}
-
-.nexafi-rep-actions-wrap .nexafi-toggle-rep-btn:hover {
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
-.nexafi-rep-actions-wrap .nexafi-delete-rep-btn {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #dc2626 !important;
-}
-
-.nexafi-rep-actions-wrap .nexafi-delete-rep-btn:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #b91c1c !important;
-}
-
-/* Photo Upload Control & Preview */
-.nexafi-photo-upload-wrap {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
-  border-radius: 8px;
-  transition: border-color 0.2s ease;
-}
-
-.nexafi-photo-upload-wrap:hover {
-  border-color: #94a3b8;
-}
-
-.nexafi-photo-preview-box {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.nexafi-photo-preview-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.nexafi-photo-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.nexafi-photo-placeholder .dashicons {
-  font-size: 36px;
-  width: 36px;
-  height: 36px;
-  color: #94a3b8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.nexafi-photo-controls {
-  flex: 1;
-  min-width: 0;
-}
-
-.nexafi-photo-btn-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.nexafi-photo-btn-group .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 34px;
-  line-height: 32px;
-  padding: 0 16px;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-}
-
-.nexafi-photo-btn-group #nexafi-upload-photo-btn {
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  color: #1e293b;
-}
-
-.nexafi-photo-btn-group #nexafi-upload-photo-btn:hover {
-  background: #f8fafc;
-  border-color: #94a3b8;
-  color: #0f172a;
-}
-
-.nexafi-photo-btn-group .button-link-delete {
-  background: #fee2e2;
-  border: 1px solid #fecaca;
-  color: #dc2626 !important;
-  text-decoration: none;
-}
-
-.nexafi-photo-btn-group .button-link-delete:hover {
-  background: #fca5a5;
-  border-color: #f87171;
-  color: #991b1b !important;
-}
-
-.nexafi-photo-controls .description {
-  margin: 6px 0 0;
-  color: #64748b;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.nexafi-settings-box {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-}
-
-.nexafi-settings-box h2 {
-  margin-top: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: #0f172a;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 10px;
-}
-
-.nexafi-policy-box {
-  border-left: 4px solid #1d72f2;
-}
-
-/* Responsive Button Adjustments */
-@media (max-width: 640px) {
-  .nexafi-admin-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+@media screen and (max-width: 960px) {
+  .nexafi-admin-wrap .nexafi-topnav {
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    min-height: auto;
   }
 
-  .nexafi-admin-actions {
-    margin-top: 0;
-    align-self: stretch;
-  }
-
-  .nexafi-export-btn {
+  .nexafi-admin-wrap .nexafi-topnav__menu {
+    order: 3;
     width: 100%;
-    justify-content: center;
-    margin-top: 0 !important;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .nexafi-admin-header button#nexafi-add-rep-btn {
-    width: 100%;
-    justify-content: center;
-    display: inline-flex;
-    align-items: center;
-    height: 38px;
-    font-size: 14px;
+  .nexafi-admin-wrap .nexafi-stat-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 782px) {
+  .nexafi-admin-wrap {
+    margin-right: 12px;
+    margin-top: 10px;
   }
 
-  .nexafi-modal {
-    padding: 8px !important;
+  .nexafi-admin-wrap .nexafi-topnav {
+    border-radius: var(--nexafi-radius-sm);
+    padding: 10px 12px;
   }
 
-  .nexafi-modal-dialog {
-    width: 100% !important;
-    max-height: calc(100vh - 16px) !important;
+  .nexafi-admin-wrap .nexafi-topnav__menu {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
   }
 
-  .nexafi-modal-dialog > form,
-  .nexafi-modal-dialog form {
-    max-height: calc(100vh - 16px) !important;
+  .nexafi-admin-wrap .nexafi-navlink {
+    white-space: nowrap;
+    padding: 6px 10px;
+    font-size: 12.5px;
   }
 
-  .nexafi-modal-body {
-    padding: 14px !important;
-  }
-
-  .nexafi-modal-footer {
-    flex-direction: column-reverse;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .nexafi-modal-footer-actions {
-    flex-direction: column-reverse;
-    width: 100%;
-    gap: 10px;
-    margin-left: 0;
-  }
-
-  .nexafi-modal-footer .button,
-  .nexafi-modal-footer-actions .button {
-    width: 100%;
-    text-align: center;
-    justify-content: center;
-    height: 38px;
-    line-height: 36px;
-    font-size: 14px;
-  }
-
-  .nexafi-photo-upload-wrap {
+  .nexafi-admin-wrap .nexafi-admin-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
 
-  .nexafi-photo-btn-group {
+  .nexafi-admin-wrap .nexafi-admin-actions {
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
+    justify-content: flex-start;
   }
 
-  .nexafi-photo-btn-group .button {
-    flex: 1;
-    text-align: center;
-    justify-content: center;
-    height: 36px;
+  .nexafi-admin-wrap .nexafi-filter-inputs {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .nexafi-rep-actions-wrap {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 4px;
+  .nexafi-admin-wrap .nexafi-admin-input,
+  .nexafi-admin-wrap .nexafi-admin-select,
+  .nexafi-admin-wrap .nexafi-admin-input-date {
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
-  .nexafi-rep-actions-wrap .button {
-    font-size: 11px;
-    padding: 2px 6px;
-  }
-}
-
-/* ==========================================================================
-   Table Action Buttons (Applications, Email Logs, etc.)
-   ========================================================================== */
-.nexafi-table-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: nowrap;
-}
-
-.nexafi-action-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 5px !important;
-  height: 28px !important;
-  line-height: 26px !important;
-  padding: 0 10px !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  border-radius: 6px !important;
-  text-decoration: none !important;
-  white-space: nowrap !important;
-  cursor: pointer !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.15s ease-in-out !important;
-}
-
-.nexafi-action-btn .dashicons {
-  font-size: 14px !important;
-  width: 14px !important;
-  height: 14px !important;
-  line-height: 14px !important;
-  margin: 0 !important;
-  vertical-align: middle !important;
-}
-
-/* View Button */
-.nexafi-action-btn-view {
-  background: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #1e293b !important;
-}
-
-.nexafi-action-btn-view .dashicons {
-  color: #475569 !important;
-}
-
-.nexafi-action-btn-view:hover,
-.nexafi-action-btn-view:focus {
-  background: #f1f5f9 !important;
-  border-color: #94a3b8 !important;
-  color: #0f172a !important;
-}
-
-.nexafi-action-btn-view:hover .dashicons,
-.nexafi-action-btn-view:focus .dashicons {
-  color: #0f172a !important;
-}
-
-/* Resend Button */
-.nexafi-action-btn-resend {
-  background: #1d72f2 !important;
-  border: 1px solid #1d72f2 !important;
-  color: #ffffff !important;
-}
-
-.nexafi-action-btn-resend .dashicons {
-  color: #ffffff !important;
-}
-
-.nexafi-action-btn-resend:hover,
-.nexafi-action-btn-resend:focus {
-  background: #1558b8 !important;
-  border-color: #1558b8 !important;
-  color: #ffffff !important;
-}
-
-/* Delete Button */
-.nexafi-action-btn-delete {
-  background: #ffffff !important;
-  border: 1px solid #fecaca !important;
-  color: #dc2626 !important;
-}
-
-.nexafi-action-btn-delete .dashicons {
-  color: #dc2626 !important;
-}
-
-.nexafi-action-btn-delete:hover,
-.nexafi-action-btn-delete:focus {
-  background: #dc2626 !important;
-  border-color: #dc2626 !important;
-  color: #ffffff !important;
-}
-
-.nexafi-action-btn-delete:hover .dashicons,
-.nexafi-action-btn-delete:focus .dashicons {
-  color: #ffffff !important;
-}
-
-@media (max-width: 782px) {
-  .nexafi-table-actions {
-    display: inline-flex;
-    flex-wrap: nowrap;
-    gap: 4px;
+  .nexafi-admin-wrap .nexafi-stat-cards-grid {
+    grid-template-columns: 1fr;
   }
 
-  .nexafi-action-btn {
-    height: 30px !important;
-    line-height: 28px !important;
-    padding: 0 8px !important;
-    font-size: 12px !important;
+  .nexafi-admin-wrap .nexafi-settings-box {
+    padding: 16px;
+  }
+
+  .nexafi-admin-wrap .nexafi-settings-box .form-table th,
+  .nexafi-admin-wrap .nexafi-settings-box .form-table td {
+    display: block;
+    width: 100%;
+    padding: 8px 0;
   }
 }
-
