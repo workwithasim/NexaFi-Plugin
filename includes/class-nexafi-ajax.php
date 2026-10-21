@@ -467,38 +467,270 @@ class NexaFi_Ajax {
             return;
         }
 
+        $is_approved   = ( 'approved' === $app->eligibility_result );
+        $is_prelim     = ( 'preliminary' === $app->eligibility_result );
+        $status_upper  = strtoupper( $app->eligibility_result );
+
         $subject = sprintf(
             /* translators: 1: application reference number, 2: eligibility result status (e.g. APPROVED) */
             __( '[NexaFi] New Financing Application: %1$s (%2$s)', 'nexafi-plugin' ),
             $app->reference_number,
-            strtoupper( $app->eligibility_result )
+            $status_upper
         );
 
-        $message = sprintf(
-            "A new NexaFi financing application has been submitted.\n\n" .
-            "Reference: %s\n" .
-            "Applicant: %s %s\n" .
-            "Email: %s\n" .
-            "Phone: %s\n" .
-            "Treatment Quote: %s\n" .
-            "Eligibility Result: %s\n" .
-            "Representative: %s (%s)\n" .
-            "Date/Time: %s\n\n" .
-            "View details in your WordPress admin dashboard:\n%s",
-            $app->reference_number,
-            $app->first_name,
-            $app->last_name,
-            $app->email,
-            $app->phone,
-            NexaFi_Calculator::format_currency( $app->treatment_quote ),
-            strtoupper( $app->eligibility_result ),
-            $rep ? $rep->name : $app->rep_id_str,
-            $app->rep_id_str,
-            $app->created_at,
-            admin_url( 'admin.php?page=nexafi-financing&search=' . urlencode( $app->reference_number ) )
-        );
+        $site_name = get_bloginfo( 'name' );
+        if ( empty( $site_name ) ) {
+            $site_name = 'NexaFi / GDG Smiles';
+        }
 
-        $headers = array( 'Content-Type: text/plain; charset=UTF-8' );
+        $headers = array(
+            'Content-Type: text/html; charset=UTF-8',
+        );
+        $headers[] = 'From: ' . wp_specialchars_decode( $site_name, ENT_QUOTES ) . ' <' . sanitize_email( $to ) . '>';
+        if ( ! empty( $app->email ) && is_email( $app->email ) ) {
+            $headers[] = 'Reply-To: ' . sanitize_email( $app->email );
+        }
+
+        $created_timestamp = ! empty( $app->created_at ) ? strtotime( $app->created_at ) : time();
+        $date_formatted    = wp_date( 'F j, Y, g:i A', $created_timestamp );
+
+        $dob_formatted = ! empty( $app->dob ) ? wp_date( 'F j, Y', strtotime( $app->dob ) ) : 'N/A';
+
+        $quote_fmt       = NexaFi_Calculator::format_currency( $app->treatment_quote );
+        $upfront_fmt     = NexaFi_Calculator::format_currency( $app->upfront_amount );
+        $financed_fmt    = NexaFi_Calculator::format_currency( $app->financed_amount );
+        $charge_fmt      = NexaFi_Calculator::format_currency( $app->charge_amount );
+        $monthly_fmt     = NexaFi_Calculator::format_currency( $app->monthly_payment );
+        $total_rep_fmt   = NexaFi_Calculator::format_currency( $app->total_repayment );
+        $monthly_income_fmt = NexaFi_Calculator::format_currency( $app->monthly_income );
+
+        $upfront_pct_str  = rtrim( rtrim( (string) $app->upfront_pct, '0' ), '.' );
+        $financed_pct_str = rtrim( rtrim( (string) $app->financed_pct, '0' ), '.' );
+        $charge_pct_str   = rtrim( rtrim( (string) $app->charge_pct, '0' ), '.' );
+
+        $status_bg    = $is_approved ? '#16a34a' : ( $is_prelim ? '#d97706' : '#dc2626' );
+        $status_label = $is_approved ? 'APPROVED' : ( $is_prelim ? 'PRELIMINARY' : 'INELIGIBLE' );
+        $banner_bg    = $is_approved ? '#f0fdf4' : ( $is_prelim ? '#fffbeb' : '#fef2f2' );
+
+        $rep_name  = $rep ? $rep->name : ( ! empty( $app->rep_id_str ) ? $app->rep_id_str : 'None' );
+        $rep_id    = $rep ? $rep->rep_id : $app->rep_id_str;
+        $rep_phone = $rep ? $rep->phone : '';
+        $rep_email = $rep ? $rep->email : '';
+
+        $admin_url = admin_url( 'admin.php?page=nexafi-financing&search=' . urlencode( $app->reference_number ) );
+
+        $employment_label = ucfirst( str_replace( '_', ' ', $app->employment_status ) );
+
+        ob_start();
+        ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo esc_html( $subject ); ?></title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; line-height: 1.5;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 15px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);" cellspacing="0" cellpadding="0">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #0f172a; padding: 26px 30px; text-align: left;">
+                            <table width="100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 700; letter-spacing: 0.3px;">NexaFi &bull; GDG Smiles</h1>
+                                        <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px;">New Financing Application Notification</p>
+                                    </td>
+                                    <td align="right">
+                                        <span style="display: inline-block; background-color: rgba(255,255,255,0.1); color: #38bdf8; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px;">ADMIN ALERT</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Status Hero Banner -->
+                    <tr>
+                        <td style="padding: 22px 30px; background-color: <?php echo esc_attr( $banner_bg ); ?>; border-bottom: 1px solid #e2e8f0;">
+                            <table width="100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <span style="display: inline-block; background-color: <?php echo esc_attr( $status_bg ); ?>; color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            <?php echo esc_html( $status_label ); ?>
+                                        </span>
+                                        <h2 style="margin: 8px 0 2px 0; color: #0f172a; font-size: 19px; font-weight: 700;">
+                                            <?php echo esc_html( $app->first_name . ' ' . $app->last_name ); ?>
+                                        </h2>
+                                        <p style="margin: 0; color: #64748b; font-size: 13px;">
+                                            Ref: <strong style="color: #0f172a; font-family: monospace;"><?php echo esc_html( $app->reference_number ); ?></strong> &bull; <?php echo esc_html( $date_formatted ); ?>
+                                        </p>
+                                    </td>
+                                    <td align="right" valign="middle">
+                                        <a href="<?php echo esc_url( $admin_url ); ?>" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; font-size: 12.5px; font-weight: 600; padding: 9px 16px; border-radius: 6px; box-shadow: 0 1px 3px rgba(37,99,235,0.3);">
+                                            View in Dashboard &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Content Body -->
+                    <tr>
+                        <td style="padding: 26px 30px;">
+
+                            <!-- Section 1: Applicant Information -->
+                            <h3 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">
+                                Applicant Information
+                            </h3>
+                            <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 22px; font-size: 13px;">
+                                <tr>
+                                    <td width="35%" style="padding: 5px 0; color: #64748b;">Full Name:</td>
+                                    <td style="padding: 5px 0; color: #0f172a; font-weight: 600;"><?php echo esc_html( $app->first_name . ' ' . $app->last_name ); ?></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b;">Date of Birth:</td>
+                                    <td style="padding: 5px 0; color: #0f172a;"><?php echo esc_html( $dob_formatted ); ?></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b;">Email Address:</td>
+                                    <td style="padding: 5px 0; color: #2563eb;"><a href="mailto:<?php echo esc_attr( $app->email ); ?>" style="color: #2563eb; text-decoration: none; font-weight: 500;"><?php echo esc_html( $app->email ); ?></a></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b;">Phone Number:</td>
+                                    <td style="padding: 5px 0; color: #0f172a;"><a href="tel:<?php echo esc_attr( $app->phone ); ?>" style="color: #0f172a; text-decoration: none;"><?php echo esc_html( $app->phone ); ?></a></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b; vertical-align: top;">Home Address:</td>
+                                    <td style="padding: 5px 0; color: #0f172a;">
+                                        <?php echo esc_html( $app->home_address ); ?><br>
+                                        <?php echo esc_html( $app->city . ', ' . $app->state . ' ' . $app->zip_code ); ?>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Section 2: Employment & Income -->
+                            <h3 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">
+                                Employment & Income
+                            </h3>
+                            <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 22px; font-size: 13px;">
+                                <tr>
+                                    <td width="35%" style="padding: 5px 0; color: #64748b;">Employment Status:</td>
+                                    <td style="padding: 5px 0; color: #0f172a; font-weight: 600;"><?php echo esc_html( $employment_label ); ?></td>
+                                </tr>
+                                <?php if ( ! empty( $app->employer_name ) ) : ?>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b;">Employer:</td>
+                                    <td style="padding: 5px 0; color: #0f172a;"><?php echo esc_html( $app->employer_name ); ?></td>
+                                </tr>
+                                <?php endif; ?>
+                                <?php if ( ! empty( $app->job_title ) ) : ?>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b;">Job Title:</td>
+                                    <td style="padding: 5px 0; color: #0f172a;"><?php echo esc_html( $app->job_title ); ?></td>
+                                </tr>
+                                <?php endif; ?>
+                                <?php if ( ! empty( $app->time_at_job ) ) : ?>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b;">Time at Current Job:</td>
+                                    <td style="padding: 5px 0; color: #0f172a;"><?php echo esc_html( $app->time_at_job ); ?></td>
+                                </tr>
+                                <?php endif; ?>
+                                <tr>
+                                    <td style="padding: 5px 0; color: #64748b;">Monthly Income:</td>
+                                    <td style="padding: 5px 0; color: #0f172a; font-weight: 600;"><?php echo esc_html( $monthly_income_fmt ); ?></td>
+                                </tr>
+                            </table>
+
+                            <!-- Section 3: Financing Calculation Breakdown -->
+                            <h3 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">
+                                Financing Breakdown
+                            </h3>
+                            <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 22px; font-size: 13px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+                                <tr>
+                                    <td style="padding: 6px 0; color: #475569;">Total Treatment Quote:</td>
+                                    <td align="right" style="padding: 6px 0; color: #0f172a; font-weight: 700; font-size: 15px;"><?php echo esc_html( $quote_fmt ); ?></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 0; color: #475569;">Upfront Contribution (<?php echo esc_html( $upfront_pct_str ); ?>%):</td>
+                                    <td align="right" style="padding: 6px 0; color: #0f172a; font-weight: 600;"><?php echo esc_html( $upfront_fmt ); ?></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 0; color: #475569;">Financed Amount (<?php echo esc_html( $financed_pct_str ); ?>%):</td>
+                                    <td align="right" style="padding: 6px 0; color: #0f172a; font-weight: 600;"><?php echo esc_html( $financed_fmt ); ?></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 0; color: #475569;">Financing Charge (<?php echo esc_html( $charge_pct_str ); ?>%):</td>
+                                    <td align="right" style="padding: 6px 0; color: #0f172a;"><?php echo esc_html( $charge_fmt ); ?></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 0; color: #475569;">Repayment Term:</td>
+                                    <td align="right" style="padding: 6px 0; color: #0f172a;"><?php echo intval( $app->repayment_term ); ?> <?php esc_html_e( 'Months', 'nexafi-plugin' ); ?></td>
+                                </tr>
+                                <tr style="border-top: 1px solid #cbd5e1;">
+                                    <td style="padding: 8px 0 4px 0; color: #0f172a; font-weight: 700;">Monthly Installment:</td>
+                                    <td align="right" style="padding: 8px 0 4px 0; color: #16a34a; font-weight: 700; font-size: 16px;"><?php echo esc_html( $monthly_fmt ); ?> / mo</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px 0 0 0; color: #64748b; font-size: 11.5px;">Total Scheduled Repayment:</td>
+                                    <td align="right" style="padding: 2px 0 0 0; color: #64748b; font-size: 11.5px;"><?php echo esc_html( $total_rep_fmt ); ?></td>
+                                </tr>
+                            </table>
+
+                            <!-- Section 4: Assigned Representative & Declarations -->
+                            <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 22px;">
+                                <tr>
+                                    <td width="48%" valign="top" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; font-size: 12.5px;">
+                                        <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Assigned Representative</div>
+                                        <div style="color: #0f172a; font-weight: 600; font-size: 13.5px;"><?php echo esc_html( $rep_name ); ?></div>
+                                        <div style="color: #64748b; font-size: 12px; margin-top: 2px;">Rep ID: <strong style="color: #0f172a;"><?php echo esc_html( $rep_id ); ?></strong></div>
+                                        <?php if ( ! empty( $rep_phone ) ) : ?>
+                                            <div style="color: #64748b; font-size: 12px; margin-top: 2px;">Phone: <?php echo esc_html( $rep_phone ); ?></div>
+                                        <?php endif; ?>
+                                        <?php if ( ! empty( $rep_email ) ) : ?>
+                                            <div style="color: #64748b; font-size: 12px; margin-top: 2px;">Email: <?php echo esc_html( $rep_email ); ?></div>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td width="4%">&nbsp;</td>
+                                    <td width="48%" valign="top" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; font-size: 12.5px;">
+                                        <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Declarations & Consent</div>
+                                        <div style="color: #16a34a; font-weight: 600; margin-bottom: 3px;">&#10003; Valid Photo ID Declared</div>
+                                        <div style="color: #16a34a; font-weight: 600; margin-bottom: 3px;">&#10003; Traditional Debit Card Declared</div>
+                                        <div style="color: #0f172a; font-size: 11.5px; margin-top: 4px;">Terms Accepted: <strong style="color: #16a34a;"><?php echo $app->consent_status ? 'Yes' : 'No'; ?></strong></div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Call to Action Button Center -->
+                            <div style="text-align: center; margin: 26px 0 10px 0;">
+                                <a href="<?php echo esc_url( $admin_url ); ?>" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 14px 28px; border-radius: 6px; letter-spacing: 0.3px;">
+                                    Open Full Application in WordPress &rarr;
+                                </a>
+                            </div>
+
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8fafc; padding: 18px 30px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #94a3b8;">
+                            <p style="margin: 0;">This automated notification was generated by NexaFi Financing Application &bull; GDG Smiles Practice Management</p>
+                            <p style="margin: 4px 0 0 0;">Application Ref: <?php echo esc_html( $app->reference_number ); ?> &bull; Logged on <?php echo esc_html( $date_formatted ); ?></p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+        <?php
+        $message = ob_get_clean();
 
         $mail_error = null;
         $fail_cb = function( $wp_error ) use ( &$mail_error ) {
