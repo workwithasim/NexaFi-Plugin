@@ -467,7 +467,6 @@ class NexaFi_Admin {
             <nav class="nexafi-topnav__menu" aria-label="<?php esc_attr_e( 'NexaFi Navigation', 'contact-form' ); ?>">
                 <?php foreach ( $tabs as $slug => $tab ) : ?>
                     <a href="<?php echo esc_url( $tab['url'] ); ?>" class="nexafi-navlink <?php echo $slug === $active_tab ? 'nexafi-navlink--active' : ''; ?>">
-                        <span class="dashicons <?php echo esc_attr( $tab['icon'] ); ?>"></span>
                         <span><?php echo esc_html( $tab['label'] ); ?></span>
                     </a>
                 <?php endforeach; ?>
@@ -538,8 +537,8 @@ class NexaFi_Admin {
                         'rep_id'        => $rep_id,
                         'date_from'     => $date_from,
                         'date_to'       => $date_to,
-                    ), admin_url( 'admin.php' ) ), 'nexafi_export_csv_action', 'nexafi_export_nonce' ) ); ?>" class="button button-primary nexafi-export-btn">
-                        <span class="dashicons dashicons-download"></span> Export Filtered CSV
+                    ), admin_url( 'admin.php' ) ), 'nexafi_export_csv_action', 'nexafi_export_nonce' ) ); ?>" class="button button-primary nexafi-header-btn nexafi-export-btn">
+                        <?php esc_html_e( 'Export Filtered CSV', 'contact-form' ); ?>
                     </a>
                 </div>
             </div>
@@ -600,8 +599,8 @@ class NexaFi_Admin {
 
                         <input type="date" name="date_from" value="<?php echo esc_attr( $date_from ); ?>" title="Filter by Date" class="nexafi-admin-input-date" />
 
-                        <button type="submit" class="button button-secondary">Filter</button>
-                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-financing' ) ); ?>" class="button">Reset</a>
+                        <button type="submit" class="button button-primary nexafi-filter-btn"><?php esc_html_e( 'Filter', 'contact-form' ); ?></button>
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-financing' ) ); ?>" class="button button-secondary nexafi-reset-btn"><?php esc_html_e( 'Reset', 'contact-form' ); ?></a>
                     </div>
                 </form>
             </div>
@@ -683,7 +682,6 @@ class NexaFi_Admin {
                                     <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'contact-form' ); ?>">
                                         <div class="nexafi-table-actions">
                                             <button type="button" class="button button-small nexafi-action-btn nexafi-action-btn-view nexafi-view-detail-btn" data-app-id="<?php echo esc_attr( $app->id ); ?>" title="<?php esc_attr_e( 'View application details', 'contact-form' ); ?>">
-                                                <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
                                                 <span><?php esc_html_e( 'View', 'contact-form' ); ?></span>
                                             </button>
                                             <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array(
@@ -693,7 +691,6 @@ class NexaFi_Admin {
                                                class="button button-small nexafi-action-btn nexafi-action-btn-delete" 
                                                onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to delete this application record?', 'contact-form' ) ); ?>');" 
                                                title="<?php esc_attr_e( 'Delete application', 'contact-form' ); ?>">
-                                                <span class="dashicons dashicons-trash" aria-hidden="true"></span>
                                                 <span><?php esc_html_e( 'Delete', 'contact-form' ); ?></span>
                                             </a>
                                         </div>
@@ -769,8 +766,8 @@ class NexaFi_Admin {
                     <span class="nexafi-admin-badge-count"><?php echo count( $reps ); ?> representatives</span>
                 </div>
                 <div>
-                    <button type="button" class="button button-primary" id="nexafi-add-rep-btn">
-                        <span class="dashicons dashicons-plus-alt2"></span> Add Representative
+                    <button type="button" class="button button-primary nexafi-header-btn" id="nexafi-add-rep-btn">
+                        <?php esc_html_e( 'Add Representative', 'contact-form' ); ?>
                     </button>
                 </div>
             </div>
@@ -834,7 +831,7 @@ class NexaFi_Admin {
                                     </td>
                                     <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'contact-form' ); ?>">
                                         <div class="nexafi-rep-actions-wrap">
-                                            <button type="button" class="button button-small nexafi-action-btn nexafi-edit-rep-btn" 
+                                            <button type="button" class="button button-small nexafi-action-btn nexafi-action-btn-edit nexafi-edit-rep-btn" 
                                                     data-id="<?php echo esc_attr( $r->id ); ?>"
                                                     data-rep-id="<?php echo esc_attr( $r->rep_id ); ?>"
                                                     data-name="<?php echo esc_attr( $r->name ); ?>"
@@ -843,17 +840,15 @@ class NexaFi_Admin {
                                                     data-photo="<?php echo esc_attr( $r->photo_url ); ?>"
                                                     data-notes="<?php echo esc_attr( $r->notes ); ?>"
                                                     data-active="<?php echo esc_attr( $r->is_active ); ?>">
-                                                <span class="dashicons dashicons-edit" aria-hidden="true"></span>
                                                 <span><?php esc_html_e( 'Edit', 'contact-form' ); ?></span>
                                             </button>
-                                            <button type="button" class="button button-small nexafi-action-btn nexafi-toggle-rep-btn" data-id="<?php echo esc_attr( $r->id ); ?>" data-active="<?php echo esc_attr( $r->is_active ); ?>">
+                                            <button type="button" class="button button-small nexafi-action-btn nexafi-action-btn-toggle nexafi-toggle-rep-btn" data-id="<?php echo esc_attr( $r->id ); ?>" data-active="<?php echo esc_attr( $r->is_active ); ?>">
                                                 <span><?php echo $r->is_active ? esc_html__( 'Deactivate', 'contact-form' ) : esc_html__( 'Activate', 'contact-form' ); ?></span>
                                             </button>
                                             <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array(
                                                 'nexafi_action' => 'delete_representative',
                                                 'rep_id'        => $r->id,
                                             ), admin_url( 'admin.php?page=nexafi-representatives' ) ), 'nexafi_delete_rep_' . $r->id, 'nexafi_delete_nonce' ) ); ?>" class="button button-small nexafi-action-btn nexafi-action-btn-delete nexafi-delete-rep-btn" onclick="return confirm('<?php echo esc_js( __( 'Delete this representative?', 'contact-form' ) ); ?>');">
-                                                <span class="dashicons dashicons-trash" aria-hidden="true"></span>
                                                 <span><?php esc_html_e( 'Delete', 'contact-form' ); ?></span>
                                             </a>
                                         </div>
@@ -912,7 +907,6 @@ class NexaFi_Admin {
                                     <div class="nexafi-photo-controls">
                                         <div class="nexafi-photo-btn-group">
                                             <button type="button" class="button button-secondary" id="nexafi-upload-photo-btn">
-                                                <span class="dashicons dashicons-upload" style="font-size:14px;width:14px;height:14px;line-height:14px;margin-right:2px;vertical-align:text-top;"></span>
                                                 <span id="nexafi-upload-btn-text"><?php esc_html_e( 'Upload Photo', 'contact-form' ); ?></span>
                                             </button>
                                             <button type="button" class="button button-link-delete" id="nexafi-remove-photo-btn">
@@ -1029,10 +1023,8 @@ class NexaFi_Admin {
                         <option value="failed" <?php selected( $status, 'failed' ); ?>><?php esc_html_e( 'Delivery Failed', 'contact-form' ); ?></option>
                     </select>
 
-                    <button type="submit" class="button button-primary"><?php esc_html_e( 'Filter Logs', 'contact-form' ); ?></button>
-                    <?php if ( ! empty( $search ) || ! empty( $status ) ) : ?>
-                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-email-logs' ) ); ?>" class="button button-secondary"><?php esc_html_e( 'Reset Filters', 'contact-form' ); ?></a>
-                    <?php endif; ?>
+                    <button type="submit" class="button button-primary nexafi-filter-btn"><?php esc_html_e( 'Filter Logs', 'contact-form' ); ?></button>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-email-logs' ) ); ?>" class="button button-secondary nexafi-reset-btn"><?php esc_html_e( 'Reset', 'contact-form' ); ?></a>
                 </form>
             </div>
 
@@ -1114,7 +1106,6 @@ class NexaFi_Admin {
                                                     data-log-id="<?php echo esc_attr( $log->id ); ?>" 
                                                     data-app-id="<?php echo esc_attr( $log->application_id ); ?>"
                                                     title="<?php esc_attr_e( 'Resend confirmation email to applicant', 'contact-form' ); ?>">
-                                                <span class="dashicons dashicons-email-alt" aria-hidden="true"></span>
                                                 <span><?php esc_html_e( 'Resend', 'contact-form' ); ?></span>
                                             </button>
                                         <?php endif; ?>
@@ -1127,7 +1118,6 @@ class NexaFi_Admin {
                                            data-log-id="<?php echo esc_attr( $log->id ); ?>" 
                                            data-nonce="<?php echo esc_attr( wp_create_nonce( 'nexafi_delete_log_' . $log->id ) ); ?>"
                                            title="<?php esc_attr_e( 'Delete log', 'contact-form' ); ?>">
-                                            <span class="dashicons dashicons-trash" aria-hidden="true"></span>
                                             <span><?php esc_html_e( 'Delete', 'contact-form' ); ?></span>
                                         </a>
                                     </div>
@@ -1544,8 +1534,7 @@ class NexaFi_Admin {
                 <!-- Email Delivery & Resend Block -->
                 <h3 style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
                     <span>Email Delivery</span>
-                    <button type="button" class="button button-small button-primary nexafi-resend-email-btn" data-app-id="<?php echo esc_attr( $app->id ); ?>" style="display: inline-flex; align-items: center; gap: 3px; font-size: 11px;">
-                        <span class="dashicons dashicons-email-alt" style="font-size: 13px; width: 13px; height: 13px; line-height: 13px;"></span>
+                    <button type="button" class="button button-small button-primary nexafi-resend-email-btn" data-app-id="<?php echo esc_attr( $app->id ); ?>" style="font-size: 11px;">
                         <span>Resend Email</span>
                     </button>
                 </h3>
