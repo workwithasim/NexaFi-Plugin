@@ -223,20 +223,26 @@ class NexaFi_Updater {
             return $source;
         }
 
-        $correct_source = trailingslashit( $remote_source ) . $this->slug . '/';
-
-        if ( trailingslashit( $source ) === $correct_source ) {
+        if ( is_wp_error( $source ) ) {
             return $source;
         }
 
-        if ( $wp_filesystem->move( $source, $correct_source ) ) {
-            return $correct_source;
+        $source_path = untrailingslashit( $source );
+        if ( basename( $source_path ) === $this->slug ) {
+            return $source;
         }
 
-        return new WP_Error(
-            'nexafi_source_rename_error',
-            __( 'Unable to rename update source folder to contact-form.', 'contact-form' )
-        );
+        $new_source = trailingslashit( dirname( $source_path ) ) . $this->slug . '/';
+
+        if ( $wp_filesystem->exists( $new_source ) ) {
+            $wp_filesystem->delete( $new_source, true );
+        }
+
+        if ( $wp_filesystem->move( $source, $new_source ) ) {
+            return $new_source;
+        }
+
+        return $source;
     }
 
     /**
