@@ -810,8 +810,8 @@ class NexaFi_Admin {
                                 $photo = ! empty( $r->photo_url ) ? $r->photo_url : $default_photo;
                                 ?>
                                 <tr>
-                                    <td class="column-photo" data-colname="<?php esc_attr_e( 'Photo', 'contact-form' ); ?>" style="text-align: center;">
-                                        <img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $r->name ); ?>" class="nexafi-rep-avatar-img" />
+                                    <td class="column-photo" data-colname="<?php esc_attr_e( 'Photo', 'contact-form' ); ?>" style="text-align: center; width: 56px;">
+                                        <img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $r->name ); ?>" class="nexafi-rep-avatar-img" width="42" height="42" style="width:42px;height:42px;border-radius:50%;object-fit:cover;display:block;margin:0 auto;" />
                                     </td>
                                     <td class="column-repid" data-colname="<?php esc_attr_e( 'Rep ID', 'contact-form' ); ?>"><span class="nexafi-rep-tag"><?php echo esc_html( $r->rep_id ); ?></span></td>
                                     <td class="column-name column-primary" data-colname="<?php esc_attr_e( 'Name', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( $r->name ); ?></strong></td>

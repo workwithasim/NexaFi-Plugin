@@ -112,9 +112,6 @@
 .nexafi-admin-wrap .nexafi-topnav__menu {
   display: flex;
   align-items: center;
-.nexafi-admin-wrap .nexafi-topnav__menu {
-  display: flex;
-  align-items: center;
   gap: 6px;
   flex-wrap: wrap;
 }
@@ -758,10 +755,12 @@
 
 /* Representative Table: Avatar & Actions */
 .nexafi-admin-wrap .nexafi-rep-avatar-img {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
+  width: 42px !important;
+  height: 42px !important;
+  max-width: 42px !important;
+  max-height: 42px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
   border: 1px solid var(--nexafi-border);
   display: block;
   margin: 0 auto;

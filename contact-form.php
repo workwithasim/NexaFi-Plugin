@@ -3,7 +3,7 @@
  * Plugin Name: NexaFi Financing Application & Contact Form
  * Plugin URI:https://github.com/workwithasim/NexaFi-Plugin
  * Description: Complete 5-screen patient financing application workflow, eligibility engine, GDG representative management, reporting, and admin dashboard for NexaFi / GDG Smiles.
- * Version: 2.4.5
+ * Version: 2.4.6
  * Author: NexaFi & GDG Smiles Team
  * Author URI:https://xortlogix.com/
  * Text Domain: contact-form
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'NEXAFI_CF_VERSION', '2.4.5' );
+define( 'NEXAFI_CF_VERSION', '2.4.6' );
 define( 'NEXAFI_CF_PLUGIN_FILE', __FILE__ );
 define( 'NEXAFI_CF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NEXAFI_CF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

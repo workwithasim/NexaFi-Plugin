@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.5
+Stable tag: 2.4.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,14 @@ NexaFi Financing Application & Contact Form provides an advanced multi-step fina
 Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
+
+= 2.4.6 =
+* Fixed admin CSS syntax error restoring full dashboard styles (cards, topnav, tables, and buttons).
+* Fixed representative photo sizing in table with strict dimensions to prevent image explosion.
+* Enhanced auto-updater to dynamically detect any folder installation name.
+
+= 2.4.5 =
+* Unified button styles and updated author/repo URIs.
 
 = 2.4.4 =
 * Refactored dashboard tables with predefined responsive classes and polished modern UI.
