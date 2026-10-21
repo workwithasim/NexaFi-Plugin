@@ -115,6 +115,10 @@ class NexaFi_Updater {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ( ! empty( $_GET['force-check'] ) || ( ! empty( $_GET['nexafi_check_update'] ) && check_admin_referer( 'nexafi_check_update_nonce' ) ) ) {
             delete_site_transient( $this->transient_key );
+            delete_site_transient( 'update_plugins' );
+            if ( function_exists( 'wp_clean_plugins_cache' ) ) {
+                wp_clean_plugins_cache();
+            }
         }
     }
 
@@ -281,6 +285,8 @@ class NexaFi_Updater {
             'sslverify'  => true,
         );
 
+        $candidates = array();
+
         // 1. Try GitHub Releases API
         $api_url  = 'https://api.github.com/repos/' . $this->github_repo . '/releases/latest';
         $response = wp_remote_get( $api_url, $http_args );
@@ -290,10 +296,9 @@ class NexaFi_Updater {
             $data = json_decode( $body, true );
 
             if ( ! empty( $data['tag_name'] ) ) {
-                $version   = ltrim( sanitize_text_field( $data['tag_name'] ), 'vV' );
-                $download  = ! empty( $data['zipball_url'] ) ? esc_url_raw( $data['zipball_url'] ) : '';
+                $version  = ltrim( sanitize_text_field( $data['tag_name'] ), 'vV' );
+                $download = ! empty( $data['zipball_url'] ) ? esc_url_raw( $data['zipball_url'] ) : '';
 
-                // If release has custom zip asset attached, prefer it
                 if ( ! empty( $data['assets'] ) && is_array( $data['assets'] ) ) {
                     foreach ( $data['assets'] as $asset ) {
                         if ( ! empty( $asset['browser_download_url'] ) && preg_match( '/\.zip$/i', $asset['name'] ?? '' ) ) {
@@ -303,19 +308,16 @@ class NexaFi_Updater {
                     }
                 }
 
-                $info = (object) array(
+                $candidates[] = (object) array(
                     'new_version'  => $version,
                     'download_url' => $download,
                     'changelog'    => ! empty( $data['body'] ) ? wp_kses_post( $data['body'] ) : '',
                     'published_at' => ! empty( $data['published_at'] ) ? sanitize_text_field( $data['published_at'] ) : current_time( 'mysql' ),
                 );
-
-                set_site_transient( $this->transient_key, $info, $this->cache_ttl );
-                return $info;
             }
         }
 
-        // 2. Try GitHub Tags API (for git tags like v2.4.4)
+        // 2. Try GitHub Tags API (for git tags like v2.4.4, v2.4.5)
         $tags_url  = 'https://api.github.com/repos/' . $this->github_repo . '/tags';
         $response = wp_remote_get( $tags_url, $http_args );
 
@@ -327,19 +329,16 @@ class NexaFi_Updater {
                 $version  = ltrim( sanitize_text_field( $tags[0]['name'] ), 'vV' );
                 $download = ! empty( $tags[0]['zipball_url'] ) ? esc_url_raw( $tags[0]['zipball_url'] ) : 'https://github.com/' . $this->github_repo . '/archive/refs/tags/' . $tags[0]['name'] . '.zip';
 
-                $info = (object) array(
+                $candidates[] = (object) array(
                     'new_version'  => $version,
                     'download_url' => $download,
                     'changelog'    => esc_html__( 'New release available from GitHub.', 'contact-form' ),
                     'published_at' => current_time( 'mysql' ),
                 );
-
-                set_site_transient( $this->transient_key, $info, $this->cache_ttl );
-                return $info;
             }
         }
 
-        // 3. Fallback: inspect raw contact-form.php on main branch
+        // 3. Inspect raw contact-form.php on main branch
         $raw_url  = 'https://raw.githubusercontent.com/' . $this->github_repo . '/main/contact-form.php';
         $response = wp_remote_get( $raw_url, $http_args );
 
@@ -349,18 +348,29 @@ class NexaFi_Updater {
                 $version  = sanitize_text_field( $matches[1] );
                 $download = 'https://github.com/' . $this->github_repo . '/archive/refs/heads/main.zip';
 
-                $info = (object) array(
+                $candidates[] = (object) array(
                     'new_version'  => $version,
                     'download_url' => $download,
                     'changelog'    => esc_html__( 'Latest update from GitHub main branch.', 'contact-form' ),
                     'published_at' => current_time( 'mysql' ),
                 );
-
-                set_site_transient( $this->transient_key, $info, $this->cache_ttl );
-                return $info;
             }
         }
 
-        return false;
+        if ( empty( $candidates ) ) {
+            return false;
+        }
+
+        // Sort descending by version and pick the highest version
+        usort(
+            $candidates,
+            function( $a, $b ) {
+                return version_compare( $b->new_version, $a->new_version );
+            }
+        );
+
+        $best = $candidates[0];
+        set_site_transient( $this->transient_key, $best, $this->cache_ttl );
+        return $best;
     }
 }
