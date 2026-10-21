@@ -112,40 +112,30 @@
 .nexafi-admin-wrap .nexafi-topnav__menu {
   display: flex;
   align-items: center;
-  gap: 4px;
+.nexafi-admin-wrap .nexafi-topnav__menu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .nexafi-admin-wrap .nexafi-navlink {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   color: #94a3b8;
   text-decoration: none;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
-  padding: 6px 11px;
+  padding: 6px 14px;
   border-radius: 5px;
   transition: all 0.15s ease;
-  line-height: 1;
-}
-
-.nexafi-admin-wrap .nexafi-navlink .dashicons {
-  font-size: 15px;
-  width: 15px;
-  height: 15px;
-  line-height: 15px;
-  color: #64748b;
-  transition: color 0.15s ease;
+  line-height: 1.2;
 }
 
 .nexafi-admin-wrap .nexafi-navlink:hover {
-  color: #f1f5f9;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.nexafi-admin-wrap .nexafi-navlink:hover .dashicons {
-  color: #38bdf8;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .nexafi-admin-wrap .nexafi-navlink--active,
@@ -153,10 +143,6 @@
   color: #ffffff;
   background: var(--nexafi-blue);
   font-weight: 600;
-}
-
-.nexafi-admin-wrap .nexafi-navlink--active .dashicons {
-  color: #ffffff;
 }
 
 /* ==========================================================================
@@ -214,7 +200,7 @@
 }
 
 /* ==========================================================================
-   4. Buttons (Minimal & Crisp)
+   4. Buttons (Unified, Crisp & Modern)
    ========================================================================== */
 
 .nexafi-admin-wrap .button,
@@ -222,51 +208,69 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  height: 34px;
-  padding: 0 13px;
-  font-size: 12.5px;
+  gap: 6px;
+  height: 35px;
+  line-height: 33px;
+  padding: 0 15px;
+  font-size: 13px;
   font-weight: 600;
   border-radius: var(--nexafi-radius-sm);
   cursor: pointer;
   text-decoration: none;
-  line-height: 1;
+  box-sizing: border-box;
   transition: all 0.15s ease;
   box-shadow: none;
 }
 
 .nexafi-admin-wrap .button-primary,
-.nexafi-admin-wrap .nexafi-btn--primary {
+.nexafi-admin-wrap .nexafi-btn--primary,
+.nexafi-admin-wrap .nexafi-header-btn,
+.nexafi-admin-wrap .nexafi-filter-btn,
+.nexafi-admin-wrap .nexafi-export-btn,
+.nexafi-admin-wrap #nexafi-add-rep-btn {
   background: var(--nexafi-blue) !important;
   border: 1px solid var(--nexafi-blue) !important;
   color: #ffffff !important;
   text-shadow: none !important;
+  height: 35px !important;
+  line-height: 33px !important;
+  padding: 0 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: var(--nexafi-radius-sm) !important;
 }
 
 .nexafi-admin-wrap .button-primary:hover,
-.nexafi-admin-wrap .nexafi-btn--primary:hover {
+.nexafi-admin-wrap .nexafi-btn--primary:hover,
+.nexafi-admin-wrap .nexafi-header-btn:hover,
+.nexafi-admin-wrap .nexafi-filter-btn:hover,
+.nexafi-admin-wrap .nexafi-export-btn:hover,
+.nexafi-admin-wrap #nexafi-add-rep-btn:hover {
   background: var(--nexafi-blue-hover) !important;
   border-color: var(--nexafi-blue-hover) !important;
+  color: #ffffff !important;
 }
 
 .nexafi-admin-wrap .button-secondary,
-.nexafi-admin-wrap .nexafi-btn--secondary {
+.nexafi-admin-wrap .nexafi-btn--secondary,
+.nexafi-admin-wrap .nexafi-reset-btn {
   background: #ffffff !important;
   border: 1px solid var(--nexafi-border) !important;
   color: var(--nexafi-ink-secondary) !important;
+  height: 35px !important;
+  line-height: 33px !important;
+  padding: 0 15px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: var(--nexafi-radius-sm) !important;
 }
 
 .nexafi-admin-wrap .button-secondary:hover,
-.nexafi-admin-wrap .nexafi-btn--secondary:hover {
+.nexafi-admin-wrap .nexafi-btn--secondary:hover,
+.nexafi-admin-wrap .nexafi-reset-btn:hover {
   background: var(--nexafi-surface-alt) !important;
   border-color: #cbd5e1 !important;
   color: var(--nexafi-ink) !important;
-}
-
-.nexafi-admin-wrap .nexafi-export-btn {
-  height: 34px !important;
-  line-height: 32px !important;
-  font-size: 12.5px !important;
 }
 
 /* ==========================================================================
@@ -776,30 +780,21 @@
 .nexafi-admin-wrap .nexafi-action-btn {
   height: 28px !important;
   line-height: 26px !important;
-  padding: 0 9px !important;
-  font-size: 11.5px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   border: 1px solid var(--nexafi-border) !important;
   background: #ffffff !important;
   color: #334155 !important;
-  border-radius: 4px !important;
+  border-radius: 5px !important;
   box-shadow: none !important;
   transition: all 0.15s ease !important;
   display: inline-flex !important;
   align-items: center !important;
-  gap: 4px !important;
+  justify-content: center !important;
   white-space: nowrap !important;
   text-decoration: none !important;
   cursor: pointer;
-}
-
-.nexafi-admin-wrap .nexafi-action-btn .dashicons {
-  font-size: 14px !important;
-  width: 14px !important;
-  height: 14px !important;
-  line-height: 14px !important;
-  vertical-align: middle !important;
-  color: inherit;
 }
 
 .nexafi-admin-wrap .nexafi-action-btn:hover {
@@ -814,8 +809,10 @@
   color: #1d4ed8 !important;
 }
 
-.nexafi-admin-wrap .nexafi-action-btn-view:hover .dashicons {
-  color: #2563eb !important;
+.nexafi-admin-wrap .nexafi-action-btn-edit:hover {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  color: #15803d !important;
 }
 
 .nexafi-admin-wrap .nexafi-action-btn-resend:hover {
@@ -824,8 +821,10 @@
   color: #1d4ed8 !important;
 }
 
-.nexafi-admin-wrap .nexafi-action-btn-resend:hover .dashicons {
-  color: #2563eb !important;
+.nexafi-admin-wrap .nexafi-action-btn-toggle:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
 }
 
 .nexafi-admin-wrap .nexafi-action-btn-delete,
