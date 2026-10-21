@@ -87,13 +87,18 @@ class NexaFi_Updater {
             $this->current_version = NEXAFI_CF_VERSION;
         }
 
+        if ( defined( 'NEXAFI_CF_PLUGIN_BASENAME' ) ) {
+            $this->plugin_basename = NEXAFI_CF_PLUGIN_BASENAME;
+            $this->slug            = dirname( $this->plugin_basename );
+        }
+
         // Check for updates in WordPress transient
         add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_update' ) );
 
         // Provide plugin information popup on "View version X.X.X details"
         add_filter( 'plugins_api', array( $this, 'plugin_information' ), 20, 3 );
 
-        // Ensure the downloaded GitHub zip extracts to the correct "contact-form" directory
+        // Ensure the downloaded GitHub zip extracts to the correct plugin directory
         add_filter( 'upgrader_source_selection', array( $this, 'fix_source_directory' ), 10, 4 );
 
         // Purge update cache after plugin upgrade
@@ -129,7 +134,22 @@ class NexaFi_Updater {
      * @return object
      */
     public function check_for_update( $transient ) {
-        if ( empty( $transient->checked ) || ! isset( $transient->checked[ $this->plugin_basename ] ) ) {
+        if ( empty( $transient->checked ) ) {
+            return $transient;
+        }
+
+        // Dynamically find our plugin basename if the folder name is different (e.g. NexaFi-Plugin-main vs contact-form)
+        if ( ! isset( $transient->checked[ $this->plugin_basename ] ) ) {
+            foreach ( array_keys( $transient->checked ) as $installed_plugin ) {
+                if ( substr( $installed_plugin, -16 ) === 'contact-form.php' ) {
+                    $this->plugin_basename = $installed_plugin;
+                    $this->slug            = dirname( $installed_plugin );
+                    break;
+                }
+            }
+        }
+
+        if ( ! isset( $transient->checked[ $this->plugin_basename ] ) ) {
             return $transient;
         }
 
