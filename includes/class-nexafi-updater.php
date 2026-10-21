@@ -309,7 +309,31 @@ class NexaFi_Updater {
             }
         }
 
-        // 2. Fallback: inspect raw contact-form.php on main branch
+        // 2. Try GitHub Tags API (for git tags like v2.4.4)
+        $tags_url  = 'https://api.github.com/repos/' . $this->github_repo . '/tags';
+        $response = wp_remote_get( $tags_url, $http_args );
+
+        if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+            $body = wp_remote_retrieve_body( $response );
+            $tags = json_decode( $body, true );
+
+            if ( ! empty( $tags ) && is_array( $tags ) && ! empty( $tags[0]['name'] ) ) {
+                $version  = ltrim( sanitize_text_field( $tags[0]['name'] ), 'vV' );
+                $download = ! empty( $tags[0]['zipball_url'] ) ? esc_url_raw( $tags[0]['zipball_url'] ) : 'https://github.com/' . $this->github_repo . '/archive/refs/tags/' . $tags[0]['name'] . '.zip';
+
+                $info = (object) array(
+                    'new_version'  => $version,
+                    'download_url' => $download,
+                    'changelog'    => esc_html__( 'New release available from GitHub.', 'contact-form' ),
+                    'published_at' => current_time( 'mysql' ),
+                );
+
+                set_site_transient( $this->transient_key, $info, $this->cache_ttl );
+                return $info;
+            }
+        }
+
+        // 3. Fallback: inspect raw contact-form.php on main branch
         $raw_url  = 'https://raw.githubusercontent.com/' . $this->github_repo . '/main/contact-form.php';
         $response = wp_remote_get( $raw_url, $http_args );
 

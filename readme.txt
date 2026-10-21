@@ -27,5 +27,10 @@ Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
 
+= 2.4.4 =
+* Refactored dashboard tables with predefined responsive classes and polished modern UI.
+* Added custom styled table scrollbars and refined email logs and reports layout.
+* Cleaned up representative modal and admin navigation headers.
+
 = 2.4.3 =
 * Plugin Check compatibility improvements and security hardening.
