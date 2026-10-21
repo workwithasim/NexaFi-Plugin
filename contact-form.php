@@ -3,10 +3,10 @@
  * Plugin Name: NexaFi Financing Application & Contact Form
  * Plugin URI:https://github.com/workwithasim/NexaFi-Plugin
  * Description: Complete 5-screen patient financing application workflow, eligibility engine, GDG representative management, reporting, and admin dashboard for NexaFi / GDG Smiles.
- * Version: 2.4.6
+ * Version: 2.4.7
  * Author: NexaFi & GDG Smiles Team
  * Author URI:https://xortlogix.com/
- * Text Domain: contact-form
+ * Text Domain: nexafi-plugin
  * Domain Path: /languages
  * Requires at least: 5.8
  * Requires PHP: 7.4
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'NEXAFI_CF_VERSION', '2.4.6' );
+define( 'NEXAFI_CF_VERSION', '2.4.7' );
 define( 'NEXAFI_CF_PLUGIN_FILE', __FILE__ );
 define( 'NEXAFI_CF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NEXAFI_CF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -146,12 +146,12 @@ final class NexaFi_Financing_Plugin {
         $settings_link = sprintf(
             '<a href="%s">%s</a>',
             esc_url( admin_url( 'admin.php?page=nexafi-financing' ) ),
-            __( 'Dashboard', 'contact-form' )
+            __( 'Dashboard', 'nexafi-plugin' )
         );
         $check_update_link = sprintf(
             '<a href="%s">%s</a>',
             esc_url( wp_nonce_url( admin_url( 'plugins.php?nexafi_check_update=1' ), 'nexafi_check_update_nonce' ) ),
-            __( 'Check for Updates', 'contact-form' )
+            __( 'Check for Updates', 'nexafi-plugin' )
         );
         array_unshift( $links, $settings_link, $check_update_link );
         return $links;

@@ -123,19 +123,19 @@ class NexaFi_Calculator {
      */
     public static function validate_settings( $upfront_pct, $financed_pct, $charge_pct, $repayment_term ) {
         if ( $upfront_pct < 0 || $upfront_pct > 100 ) {
-            return new WP_Error( 'invalid_upfront', __( 'Upfront contribution percentage must be between 0% and 100%.', 'contact-form' ) );
+            return new WP_Error( 'invalid_upfront', __( 'Upfront contribution percentage must be between 0% and 100%.', 'nexafi-plugin' ) );
         }
         if ( $financed_pct < 0 || $financed_pct > 100 ) {
-            return new WP_Error( 'invalid_financed', __( 'Financed percentage must be between 0% and 100%.', 'contact-form' ) );
+            return new WP_Error( 'invalid_financed', __( 'Financed percentage must be between 0% and 100%.', 'nexafi-plugin' ) );
         }
         if ( round( $upfront_pct + $financed_pct, 2 ) !== 100.0 ) {
-            return new WP_Error( 'pct_sum_mismatch', __( 'Upfront percentage and financed percentage must sum to exactly 100%.', 'contact-form' ) );
+            return new WP_Error( 'pct_sum_mismatch', __( 'Upfront percentage and financed percentage must sum to exactly 100%.', 'nexafi-plugin' ) );
         }
         if ( $charge_pct < 0 ) {
-            return new WP_Error( 'invalid_charge', __( 'Financing charge percentage cannot be negative.', 'contact-form' ) );
+            return new WP_Error( 'invalid_charge', __( 'Financing charge percentage cannot be negative.', 'nexafi-plugin' ) );
         }
         if ( $repayment_term < 1 || $repayment_term > 120 ) {
-            return new WP_Error( 'invalid_term', __( 'Repayment term must be between 1 and 120 months.', 'contact-form' ) );
+            return new WP_Error( 'invalid_term', __( 'Repayment term must be between 1 and 120 months.', 'nexafi-plugin' ) );
         }
         return true;
     }

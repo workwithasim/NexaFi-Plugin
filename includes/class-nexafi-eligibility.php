@@ -39,11 +39,11 @@ class NexaFi_Eligibility {
             return array(
                 'is_eligible'        => false,
                 'result'             => 'ineligible',
-                'reason'             => __( 'Applicant consent was not provided.', 'contact-form' ),
+                'reason'             => __( 'Applicant consent was not provided.', 'nexafi-plugin' ),
                 'decision_mode'      => $decision_mode,
                 'rule_version'       => $rule_version,
-                'headline'           => __( 'Consent Required', 'contact-form' ),
-                'message'            => __( 'Financing authorization consent is required to process this application.', 'contact-form' ),
+                'headline'           => __( 'Consent Required', 'nexafi-plugin' ),
+                'message'            => __( 'Financing authorization consent is required to process this application.', 'nexafi-plugin' ),
                 'requires_contact'   => true,
             );
         }
@@ -61,13 +61,13 @@ class NexaFi_Eligibility {
         if ( ! $has_id || ! $has_debit ) {
             $missing = array();
             if ( ! $has_id ) {
-                $missing[] = __( 'valid unexpired driver’s license or state ID', 'contact-form' );
+                $missing[] = __( 'valid unexpired driver’s license or state ID', 'nexafi-plugin' );
             }
             if ( ! $has_debit ) {
-                $missing[] = __( 'active debit card from a traditional bank or credit union', 'contact-form' );
+                $missing[] = __( 'active debit card from a traditional bank or credit union', 'nexafi-plugin' );
             }
 
-            $reason = __( 'Unfortunately, you don’t currently meet the requirements for our in-house financing program. Don’t worry! Your GDG Smiles representative can help you explore other available payment options.', 'contact-form' );
+            $reason = __( 'Unfortunately, you don’t currently meet the requirements for our in-house financing program. Don’t worry! Your GDG Smiles representative can help you explore other available payment options.', 'nexafi-plugin' );
 
             $ineligibility_msg = $reason;
 
@@ -77,7 +77,7 @@ class NexaFi_Eligibility {
                 'reason'             => $reason,
                 'decision_mode'      => $decision_mode,
                 'rule_version'       => $rule_version,
-                'headline'           => __( 'We’re Unable to Offer In-House Financing Right Now', 'contact-form' ),
+                'headline'           => __( 'We’re Unable to Offer In-House Financing Right Now', 'nexafi-plugin' ),
                 'message'            => $ineligibility_msg,
                 'requires_contact'   => true,
             );
@@ -87,11 +87,11 @@ class NexaFi_Eligibility {
         return array(
             'is_eligible'        => true,
             'result'             => 'approved',
-            'reason'             => __( 'All program declarations and authorization criteria satisfied.', 'contact-form' ),
+            'reason'             => __( 'All program declarations and authorization criteria satisfied.', 'nexafi-plugin' ),
             'decision_mode'      => 'final_authorized',
             'rule_version'       => $rule_version,
-            'headline'           => __( "YOU'RE APPROVED!", 'contact-form' ),
-            'subtitle'           => __( 'Your GDG Smiles in-house financing has been approved.', 'contact-form' ),
+            'headline'           => __( "YOU'RE APPROVED!", 'nexafi-plugin' ),
+            'subtitle'           => __( 'Your GDG Smiles in-house financing has been approved.', 'nexafi-plugin' ),
             'message'            => '',
             'requires_contact'   => false,
         );

@@ -53,8 +53,8 @@ class NexaFi_Admin {
      */
     public function register_admin_menus() {
         $hook_main = add_menu_page(
-            __( 'NexaFi Financing', 'contact-form' ),
-            __( 'NexaFi Financing', 'contact-form' ),
+            __( 'NexaFi Financing', 'nexafi-plugin' ),
+            __( 'NexaFi Financing', 'nexafi-plugin' ),
             'manage_options',
             'nexafi-financing',
             array( $this, 'render_applications_page' ),
@@ -64,8 +64,8 @@ class NexaFi_Admin {
 
         add_submenu_page(
             'nexafi-financing',
-            __( 'Applications — NexaFi', 'contact-form' ),
-            __( 'Applications', 'contact-form' ),
+            __( 'Applications — NexaFi', 'nexafi-plugin' ),
+            __( 'Applications', 'nexafi-plugin' ),
             'manage_options',
             'nexafi-financing',
             array( $this, 'render_applications_page' )
@@ -73,8 +73,8 @@ class NexaFi_Admin {
 
         add_submenu_page(
             'nexafi-financing',
-            __( 'GDG Representatives — NexaFi', 'contact-form' ),
-            __( 'Representatives', 'contact-form' ),
+            __( 'GDG Representatives — NexaFi', 'nexafi-plugin' ),
+            __( 'Representatives', 'nexafi-plugin' ),
             'manage_options',
             'nexafi-representatives',
             array( $this, 'render_representatives_page' )
@@ -82,8 +82,8 @@ class NexaFi_Admin {
 
         add_submenu_page(
             'nexafi-financing',
-            __( 'Email Logs — NexaFi', 'contact-form' ),
-            __( 'Email Logs', 'contact-form' ),
+            __( 'Email Logs — NexaFi', 'nexafi-plugin' ),
+            __( 'Email Logs', 'nexafi-plugin' ),
             'manage_options',
             'nexafi-email-logs',
             array( $this, 'render_email_logs_page' )
@@ -91,8 +91,8 @@ class NexaFi_Admin {
 
         add_submenu_page(
             'nexafi-financing',
-            __( 'Reports & Analytics — NexaFi', 'contact-form' ),
-            __( 'Reports', 'contact-form' ),
+            __( 'Reports & Analytics — NexaFi', 'nexafi-plugin' ),
+            __( 'Reports', 'nexafi-plugin' ),
             'manage_options',
             'nexafi-reports',
             array( $this, 'render_reports_page' )
@@ -100,8 +100,8 @@ class NexaFi_Admin {
 
         add_submenu_page(
             'nexafi-financing',
-            __( 'Settings & Policies — NexaFi', 'contact-form' ),
-            __( 'Settings', 'contact-form' ),
+            __( 'Settings & Policies — NexaFi', 'nexafi-plugin' ),
+            __( 'Settings', 'nexafi-plugin' ),
             'manage_options',
             'nexafi-settings',
             array( $this, 'render_settings_page' )
@@ -137,8 +137,8 @@ class NexaFi_Admin {
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce'    => wp_create_nonce( 'nexafi_admin_action_nonce' ),
             'i18n'     => array(
-                'confirm_delete'      => __( 'Are you sure you want to delete this record? This action cannot be undone.', 'contact-form' ),
-                'confirm_policy_text' => __( 'WARNING: Enabling Final Approval wording confirms written authorization has been obtained from GDG & iCare. Are you sure you wish to enable final approval mode?', 'contact-form' ),
+                'confirm_delete'      => __( 'Are you sure you want to delete this record? This action cannot be undone.', 'nexafi-plugin' ),
+                'confirm_policy_text' => __( 'WARNING: Enabling Final Approval wording confirms written authorization has been obtained from GDG & iCare. Are you sure you wish to enable final approval mode?', 'nexafi-plugin' ),
             ),
         ) );
     }
@@ -429,27 +429,27 @@ class NexaFi_Admin {
     public function render_top_navigation( $active_tab = 'applications' ) {
         $tabs = array(
             'applications'    => array(
-                'label' => __( 'Applications', 'contact-form' ),
+                'label' => __( 'Applications', 'nexafi-plugin' ),
                 'url'   => admin_url( 'admin.php?page=nexafi-financing' ),
                 'icon'  => 'dashicons-clipboard',
             ),
             'representatives' => array(
-                'label' => __( 'Representatives', 'contact-form' ),
+                'label' => __( 'Representatives', 'nexafi-plugin' ),
                 'url'   => admin_url( 'admin.php?page=nexafi-representatives' ),
                 'icon'  => 'dashicons-id-alt',
             ),
             'email-logs'      => array(
-                'label' => __( 'Email Logs', 'contact-form' ),
+                'label' => __( 'Email Logs', 'nexafi-plugin' ),
                 'url'   => admin_url( 'admin.php?page=nexafi-email-logs' ),
                 'icon'  => 'dashicons-email-alt',
             ),
             'reports'         => array(
-                'label' => __( 'Reports', 'contact-form' ),
+                'label' => __( 'Reports', 'nexafi-plugin' ),
                 'url'   => admin_url( 'admin.php?page=nexafi-reports' ),
                 'icon'  => 'dashicons-chart-area',
             ),
             'settings'        => array(
-                'label' => __( 'Settings', 'contact-form' ),
+                'label' => __( 'Settings', 'nexafi-plugin' ),
                 'url'   => admin_url( 'admin.php?page=nexafi-settings' ),
                 'icon'  => 'dashicons-admin-settings',
             ),
@@ -464,7 +464,7 @@ class NexaFi_Admin {
                 <span class="nexafi-topnav__version">v<?php echo esc_html( NEXAFI_CF_VERSION ); ?></span>
             </div>
 
-            <nav class="nexafi-topnav__menu" aria-label="<?php esc_attr_e( 'NexaFi Navigation', 'contact-form' ); ?>">
+            <nav class="nexafi-topnav__menu" aria-label="<?php esc_attr_e( 'NexaFi Navigation', 'nexafi-plugin' ); ?>">
                 <?php foreach ( $tabs as $slug => $tab ) : ?>
                     <a href="<?php echo esc_url( $tab['url'] ); ?>" class="nexafi-navlink <?php echo $slug === $active_tab ? 'nexafi-navlink--active' : ''; ?>">
                         <span><?php echo esc_html( $tab['label'] ); ?></span>
@@ -538,7 +538,7 @@ class NexaFi_Admin {
                         'date_from'     => $date_from,
                         'date_to'       => $date_to,
                     ), admin_url( 'admin.php' ) ), 'nexafi_export_csv_action', 'nexafi_export_nonce' ) ); ?>" class="button button-primary nexafi-header-btn nexafi-export-btn">
-                        <?php esc_html_e( 'Export Filtered CSV', 'contact-form' ); ?>
+                        <?php esc_html_e( 'Export Filtered CSV', 'nexafi-plugin' ); ?>
                     </a>
                 </div>
             </div>
@@ -599,8 +599,8 @@ class NexaFi_Admin {
 
                         <input type="date" name="date_from" value="<?php echo esc_attr( $date_from ); ?>" title="Filter by Date" class="nexafi-admin-input-date" />
 
-                        <button type="submit" class="button button-primary nexafi-filter-btn"><?php esc_html_e( 'Filter', 'contact-form' ); ?></button>
-                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-financing' ) ); ?>" class="button button-secondary nexafi-reset-btn"><?php esc_html_e( 'Reset', 'contact-form' ); ?></a>
+                        <button type="submit" class="button button-primary nexafi-filter-btn"><?php esc_html_e( 'Filter', 'nexafi-plugin' ); ?></button>
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-financing' ) ); ?>" class="button button-secondary nexafi-reset-btn"><?php esc_html_e( 'Reset', 'nexafi-plugin' ); ?></a>
                     </div>
                 </form>
             </div>
@@ -610,32 +610,32 @@ class NexaFi_Admin {
                 <table class="wp-list-table widefat striped nexafi-apps-table">
                     <thead>
                         <tr>
-                            <th scope="col" class="manage-column column-ref"><?php esc_html_e( 'Reference #', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-applicant column-primary"><?php esc_html_e( 'Applicant', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-rep"><?php esc_html_e( 'Representative', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-quote"><?php esc_html_e( 'Quote / Financed', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-decision"><?php esc_html_e( 'Eligibility Decision', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-status"><?php esc_html_e( 'Application Status', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-date"><?php esc_html_e( 'Submitted', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-ref"><?php esc_html_e( 'Reference #', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-applicant column-primary"><?php esc_html_e( 'Applicant', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-rep"><?php esc_html_e( 'Representative', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-quote"><?php esc_html_e( 'Quote / Financed', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-decision"><?php esc_html_e( 'Eligibility Decision', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-status"><?php esc_html_e( 'Application Status', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-date"><?php esc_html_e( 'Submitted', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'nexafi-plugin' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if ( empty( $applications ) ) : ?>
                             <tr>
                                 <td colspan="8" style="text-align: center; padding: 30px;">
-                                    <em><?php esc_html_e( 'No applications found matching your criteria.', 'contact-form' ); ?></em>
+                                    <em><?php esc_html_e( 'No applications found matching your criteria.', 'nexafi-plugin' ); ?></em>
                                 </td>
                             </tr>
                         <?php else : ?>
                             <?php foreach ( $applications as $app ) : ?>
                                 <tr>
-                                    <td class="column-ref" data-colname="<?php esc_attr_e( 'Reference #', 'contact-form' ); ?>">
-                                        <a href="#" class="nexafi-view-detail-link" data-app-id="<?php echo esc_attr( $app->id ); ?>" title="<?php esc_attr_e( 'View application details', 'contact-form' ); ?>">
+                                    <td class="column-ref" data-colname="<?php esc_attr_e( 'Reference #', 'nexafi-plugin' ); ?>">
+                                        <a href="#" class="nexafi-view-detail-link" data-app-id="<?php echo esc_attr( $app->id ); ?>" title="<?php esc_attr_e( 'View application details', 'nexafi-plugin' ); ?>">
                                             <?php echo esc_html( $app->reference_number ); ?>
                                         </a>
                                     </td>
-                                    <td class="column-applicant column-primary" data-colname="<?php esc_attr_e( 'Applicant', 'contact-form' ); ?>">
+                                    <td class="column-applicant column-primary" data-colname="<?php esc_attr_e( 'Applicant', 'nexafi-plugin' ); ?>">
                                         <div class="nexafi-applicant-cell">
                                             <strong><?php echo esc_html( $app->first_name . ' ' . $app->last_name ); ?></strong>
                                             <div class="nexafi-sub-meta">
@@ -651,47 +651,47 @@ class NexaFi_Admin {
                                             <?php endif; ?>
                                         </div>
                                     </td>
-                                    <td class="column-rep" data-colname="<?php esc_attr_e( 'Representative', 'contact-form' ); ?>">
+                                    <td class="column-rep" data-colname="<?php esc_attr_e( 'Representative', 'nexafi-plugin' ); ?>">
                                         <span class="nexafi-rep-tag"><?php echo esc_html( $app->rep_id_str ); ?></span>
                                     </td>
-                                    <td class="column-quote" data-colname="<?php esc_attr_e( 'Quote / Financed', 'contact-form' ); ?>">
+                                    <td class="column-quote" data-colname="<?php esc_attr_e( 'Quote / Financed', 'nexafi-plugin' ); ?>">
                                         <div><strong>Quote:</strong> <?php echo esc_html( NexaFi_Calculator::format_currency( $app->treatment_quote ) ); ?></div>
                                         <div class="nexafi-sub-meta">Financed: <?php echo esc_html( NexaFi_Calculator::format_currency( $app->financed_amount ) ); ?> (<?php echo esc_html( NexaFi_Calculator::format_currency( $app->monthly_payment ) ); ?>/mo)</div>
                                     </td>
-                                    <td class="column-decision" data-colname="<?php esc_attr_e( 'Eligibility Decision', 'contact-form' ); ?>">
+                                    <td class="column-decision" data-colname="<?php esc_attr_e( 'Eligibility Decision', 'nexafi-plugin' ); ?>">
                                         <?php if ( 'approved' === $app->eligibility_result || 'approved' === $app->application_status ) : ?>
-                                            <span class="nexafi-badge nexafi-badge-success"><?php esc_html_e( 'Approved', 'contact-form' ); ?></span>
-                                            <div class="nexafi-sub-meta"><?php esc_html_e( 'Automated Rule', 'contact-form' ); ?></div>
+                                            <span class="nexafi-badge nexafi-badge-success"><?php esc_html_e( 'Approved', 'nexafi-plugin' ); ?></span>
+                                            <div class="nexafi-sub-meta"><?php esc_html_e( 'Automated Rule', 'nexafi-plugin' ); ?></div>
                                         <?php else : ?>
-                                            <span class="nexafi-badge nexafi-badge-warning"><?php esc_html_e( 'Ineligible', 'contact-form' ); ?></span>
-                                            <div class="nexafi-sub-meta"><?php esc_html_e( 'Criteria Unmet', 'contact-form' ); ?></div>
+                                            <span class="nexafi-badge nexafi-badge-warning"><?php esc_html_e( 'Ineligible', 'nexafi-plugin' ); ?></span>
+                                            <div class="nexafi-sub-meta"><?php esc_html_e( 'Criteria Unmet', 'nexafi-plugin' ); ?></div>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="column-status" data-colname="<?php esc_attr_e( 'Application Status', 'contact-form' ); ?>">
+                                    <td class="column-status" data-colname="<?php esc_attr_e( 'Application Status', 'nexafi-plugin' ); ?>">
                                         <?php if ( ! empty( $app->terms_accepted ) || 'accepted' === $app->application_status ) : ?>
-                                            <span class="nexafi-badge nexafi-badge-primary"><?php esc_html_e( 'Accepted Offer', 'contact-form' ); ?></span>
+                                            <span class="nexafi-badge nexafi-badge-primary"><?php esc_html_e( 'Accepted Offer', 'nexafi-plugin' ); ?></span>
                                         <?php elseif ( 'approved' === $app->eligibility_result || 'approved' === $app->application_status ) : ?>
-                                            <span class="nexafi-badge nexafi-badge-success"><?php esc_html_e( 'Approved', 'contact-form' ); ?></span>
+                                            <span class="nexafi-badge nexafi-badge-success"><?php esc_html_e( 'Approved', 'nexafi-plugin' ); ?></span>
                                         <?php else : ?>
-                                            <span class="nexafi-badge nexafi-badge-warning"><?php esc_html_e( 'Ineligible', 'contact-form' ); ?></span>
+                                            <span class="nexafi-badge nexafi-badge-warning"><?php esc_html_e( 'Ineligible', 'nexafi-plugin' ); ?></span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="column-date" data-colname="<?php esc_attr_e( 'Submitted', 'contact-form' ); ?>">
+                                    <td class="column-date" data-colname="<?php esc_attr_e( 'Submitted', 'nexafi-plugin' ); ?>">
                                         <?php echo esc_html( wp_date( 'M j, Y g:i A', strtotime( $app->created_at ) ) ); ?>
                                     </td>
-                                    <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'contact-form' ); ?>">
+                                    <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'nexafi-plugin' ); ?>">
                                         <div class="nexafi-table-actions">
-                                            <button type="button" class="button button-small nexafi-action-btn nexafi-action-btn-view nexafi-view-detail-btn" data-app-id="<?php echo esc_attr( $app->id ); ?>" title="<?php esc_attr_e( 'View application details', 'contact-form' ); ?>">
-                                                <span><?php esc_html_e( 'View', 'contact-form' ); ?></span>
+                                            <button type="button" class="button button-small nexafi-action-btn nexafi-action-btn-view nexafi-view-detail-btn" data-app-id="<?php echo esc_attr( $app->id ); ?>" title="<?php esc_attr_e( 'View application details', 'nexafi-plugin' ); ?>">
+                                                <span><?php esc_html_e( 'View', 'nexafi-plugin' ); ?></span>
                                             </button>
                                             <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array(
                                                 'nexafi_action' => 'delete_application',
                                                 'app_id'        => $app->id,
                                             ), admin_url( 'admin.php?page=nexafi-financing' ) ), 'nexafi_delete_app_' . $app->id, 'nexafi_delete_nonce' ) ); ?>" 
                                                class="button button-small nexafi-action-btn nexafi-action-btn-delete" 
-                                               onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to delete this application record?', 'contact-form' ) ); ?>');" 
-                                               title="<?php esc_attr_e( 'Delete application', 'contact-form' ); ?>">
-                                                <span><?php esc_html_e( 'Delete', 'contact-form' ); ?></span>
+                                               onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to delete this application record?', 'nexafi-plugin' ) ); ?>');" 
+                                               title="<?php esc_attr_e( 'Delete application', 'nexafi-plugin' ); ?>">
+                                                <span><?php esc_html_e( 'Delete', 'nexafi-plugin' ); ?></span>
                                             </a>
                                         </div>
                                     </td>
@@ -709,7 +709,7 @@ class NexaFi_Admin {
                         <span class="displaying-num">
                             <?php
                             /* translators: %s: number of items */
-                            echo esc_html( sprintf( _n( '%s item', '%s items', $total_count, 'contact-form' ), number_format_i18n( $total_count ) ) );
+                            echo esc_html( sprintf( _n( '%s item', '%s items', $total_count, 'nexafi-plugin' ), number_format_i18n( $total_count ) ) );
                             ?>
                         </span>
                         <?php
@@ -767,7 +767,7 @@ class NexaFi_Admin {
                 </div>
                 <div>
                     <button type="button" class="button button-primary nexafi-header-btn" id="nexafi-add-rep-btn">
-                        <?php esc_html_e( 'Add Representative', 'contact-form' ); ?>
+                        <?php esc_html_e( 'Add Representative', 'nexafi-plugin' ); ?>
                     </button>
                 </div>
             </div>
@@ -791,18 +791,18 @@ class NexaFi_Admin {
                 <table class="wp-list-table widefat striped nexafi-reps-table">
                     <thead>
                         <tr>
-                            <th scope="col" class="manage-column column-photo" style="width: 56px; text-align: center;"><?php esc_html_e( 'Photo', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-repid"><?php esc_html_e( 'Rep ID', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-name column-primary"><?php esc_html_e( 'Name', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-contact"><?php esc_html_e( 'Contact Details', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-apps"><?php esc_html_e( 'Applications', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-photo" style="width: 56px; text-align: center;"><?php esc_html_e( 'Photo', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-repid"><?php esc_html_e( 'Rep ID', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-name column-primary"><?php esc_html_e( 'Name', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-contact"><?php esc_html_e( 'Contact Details', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-apps"><?php esc_html_e( 'Applications', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'nexafi-plugin' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if ( empty( $reps ) ) : ?>
-                            <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;"><em><?php esc_html_e( 'No representatives found. Click "Add Representative" to create one.', 'contact-form' ); ?></em></td></tr>
+                            <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;"><em><?php esc_html_e( 'No representatives found. Click "Add Representative" to create one.', 'nexafi-plugin' ); ?></em></td></tr>
                         <?php else : ?>
                             <?php foreach ( $reps as $r ) : ?>
                                 <?php
@@ -810,26 +810,26 @@ class NexaFi_Admin {
                                 $photo = ! empty( $r->photo_url ) ? $r->photo_url : $default_photo;
                                 ?>
                                 <tr>
-                                    <td class="column-photo" data-colname="<?php esc_attr_e( 'Photo', 'contact-form' ); ?>" style="text-align: center; width: 56px;">
+                                    <td class="column-photo" data-colname="<?php esc_attr_e( 'Photo', 'nexafi-plugin' ); ?>" style="text-align: center; width: 56px;">
                                         <img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $r->name ); ?>" class="nexafi-rep-avatar-img" width="42" height="42" style="width:42px;height:42px;border-radius:50%;object-fit:cover;display:block;margin:0 auto;" />
                                     </td>
-                                    <td class="column-repid" data-colname="<?php esc_attr_e( 'Rep ID', 'contact-form' ); ?>"><span class="nexafi-rep-tag"><?php echo esc_html( $r->rep_id ); ?></span></td>
-                                    <td class="column-name column-primary" data-colname="<?php esc_attr_e( 'Name', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( $r->name ); ?></strong></td>
-                                    <td class="column-contact" data-colname="<?php esc_attr_e( 'Contact Details', 'contact-form' ); ?>">
+                                    <td class="column-repid" data-colname="<?php esc_attr_e( 'Rep ID', 'nexafi-plugin' ); ?>"><span class="nexafi-rep-tag"><?php echo esc_html( $r->rep_id ); ?></span></td>
+                                    <td class="column-name column-primary" data-colname="<?php esc_attr_e( 'Name', 'nexafi-plugin' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( $r->name ); ?></strong></td>
+                                    <td class="column-contact" data-colname="<?php esc_attr_e( 'Contact Details', 'nexafi-plugin' ); ?>">
                                         <div style="color: #1e293b;"><a href="mailto:<?php echo esc_attr( $r->email ); ?>"><?php echo esc_html( $r->email ); ?></a></div>
                                         <div class="nexafi-sub-meta"><?php echo esc_html( $r->phone ); ?></div>
                                     </td>
-                                    <td class="column-apps" data-colname="<?php esc_attr_e( 'Applications', 'contact-form' ); ?>">
-                                        <span class="nexafi-badge nexafi-badge-info"><?php echo intval( $r->apps_count ); ?> <?php esc_html_e( 'apps', 'contact-form' ); ?></span>
+                                    <td class="column-apps" data-colname="<?php esc_attr_e( 'Applications', 'nexafi-plugin' ); ?>">
+                                        <span class="nexafi-badge nexafi-badge-info"><?php echo intval( $r->apps_count ); ?> <?php esc_html_e( 'apps', 'nexafi-plugin' ); ?></span>
                                     </td>
-                                    <td class="column-status" data-colname="<?php esc_attr_e( 'Status', 'contact-form' ); ?>">
+                                    <td class="column-status" data-colname="<?php esc_attr_e( 'Status', 'nexafi-plugin' ); ?>">
                                         <?php if ( $r->is_active ) : ?>
-                                            <span class="nexafi-badge nexafi-badge-success"><?php esc_html_e( 'Active', 'contact-form' ); ?></span>
+                                            <span class="nexafi-badge nexafi-badge-success"><?php esc_html_e( 'Active', 'nexafi-plugin' ); ?></span>
                                         <?php else : ?>
-                                            <span class="nexafi-badge nexafi-badge-warning"><?php esc_html_e( 'Inactive', 'contact-form' ); ?></span>
+                                            <span class="nexafi-badge nexafi-badge-warning"><?php esc_html_e( 'Inactive', 'nexafi-plugin' ); ?></span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'contact-form' ); ?>">
+                                    <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'nexafi-plugin' ); ?>">
                                         <div class="nexafi-rep-actions-wrap">
                                             <button type="button" class="button button-small nexafi-action-btn nexafi-action-btn-edit nexafi-edit-rep-btn" 
                                                     data-id="<?php echo esc_attr( $r->id ); ?>"
@@ -840,16 +840,16 @@ class NexaFi_Admin {
                                                     data-photo="<?php echo esc_attr( $r->photo_url ); ?>"
                                                     data-notes="<?php echo esc_attr( $r->notes ); ?>"
                                                     data-active="<?php echo esc_attr( $r->is_active ); ?>">
-                                                <span><?php esc_html_e( 'Edit', 'contact-form' ); ?></span>
+                                                <span><?php esc_html_e( 'Edit', 'nexafi-plugin' ); ?></span>
                                             </button>
                                             <button type="button" class="button button-small nexafi-action-btn nexafi-action-btn-toggle nexafi-toggle-rep-btn" data-id="<?php echo esc_attr( $r->id ); ?>" data-active="<?php echo esc_attr( $r->is_active ); ?>">
-                                                <span><?php echo $r->is_active ? esc_html__( 'Deactivate', 'contact-form' ) : esc_html__( 'Activate', 'contact-form' ); ?></span>
+                                                <span><?php echo $r->is_active ? esc_html__( 'Deactivate', 'nexafi-plugin' ) : esc_html__( 'Activate', 'nexafi-plugin' ); ?></span>
                                             </button>
                                             <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array(
                                                 'nexafi_action' => 'delete_representative',
                                                 'rep_id'        => $r->id,
-                                            ), admin_url( 'admin.php?page=nexafi-representatives' ) ), 'nexafi_delete_rep_' . $r->id, 'nexafi_delete_nonce' ) ); ?>" class="button button-small nexafi-action-btn nexafi-action-btn-delete nexafi-delete-rep-btn" onclick="return confirm('<?php echo esc_js( __( 'Delete this representative?', 'contact-form' ) ); ?>');">
-                                                <span><?php esc_html_e( 'Delete', 'contact-form' ); ?></span>
+                                            ), admin_url( 'admin.php?page=nexafi-representatives' ) ), 'nexafi_delete_rep_' . $r->id, 'nexafi_delete_nonce' ) ); ?>" class="button button-small nexafi-action-btn nexafi-action-btn-delete nexafi-delete-rep-btn" onclick="return confirm('<?php echo esc_js( __( 'Delete this representative?', 'nexafi-plugin' ) ); ?>');">
+                                                <span><?php esc_html_e( 'Delete', 'nexafi-plugin' ); ?></span>
                                             </a>
                                         </div>
                                     </td>
@@ -870,36 +870,36 @@ class NexaFi_Admin {
                         <input type="hidden" name="rep_db_id" id="rep_db_id" value="0" />
 
                         <div class="nexafi-modal-header">
-                            <h2 class="nexafi-modal-title" id="rep-modal-title"><?php esc_html_e( 'Add Representative', 'contact-form' ); ?></h2>
-                            <button type="button" class="nexafi-modal-close" aria-label="<?php esc_attr_e( 'Close', 'contact-form' ); ?>">&times;</button>
+                            <h2 class="nexafi-modal-title" id="rep-modal-title"><?php esc_html_e( 'Add Representative', 'nexafi-plugin' ); ?></h2>
+                            <button type="button" class="nexafi-modal-close" aria-label="<?php esc_attr_e( 'Close', 'nexafi-plugin' ); ?>">&times;</button>
                         </div>
                         <div class="nexafi-modal-body">
                             <div class="nexafi-form-grid-2">
                                 <div class="nexafi-form-col">
-                                    <label class="nexafi-admin-label" for="rep_field_id"><?php esc_html_e( 'Representative ID *', 'contact-form' ); ?></label>
+                                    <label class="nexafi-admin-label" for="rep_field_id"><?php esc_html_e( 'Representative ID *', 'nexafi-plugin' ); ?></label>
                                     <input type="text" name="rep_id" id="rep_field_id" placeholder="e.g. GDG1027" required style="text-transform: uppercase;" />
                                 </div>
                                 <div class="nexafi-form-col">
-                                    <label class="nexafi-admin-label" for="rep_field_name"><?php esc_html_e( 'Full Name *', 'contact-form' ); ?></label>
+                                    <label class="nexafi-admin-label" for="rep_field_name"><?php esc_html_e( 'Full Name *', 'nexafi-plugin' ); ?></label>
                                     <input type="text" name="name" id="rep_field_name" placeholder="e.g. Caleb Johnson" required />
                                 </div>
                             </div>
                             <div class="nexafi-form-grid-2">
                                 <div class="nexafi-form-col">
-                                    <label class="nexafi-admin-label" for="rep_field_email"><?php esc_html_e( 'Email Address', 'contact-form' ); ?></label>
+                                    <label class="nexafi-admin-label" for="rep_field_email"><?php esc_html_e( 'Email Address', 'nexafi-plugin' ); ?></label>
                                     <input type="email" name="email" id="rep_field_email" placeholder="name@gdgsmiles.com" />
                                 </div>
                                 <div class="nexafi-form-col">
-                                    <label class="nexafi-admin-label" for="rep_field_phone"><?php esc_html_e( 'Phone Number', 'contact-form' ); ?></label>
+                                    <label class="nexafi-admin-label" for="rep_field_phone"><?php esc_html_e( 'Phone Number', 'nexafi-plugin' ); ?></label>
                                     <input type="text" name="phone" id="rep_field_phone" placeholder="(555) 000-0000" />
                                 </div>
                             </div>
                             <div class="nexafi-form-row">
-                                <label class="nexafi-admin-label"><?php esc_html_e( 'Representative Photo', 'contact-form' ); ?></label>
+                                <label class="nexafi-admin-label"><?php esc_html_e( 'Representative Photo', 'nexafi-plugin' ); ?></label>
                                 <input type="hidden" name="photo_url" id="rep_field_photo" value="" />
                                 <div class="nexafi-photo-upload-wrap">
                                     <div class="nexafi-photo-preview-box">
-                                        <img id="rep_photo_preview_img" src="" alt="<?php esc_attr_e( 'Preview', 'contact-form' ); ?>" style="display: none;" />
+                                        <img id="rep_photo_preview_img" src="" alt="<?php esc_attr_e( 'Preview', 'nexafi-plugin' ); ?>" style="display: none;" />
                                         <div id="rep_photo_placeholder" class="nexafi-photo-placeholder">
                                             <span class="dashicons dashicons-admin-users"></span>
                                         </div>
@@ -907,34 +907,34 @@ class NexaFi_Admin {
                                     <div class="nexafi-photo-controls">
                                         <div class="nexafi-photo-btn-group">
                                             <button type="button" class="button button-secondary" id="nexafi-upload-photo-btn">
-                                                <span id="nexafi-upload-btn-text"><?php esc_html_e( 'Upload Photo', 'contact-form' ); ?></span>
+                                                <span id="nexafi-upload-btn-text"><?php esc_html_e( 'Upload Photo', 'nexafi-plugin' ); ?></span>
                                             </button>
                                             <button type="button" class="button button-link-delete" id="nexafi-remove-photo-btn">
-                                                <?php esc_html_e( 'Remove', 'contact-form' ); ?>
+                                                <?php esc_html_e( 'Remove', 'nexafi-plugin' ); ?>
                                             </button>
                                         </div>
-                                        <p class="description" style="margin-top: 4px;"><?php esc_html_e( 'Square portrait photo (e.g. 200x200px).', 'contact-form' ); ?></p>
+                                        <p class="description" style="margin-top: 4px;"><?php esc_html_e( 'Square portrait photo (e.g. 200x200px).', 'nexafi-plugin' ); ?></p>
                                     </div>
                                 </div>
                             </div>
                             <div class="nexafi-form-row">
-                                <label class="nexafi-admin-label" for="rep_field_notes"><?php esc_html_e( 'Internal Notes (Optional)', 'contact-form' ); ?></label>
-                                <textarea name="notes" id="rep_field_notes" rows="2" placeholder="<?php esc_attr_e( 'Internal notes or clinic location...', 'contact-form' ); ?>"></textarea>
+                                <label class="nexafi-admin-label" for="rep_field_notes"><?php esc_html_e( 'Internal Notes (Optional)', 'nexafi-plugin' ); ?></label>
+                                <textarea name="notes" id="rep_field_notes" rows="2" placeholder="<?php esc_attr_e( 'Internal notes or clinic location...', 'nexafi-plugin' ); ?>"></textarea>
                             </div>
                             <div class="nexafi-form-row" style="margin-top: 8px;">
                                 <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; color: #334155;">
                                     <input type="checkbox" name="is_active" id="rep_field_active" value="1" checked style="margin: 0;" />
-                                    <span><?php esc_html_e( 'Active (Eligible to receive applications)', 'contact-form' ); ?></span>
+                                    <span><?php esc_html_e( 'Active (Eligible to receive applications)', 'nexafi-plugin' ); ?></span>
                                 </label>
                             </div>
                         </div>
                         <div class="nexafi-modal-footer">
-                            <a href="#" id="nexafi-modal-delete-rep-link" class="button button-link-delete nexafi-modal-delete-rep-btn" style="display: none;" onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to delete this representative?', 'contact-form' ) ); ?>');">
-                                <?php esc_html_e( 'Delete Representative', 'contact-form' ); ?>
+                            <a href="#" id="nexafi-modal-delete-rep-link" class="button button-link-delete nexafi-modal-delete-rep-btn" style="display: none;" onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to delete this representative?', 'nexafi-plugin' ) ); ?>');">
+                                <?php esc_html_e( 'Delete Representative', 'nexafi-plugin' ); ?>
                             </a>
                             <div class="nexafi-modal-footer-actions">
-                                <button type="button" class="button button-secondary nexafi-modal-close-btn"><?php esc_html_e( 'Cancel', 'contact-form' ); ?></button>
-                                <button type="submit" class="button button-primary"><?php esc_html_e( 'Save Representative', 'contact-form' ); ?></button>
+                                <button type="button" class="button button-secondary nexafi-modal-close-btn"><?php esc_html_e( 'Cancel', 'nexafi-plugin' ); ?></button>
+                                <button type="submit" class="button button-primary"><?php esc_html_e( 'Save Representative', 'nexafi-plugin' ); ?></button>
                             </div>
                         </div>
                     </form>
@@ -990,19 +990,19 @@ class NexaFi_Admin {
                         'nexafi_action' => 'clear_email_logs',
                     ), admin_url( 'admin.php' ) ), 'nexafi_clear_email_logs_action', 'nexafi_clear_nonce' ) ); ?>" 
                        class="button button-secondary" 
-                       onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to clear all email delivery logs?', 'contact-form' ) ); ?>');">
-                        <?php esc_html_e( 'Clear All Logs', 'contact-form' ); ?>
+                       onclick="return confirm('<?php echo esc_js( __( 'Are you sure you want to clear all email delivery logs?', 'nexafi-plugin' ) ); ?>');">
+                        <?php esc_html_e( 'Clear All Logs', 'nexafi-plugin' ); ?>
                     </a>
                     <?php endif; ?>
                 </div>
             </div>
 
             <?php if ( $deleted ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Email log entry deleted successfully.', 'contact-form' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Email log entry deleted successfully.', 'nexafi-plugin' ); ?></p></div>
             <?php endif; ?>
 
             <?php if ( $cleared ) : ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'All email delivery logs cleared successfully.', 'contact-form' ); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'All email delivery logs cleared successfully.', 'nexafi-plugin' ); ?></p></div>
             <?php endif; ?>
 
             <!-- Notification banner placeholder for AJAX resend responses -->
@@ -1015,16 +1015,16 @@ class NexaFi_Admin {
                 <form method="get" class="nexafi-admin-filters">
                     <input type="hidden" name="page" value="nexafi-email-logs" />
                     
-                    <input type="text" name="search" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search recipient, subject, reference...', 'contact-form' ); ?>" class="nexafi-admin-input" style="min-width: 260px;" />
+                    <input type="text" name="search" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search recipient, subject, reference...', 'nexafi-plugin' ); ?>" class="nexafi-admin-input" style="min-width: 260px;" />
 
                     <select name="status" class="nexafi-admin-select">
-                        <option value=""><?php esc_html_e( 'All Delivery Statuses', 'contact-form' ); ?></option>
-                        <option value="sent" <?php selected( $status, 'sent' ); ?>><?php esc_html_e( 'Sent Successfully', 'contact-form' ); ?></option>
-                        <option value="failed" <?php selected( $status, 'failed' ); ?>><?php esc_html_e( 'Delivery Failed', 'contact-form' ); ?></option>
+                        <option value=""><?php esc_html_e( 'All Delivery Statuses', 'nexafi-plugin' ); ?></option>
+                        <option value="sent" <?php selected( $status, 'sent' ); ?>><?php esc_html_e( 'Sent Successfully', 'nexafi-plugin' ); ?></option>
+                        <option value="failed" <?php selected( $status, 'failed' ); ?>><?php esc_html_e( 'Delivery Failed', 'nexafi-plugin' ); ?></option>
                     </select>
 
-                    <button type="submit" class="button button-primary nexafi-filter-btn"><?php esc_html_e( 'Filter Logs', 'contact-form' ); ?></button>
-                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-email-logs' ) ); ?>" class="button button-secondary nexafi-reset-btn"><?php esc_html_e( 'Reset', 'contact-form' ); ?></a>
+                    <button type="submit" class="button button-primary nexafi-filter-btn"><?php esc_html_e( 'Filter Logs', 'nexafi-plugin' ); ?></button>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-email-logs' ) ); ?>" class="button button-secondary nexafi-reset-btn"><?php esc_html_e( 'Reset', 'nexafi-plugin' ); ?></a>
                 </form>
             </div>
 
@@ -1033,33 +1033,33 @@ class NexaFi_Admin {
                 <table class="wp-list-table widefat striped nexafi-admin-table nexafi-logs-table">
                     <thead>
                         <tr>
-                            <th scope="col" class="manage-column column-id" style="width: 60px;"><?php esc_html_e( 'ID', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-date"><?php esc_html_e( 'Date & Time', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-recipient column-primary"><?php esc_html_e( 'Recipient', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-ref"><?php esc_html_e( 'Application Ref #', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-type"><?php esc_html_e( 'Email Type', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-details"><?php esc_html_e( 'Delivery Details / Error', 'contact-form' ); ?></th>
-                            <th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-id" style="width: 60px;"><?php esc_html_e( 'ID', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-date"><?php esc_html_e( 'Date & Time', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-recipient column-primary"><?php esc_html_e( 'Recipient', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-ref"><?php esc_html_e( 'Application Ref #', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-type"><?php esc_html_e( 'Email Type', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-details"><?php esc_html_e( 'Delivery Details / Error', 'nexafi-plugin' ); ?></th>
+                            <th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'nexafi-plugin' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if ( empty( $logs ) ) : ?>
                             <tr>
                                 <td colspan="8" style="text-align: center; padding: 30px; color: #64748b;">
-                                    <em><?php esc_html_e( 'No email delivery logs recorded yet. Outgoing emails from NexaFi will appear here.', 'contact-form' ); ?></em>
+                                    <em><?php esc_html_e( 'No email delivery logs recorded yet. Outgoing emails from NexaFi will appear here.', 'nexafi-plugin' ); ?></em>
                                 </td>
                             </tr>
                         <?php else : ?>
                             <?php foreach ( $logs as $log ) : 
                                 $is_sent = ( 'sent' === $log->status );
-                                $type_label = ( 'resend' === $log->email_type ) ? __( 'Resend Notification', 'contact-form' ) : ( ( 'admin_notification' === $log->email_type ) ? __( 'Admin Alert', 'contact-form' ) : __( 'Applicant Email', 'contact-form' ) );
+                                $type_label = ( 'resend' === $log->email_type ) ? __( 'Resend Notification', 'nexafi-plugin' ) : ( ( 'admin_notification' === $log->email_type ) ? __( 'Admin Alert', 'nexafi-plugin' ) : __( 'Applicant Email', 'nexafi-plugin' ) );
                                 $type_class = ( 'resend' === $log->email_type ) ? 'nexafi-type-resend' : ( ( 'admin_notification' === $log->email_type ) ? 'nexafi-type-alert' : 'nexafi-type-applicant' );
                             ?>
                             <tr id="nexafi-log-row-<?php echo intval( $log->id ); ?>">
-                                <td class="column-id" data-colname="<?php esc_attr_e( 'ID', 'contact-form' ); ?>"><strong>#<?php echo intval( $log->id ); ?></strong></td>
-                                <td class="column-date" data-colname="<?php esc_attr_e( 'Date & Time', 'contact-form' ); ?>"><?php echo esc_html( wp_date( 'M j, Y g:i A', strtotime( $log->sent_at ) ) ); ?></td>
-                                <td class="column-recipient column-primary" data-colname="<?php esc_attr_e( 'Recipient', 'contact-form' ); ?>">
+                                <td class="column-id" data-colname="<?php esc_attr_e( 'ID', 'nexafi-plugin' ); ?>"><strong>#<?php echo intval( $log->id ); ?></strong></td>
+                                <td class="column-date" data-colname="<?php esc_attr_e( 'Date & Time', 'nexafi-plugin' ); ?>"><?php echo esc_html( wp_date( 'M j, Y g:i A', strtotime( $log->sent_at ) ) ); ?></td>
+                                <td class="column-recipient column-primary" data-colname="<?php esc_attr_e( 'Recipient', 'nexafi-plugin' ); ?>">
                                     <div class="nexafi-recipient-cell">
                                         <strong><?php echo esc_html( $log->recipient_name ? $log->recipient_name : 'Applicant' ); ?></strong>
                                         <div class="nexafi-sub-meta">
@@ -1067,7 +1067,7 @@ class NexaFi_Admin {
                                         </div>
                                     </div>
                                 </td>
-                                <td class="column-ref" data-colname="<?php esc_attr_e( 'Application Ref #', 'contact-form' ); ?>">
+                                <td class="column-ref" data-colname="<?php esc_attr_e( 'Application Ref #', 'nexafi-plugin' ); ?>">
                                     <?php if ( ! empty( $log->reference_number ) ) : ?>
                                         <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-financing&search=' . urlencode( $log->reference_number ) ) ); ?>" class="nexafi-view-detail-link" data-app-id="<?php echo esc_attr( $log->application_id ); ?>">
                                             <?php echo esc_html( $log->reference_number ); ?>
@@ -1076,37 +1076,37 @@ class NexaFi_Admin {
                                         <span style="color: #94a3b8;">—</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="column-type" data-colname="<?php esc_attr_e( 'Email Type', 'contact-form' ); ?>">
+                                <td class="column-type" data-colname="<?php esc_attr_e( 'Email Type', 'nexafi-plugin' ); ?>">
                                     <span class="nexafi-type-tag <?php echo esc_attr( $type_class ); ?>">
                                         <?php echo esc_html( $type_label ); ?>
                                     </span>
                                 </td>
-                                <td class="column-status nexafi-log-status-cell" data-colname="<?php esc_attr_e( 'Status', 'contact-form' ); ?>">
+                                <td class="column-status nexafi-log-status-cell" data-colname="<?php esc_attr_e( 'Status', 'nexafi-plugin' ); ?>">
                                     <?php if ( $is_sent ) : ?>
-                                        <span class="nexafi-badge nexafi-badge-success">&#10003; <?php esc_html_e( 'Sent', 'contact-form' ); ?></span>
+                                        <span class="nexafi-badge nexafi-badge-success">&#10003; <?php esc_html_e( 'Sent', 'nexafi-plugin' ); ?></span>
                                     <?php else : ?>
-                                        <span class="nexafi-badge nexafi-badge-danger">&#10007; <?php esc_html_e( 'Failed', 'contact-form' ); ?></span>
+                                        <span class="nexafi-badge nexafi-badge-danger">&#10007; <?php esc_html_e( 'Failed', 'nexafi-plugin' ); ?></span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="column-details nexafi-log-error-cell" data-colname="<?php esc_attr_e( 'Delivery Details / Error', 'contact-form' ); ?>">
+                                <td class="column-details nexafi-log-error-cell" data-colname="<?php esc_attr_e( 'Delivery Details / Error', 'nexafi-plugin' ); ?>">
                                     <?php if ( ! empty( $log->error_message ) ) : ?>
                                         <div class="nexafi-error-snippet" title="<?php echo esc_attr( $log->error_message ); ?>">
                                             <span class="nexafi-error-icon">⚠️</span>
                                             <span><?php echo esc_html( $log->error_message ); ?></span>
                                         </div>
                                     <?php else : ?>
-                                        <span class="nexafi-success-snippet">&#10003; <?php esc_html_e( 'Delivered to mail server', 'contact-form' ); ?></span>
+                                        <span class="nexafi-success-snippet">&#10003; <?php esc_html_e( 'Delivered to mail server', 'nexafi-plugin' ); ?></span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'contact-form' ); ?>">
+                                <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'nexafi-plugin' ); ?>">
                                     <div class="nexafi-table-actions">
                                         <?php if ( ! empty( $log->application_id ) ) : ?>
                                             <button type="button" 
                                                     class="button button-small nexafi-action-btn nexafi-action-btn-resend nexafi-resend-email-btn" 
                                                     data-log-id="<?php echo esc_attr( $log->id ); ?>" 
                                                     data-app-id="<?php echo esc_attr( $log->application_id ); ?>"
-                                                    title="<?php esc_attr_e( 'Resend confirmation email to applicant', 'contact-form' ); ?>">
-                                                <span><?php esc_html_e( 'Resend', 'contact-form' ); ?></span>
+                                                    title="<?php esc_attr_e( 'Resend confirmation email to applicant', 'nexafi-plugin' ); ?>">
+                                                <span><?php esc_html_e( 'Resend', 'nexafi-plugin' ); ?></span>
                                             </button>
                                         <?php endif; ?>
                                         <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array(
@@ -1117,8 +1117,8 @@ class NexaFi_Admin {
                                            class="button button-small nexafi-action-btn nexafi-action-btn-delete nexafi-delete-email-log-btn" 
                                            data-log-id="<?php echo esc_attr( $log->id ); ?>" 
                                            data-nonce="<?php echo esc_attr( wp_create_nonce( 'nexafi_delete_log_' . $log->id ) ); ?>"
-                                           title="<?php esc_attr_e( 'Delete log', 'contact-form' ); ?>">
-                                            <span><?php esc_html_e( 'Delete', 'contact-form' ); ?></span>
+                                           title="<?php esc_attr_e( 'Delete log', 'nexafi-plugin' ); ?>">
+                                            <span><?php esc_html_e( 'Delete', 'nexafi-plugin' ); ?></span>
                                         </a>
                                     </div>
                                 </td>
@@ -1135,7 +1135,7 @@ class NexaFi_Admin {
                     <div class="tablenav-pages">
                         <span class="displaying-num"><?php
                         /* translators: %s: number of items */
-                        echo esc_html( sprintf( _n( '%s item', '%s items', $total_count, 'contact-form' ), number_format_i18n( $total_count ) ) ); ?></span>
+                        echo esc_html( sprintf( _n( '%s item', '%s items', $total_count, 'nexafi-plugin' ), number_format_i18n( $total_count ) ) ); ?></span>
                         <?php
                         echo wp_kses_post( paginate_links( array(
                             'base'      => add_query_arg( 'paged', '%#%' ),
@@ -1168,7 +1168,7 @@ class NexaFi_Admin {
             <div class="nexafi-admin-header">
                 <div>
                     <h1 class="wp-heading-inline"><span class="nexafi-brand-text">NexaFi</span> Reports &amp; Analytics</h1>
-                    <p class="description"><?php esc_html_e( 'Real-time breakdown of applications, authorized financing totals, and GDG representative performance.', 'contact-form' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Real-time breakdown of applications, authorized financing totals, and GDG representative performance.', 'nexafi-plugin' ); ?></p>
                 </div>
             </div>
 
@@ -1198,33 +1198,33 @@ class NexaFi_Admin {
             </div>
 
             <div class="nexafi-report-section" style="margin-top: 24px;">
-                <h2 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;"><?php esc_html_e( 'Applications Grouped by Representative', 'contact-form' ); ?></h2>
+                <h2 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;"><?php esc_html_e( 'Applications Grouped by Representative', 'nexafi-plugin' ); ?></h2>
                 <div class="nexafi-table-container">
                     <table class="wp-list-table widefat striped nexafi-reports-table">
                         <thead>
                             <tr>
-                                <th scope="col" class="manage-column column-repid" style="width: 120px;"><?php esc_html_e( 'Rep ID', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-repname column-primary"><?php esc_html_e( 'Representative Name', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-totalapps"><?php esc_html_e( 'Total Applications', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-approved"><?php esc_html_e( 'Approved / Eligible', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-accepted"><?php esc_html_e( 'Accepted Offers', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-quotes"><?php esc_html_e( 'Total Treatment Quotes', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-financed"><?php esc_html_e( 'Total Financed Amount', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-repid" style="width: 120px;"><?php esc_html_e( 'Rep ID', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-repname column-primary"><?php esc_html_e( 'Representative Name', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-totalapps"><?php esc_html_e( 'Total Applications', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-approved"><?php esc_html_e( 'Approved / Eligible', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-accepted"><?php esc_html_e( 'Accepted Offers', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-quotes"><?php esc_html_e( 'Total Treatment Quotes', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-financed"><?php esc_html_e( 'Total Financed Amount', 'nexafi-plugin' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if ( empty( $rep_stats ) ) : ?>
-                                <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;"><?php esc_html_e( 'No representative application data available.', 'contact-form' ); ?></td></tr>
+                                <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;"><?php esc_html_e( 'No representative application data available.', 'nexafi-plugin' ); ?></td></tr>
                             <?php else : ?>
                                 <?php foreach ( $rep_stats as $rs ) : ?>
                                     <tr>
-                                        <td class="column-repid" data-colname="<?php esc_attr_e( 'Rep ID', 'contact-form' ); ?>"><span class="nexafi-rep-tag"><?php echo esc_html( $rs->rep_id ); ?></span></td>
-                                        <td class="column-repname column-primary" data-colname="<?php esc_attr_e( 'Representative Name', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( $rs->name ); ?></strong></td>
-                                        <td class="column-totalapps" data-colname="<?php esc_attr_e( 'Total Applications', 'contact-form' ); ?>"><strong><?php echo intval( $rs->total_apps ); ?></strong></td>
-                                        <td class="column-approved" data-colname="<?php esc_attr_e( 'Approved / Eligible', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $rs->approved_apps ); ?></span></td>
-                                        <td class="column-accepted" data-colname="<?php esc_attr_e( 'Accepted Offers', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-info"><?php echo intval( $rs->accepted_apps ); ?></span></td>
-                                        <td class="column-quotes" data-colname="<?php esc_attr_e( 'Total Treatment Quotes', 'contact-form' ); ?>"><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_quote_amount ) ); ?></td>
-                                        <td class="column-financed" data-colname="<?php esc_attr_e( 'Total Financed Amount', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_financed_amount ) ); ?></strong></td>
+                                        <td class="column-repid" data-colname="<?php esc_attr_e( 'Rep ID', 'nexafi-plugin' ); ?>"><span class="nexafi-rep-tag"><?php echo esc_html( $rs->rep_id ); ?></span></td>
+                                        <td class="column-repname column-primary" data-colname="<?php esc_attr_e( 'Representative Name', 'nexafi-plugin' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( $rs->name ); ?></strong></td>
+                                        <td class="column-totalapps" data-colname="<?php esc_attr_e( 'Total Applications', 'nexafi-plugin' ); ?>"><strong><?php echo intval( $rs->total_apps ); ?></strong></td>
+                                        <td class="column-approved" data-colname="<?php esc_attr_e( 'Approved / Eligible', 'nexafi-plugin' ); ?>"><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $rs->approved_apps ); ?></span></td>
+                                        <td class="column-accepted" data-colname="<?php esc_attr_e( 'Accepted Offers', 'nexafi-plugin' ); ?>"><span class="nexafi-badge nexafi-badge-info"><?php echo intval( $rs->accepted_apps ); ?></span></td>
+                                        <td class="column-quotes" data-colname="<?php esc_attr_e( 'Total Treatment Quotes', 'nexafi-plugin' ); ?>"><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_quote_amount ) ); ?></td>
+                                        <td class="column-financed" data-colname="<?php esc_attr_e( 'Total Financed Amount', 'nexafi-plugin' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_financed_amount ) ); ?></strong></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -1234,31 +1234,31 @@ class NexaFi_Admin {
             </div>
 
             <div class="nexafi-report-section" style="margin-top: 28px;">
-                <h2 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;"><?php esc_html_e( 'Applications by Date (Last 30 Days)', 'contact-form' ); ?></h2>
+                <h2 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;"><?php esc_html_e( 'Applications by Date (Last 30 Days)', 'nexafi-plugin' ); ?></h2>
                 <div class="nexafi-table-container">
                     <table class="wp-list-table widefat striped nexafi-reports-table">
                         <thead>
                             <tr>
-                                <th scope="col" class="manage-column column-date column-primary"><?php esc_html_e( 'Date', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-totalapps"><?php esc_html_e( 'Total Applications', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-approved"><?php esc_html_e( 'Approved', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-ineligible"><?php esc_html_e( 'Ineligible', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-accepted"><?php esc_html_e( 'Offers Accepted', 'contact-form' ); ?></th>
-                                <th scope="col" class="manage-column column-volume"><?php esc_html_e( 'Submitted Treatment Volume', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-date column-primary"><?php esc_html_e( 'Date', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-totalapps"><?php esc_html_e( 'Total Applications', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-approved"><?php esc_html_e( 'Approved', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-ineligible"><?php esc_html_e( 'Ineligible', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-accepted"><?php esc_html_e( 'Offers Accepted', 'nexafi-plugin' ); ?></th>
+                                <th scope="col" class="manage-column column-volume"><?php esc_html_e( 'Submitted Treatment Volume', 'nexafi-plugin' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if ( empty( $date_stats ) ) : ?>
-                                <tr><td colspan="6" style="text-align:center; padding: 24px; color: #64748b;"><?php esc_html_e( 'No historical data recorded in the last 30 days.', 'contact-form' ); ?></td></tr>
+                                <tr><td colspan="6" style="text-align:center; padding: 24px; color: #64748b;"><?php esc_html_e( 'No historical data recorded in the last 30 days.', 'nexafi-plugin' ); ?></td></tr>
                             <?php else : ?>
                                 <?php foreach ( $date_stats as $ds ) : ?>
                                     <tr>
-                                        <td class="column-date column-primary" data-colname="<?php esc_attr_e( 'Date', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( wp_date( 'M j, Y (l)', strtotime( $ds->app_date ) ) ); ?></strong></td>
-                                        <td class="column-totalapps" data-colname="<?php esc_attr_e( 'Total Applications', 'contact-form' ); ?>"><strong><?php echo intval( $ds->total_apps ); ?></strong></td>
-                                        <td class="column-approved" data-colname="<?php esc_attr_e( 'Approved', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $ds->approved_apps ); ?></span></td>
-                                        <td class="column-ineligible" data-colname="<?php esc_attr_e( 'Ineligible', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-warning"><?php echo intval( $ds->ineligible_apps ); ?></span></td>
-                                        <td class="column-accepted" data-colname="<?php esc_attr_e( 'Offers Accepted', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-info"><?php echo intval( $ds->accepted_apps ); ?></span></td>
-                                        <td class="column-volume" data-colname="<?php esc_attr_e( 'Submitted Treatment Volume', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $ds->total_volume ) ); ?></strong></td>
+                                        <td class="column-date column-primary" data-colname="<?php esc_attr_e( 'Date', 'nexafi-plugin' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( wp_date( 'M j, Y (l)', strtotime( $ds->app_date ) ) ); ?></strong></td>
+                                        <td class="column-totalapps" data-colname="<?php esc_attr_e( 'Total Applications', 'nexafi-plugin' ); ?>"><strong><?php echo intval( $ds->total_apps ); ?></strong></td>
+                                        <td class="column-approved" data-colname="<?php esc_attr_e( 'Approved', 'nexafi-plugin' ); ?>"><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $ds->approved_apps ); ?></span></td>
+                                        <td class="column-ineligible" data-colname="<?php esc_attr_e( 'Ineligible', 'nexafi-plugin' ); ?>"><span class="nexafi-badge nexafi-badge-warning"><?php echo intval( $ds->ineligible_apps ); ?></span></td>
+                                        <td class="column-accepted" data-colname="<?php esc_attr_e( 'Offers Accepted', 'nexafi-plugin' ); ?>"><span class="nexafi-badge nexafi-badge-info"><?php echo intval( $ds->accepted_apps ); ?></span></td>
+                                        <td class="column-volume" data-colname="<?php esc_attr_e( 'Submitted Treatment Volume', 'nexafi-plugin' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $ds->total_volume ) ); ?></strong></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -1283,19 +1283,19 @@ class NexaFi_Admin {
 
         $ineligibility_msg = get_option(
             'nexafi_ineligibility_message',
-            __( 'Based on your self-reported declarations, your application does not currently meet our standard automated financing criteria. However, our team is here to help discuss alternative options for your treatment.', 'contact-form' )
+            __( 'Based on your self-reported declarations, your application does not currently meet our standard automated financing criteria. However, our team is here to help discuss alternative options for your treatment.', 'nexafi-plugin' )
         );
 
         $prelim_msg = get_option(
             'nexafi_preliminary_message',
-            __( 'Your self-reported declarations satisfy initial financing eligibility. A GDG representative will review your treatment plan to finalize your financing.', 'contact-form' )
+            __( 'Your self-reported declarations satisfy initial financing eligibility. A GDG representative will review your treatment plan to finalize your financing.', 'nexafi-plugin' )
         );
 
         $privacy_url = get_option( 'nexafi_privacy_policy_url', home_url( '/privacy-policy/' ) );
         $return_url  = get_option( 'nexafi_return_url', home_url( '/' ) );
         $fallback_rep_text = get_option(
             'nexafi_contact_fallback_text',
-            __( 'Please contact your GDG representative directly or speak with our front desk.', 'contact-form' )
+            __( 'Please contact your GDG representative directly or speak with our front desk.', 'nexafi-plugin' )
         );
 
         ?>
@@ -1304,7 +1304,7 @@ class NexaFi_Admin {
             <div class="nexafi-admin-header">
                 <div>
                     <h1 class="wp-heading-inline"><span class="nexafi-brand-text">NexaFi</span> Financing &amp; Policy Settings</h1>
-                    <p class="description"><?php esc_html_e( 'Configure automated financing parameters, calculation percentages, and customer policies.', 'contact-form' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Configure automated financing parameters, calculation percentages, and customer policies.', 'nexafi-plugin' ); ?></p>
                 </div>
             </div>
 
@@ -1622,7 +1622,7 @@ class NexaFi_Admin {
      */
     public function ajax_delete_email_log() {
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'contact-form' ) ), 403 );
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'nexafi-plugin' ) ), 403 );
         }
 
         $log_id = isset( $_POST['log_id'] ) ? intval( $_POST['log_id'] ) : 0;
@@ -1633,11 +1633,11 @@ class NexaFi_Admin {
 
         if ( $ok ) {
             wp_send_json_success( array(
-                'message' => __( 'Email log deleted successfully.', 'contact-form' ),
+                'message' => __( 'Email log deleted successfully.', 'nexafi-plugin' ),
                 'log_id'  => $log_id,
             ) );
         } else {
-            wp_send_json_error( array( 'message' => __( 'Could not delete email log from database.', 'contact-form' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Could not delete email log from database.', 'nexafi-plugin' ) ) );
         }
     }
 }

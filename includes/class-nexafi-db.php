@@ -623,10 +623,10 @@ class NexaFi_DB {
         $name   = sanitize_text_field( $data['name'] ?? '' );
 
         if ( empty( $rep_id ) ) {
-            return new WP_Error( 'missing_id', __( 'Representative ID is required.', 'contact-form' ) );
+            return new WP_Error( 'missing_id', __( 'Representative ID is required.', 'nexafi-plugin' ) );
         }
         if ( empty( $name ) ) {
-            return new WP_Error( 'missing_name', __( 'Representative Name is required.', 'contact-form' ) );
+            return new WP_Error( 'missing_name', __( 'Representative Name is required.', 'nexafi-plugin' ) );
         }
 
         // Check uniqueness of rep_id
@@ -648,7 +648,7 @@ class NexaFi_DB {
         }
 
         if ( $exists ) {
-            return new WP_Error( 'duplicate_id', __( 'This Representative ID is already assigned to another representative.', 'contact-form' ) );
+            return new WP_Error( 'duplicate_id', __( 'This Representative ID is already assigned to another representative.', 'nexafi-plugin' ) );
         }
 
         $now = current_time( 'mysql' );
@@ -712,7 +712,7 @@ class NexaFi_DB {
         $id  = intval( $id );
         $rep = $this->get_representative_by_id( $id );
         if ( ! $rep ) {
-            return new WP_Error( 'not_found', __( 'Representative not found.', 'contact-form' ) );
+            return new WP_Error( 'not_found', __( 'Representative not found.', 'nexafi-plugin' ) );
         }
 
         // Unlink applications pointing to this representative to preserve applicant records

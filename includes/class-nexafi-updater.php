@@ -219,8 +219,8 @@ class NexaFi_Updater {
         $res->downloaded     = 0;
         $res->last_updated   = ! empty( $remote->published_at ) ? $remote->published_at : gmdate( 'Y-m-d' );
         $res->sections       = array(
-            'description' => esc_html__( 'Complete 5-screen patient financing application workflow, eligibility engine, GDG representative management, reporting, and admin dashboard for NexaFi / GDG Smiles.', 'contact-form' ),
-            'changelog'   => ! empty( $remote->changelog ) ? wp_kses_post( wpautop( $remote->changelog ) ) : esc_html__( 'Please visit the GitHub repository for release notes.', 'contact-form' ),
+            'description' => esc_html__( 'Complete 5-screen patient financing application workflow, eligibility engine, GDG representative management, reporting, and admin dashboard for NexaFi / GDG Smiles.', 'nexafi-plugin' ),
+            'changelog'   => ! empty( $remote->changelog ) ? wp_kses_post( wpautop( $remote->changelog ) ) : esc_html__( 'Please visit the GitHub repository for release notes.', 'nexafi-plugin' ),
         );
         $res->download_link  = $remote->download_url;
 
@@ -352,7 +352,7 @@ class NexaFi_Updater {
                 $candidates[] = (object) array(
                     'new_version'  => $version,
                     'download_url' => $download,
-                    'changelog'    => esc_html__( 'New release available from GitHub.', 'contact-form' ),
+                    'changelog'    => esc_html__( 'New release available from GitHub.', 'nexafi-plugin' ),
                     'published_at' => current_time( 'mysql' ),
                 );
             }
@@ -371,7 +371,7 @@ class NexaFi_Updater {
                 $candidates[] = (object) array(
                     'new_version'  => $version,
                     'download_url' => $download,
-                    'changelog'    => esc_html__( 'Latest update from GitHub main branch.', 'contact-form' ),
+                    'changelog'    => esc_html__( 'Latest update from GitHub main branch.', 'nexafi-plugin' ),
                     'published_at' => current_time( 'mysql' ),
                 );
             }

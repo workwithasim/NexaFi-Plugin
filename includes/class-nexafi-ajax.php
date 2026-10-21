@@ -63,7 +63,7 @@ class NexaFi_Ajax {
 
         if ( empty( $rep_id ) ) {
             wp_send_json_error( array(
-                'message' => __( 'Please enter a Representative ID.', 'contact-form' ),
+                'message' => __( 'Please enter a Representative ID.', 'nexafi-plugin' ),
             ) );
         }
 
@@ -75,12 +75,12 @@ class NexaFi_Ajax {
             $inactive = $db->get_representative_by_id_str( $rep_id );
             if ( $inactive && ! $inactive->is_active ) {
                 wp_send_json_error( array(
-                    'message' => __( 'This Representative ID is currently inactive. Please contact GDG Smiles.', 'contact-form' ),
+                    'message' => __( 'This Representative ID is currently inactive. Please contact GDG Smiles.', 'nexafi-plugin' ),
                 ) );
             }
 
             wp_send_json_error( array(
-                'message' => __( 'Representative ID not found. Please verify with your GDG representative.', 'contact-form' ),
+                'message' => __( 'Representative ID not found. Please verify with your GDG representative.', 'nexafi-plugin' ),
             ) );
         }
 
@@ -105,7 +105,7 @@ class NexaFi_Ajax {
         $has_valid_nonce = check_ajax_referer( 'nexafi_financing_nonce', 'security', false );
         if ( ! $has_valid_nonce && empty( $_POST['email'] ) && empty( $_POST['first_name'] ) ) {
             wp_send_json_error( array(
-                'message' => __( 'Security verification expired. Please refresh the page and try again.', 'contact-form' ),
+                'message' => __( 'Security verification expired. Please refresh the page and try again.', 'nexafi-plugin' ),
             ), 403 );
         }
 
@@ -158,81 +158,81 @@ class NexaFi_Ajax {
 
         // Validation rules
         if ( empty( $first_name ) ) {
-            $errors['first_name'] = __( 'First name is required.', 'contact-form' );
+            $errors['first_name'] = __( 'First name is required.', 'nexafi-plugin' );
         }
         if ( empty( $last_name ) ) {
-            $errors['last_name'] = __( 'Last name is required.', 'contact-form' );
+            $errors['last_name'] = __( 'Last name is required.', 'nexafi-plugin' );
         }
         if ( empty( $dob ) ) {
-            $errors['dob'] = __( 'Date of birth is required.', 'contact-form' );
+            $errors['dob'] = __( 'Date of birth is required.', 'nexafi-plugin' );
         } elseif ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $dob ) && ! preg_match( '/^\d{2}\/\d{2}\/\d{4}$/', $dob ) ) {
-            $errors['dob'] = __( 'Please enter a valid date of birth.', 'contact-form' );
+            $errors['dob'] = __( 'Please enter a valid date of birth.', 'nexafi-plugin' );
         } else {
             // Standardize dob to YYYY-MM-DD
             $time = strtotime( $dob );
             if ( ! $time ) {
-                $errors['dob'] = __( 'Invalid date of birth format.', 'contact-form' );
+                $errors['dob'] = __( 'Invalid date of birth format.', 'nexafi-plugin' );
             } else {
                 $dob = gmdate( 'Y-m-d', $time );
             }
         }
 
         if ( empty( $phone ) ) {
-            $errors['phone'] = __( 'Phone number is required.', 'contact-form' );
+            $errors['phone'] = __( 'Phone number is required.', 'nexafi-plugin' );
         }
         if ( empty( $email ) || ! is_email( $email ) ) {
-            $errors['email'] = __( 'Please enter a valid email address.', 'contact-form' );
+            $errors['email'] = __( 'Please enter a valid email address.', 'nexafi-plugin' );
         }
 
         if ( empty( $home_address ) ) {
-            $errors['home_address'] = __( 'Home address is required.', 'contact-form' );
+            $errors['home_address'] = __( 'Home address is required.', 'nexafi-plugin' );
         }
         if ( empty( $city ) ) {
-            $errors['city'] = __( 'City is required.', 'contact-form' );
+            $errors['city'] = __( 'City is required.', 'nexafi-plugin' );
         }
         if ( empty( $state ) ) {
-            $errors['state'] = __( 'State is required.', 'contact-form' );
+            $errors['state'] = __( 'State is required.', 'nexafi-plugin' );
         }
         if ( empty( $zip_code ) ) {
-            $errors['zip_code'] = __( 'ZIP code is required.', 'contact-form' );
+            $errors['zip_code'] = __( 'ZIP code is required.', 'nexafi-plugin' );
         }
 
         if ( empty( $employment_status ) ) {
-            $errors['employment_status'] = __( 'Employment status is required.', 'contact-form' );
+            $errors['employment_status'] = __( 'Employment status is required.', 'nexafi-plugin' );
         }
 
         $emp_status_lower = strtolower( $employment_status );
         if ( empty( $employment_status ) || in_array( $emp_status_lower, array( 'employed', 'self-employed' ), true ) ) {
             if ( empty( $employer_name ) ) {
-                $errors['employer_name'] = __( 'Employer name is required.', 'contact-form' );
+                $errors['employer_name'] = __( 'Employer name is required.', 'nexafi-plugin' );
             }
             if ( empty( $job_title ) ) {
-                $errors['job_title'] = __( 'Job title is required.', 'contact-form' );
+                $errors['job_title'] = __( 'Job title is required.', 'nexafi-plugin' );
             }
             if ( empty( $time_at_job ) ) {
-                $errors['time_at_job'] = __( 'Time at job is required.', 'contact-form' );
+                $errors['time_at_job'] = __( 'Time at job is required.', 'nexafi-plugin' );
             }
         }
 
         if ( $monthly_income < 0 ) {
-            $errors['monthly_income'] = __( 'Monthly income cannot be negative.', 'contact-form' );
+            $errors['monthly_income'] = __( 'Monthly income cannot be negative.', 'nexafi-plugin' );
         }
 
         // Quote Validation
         $max_quote = floatval( get_option( 'nexafi_max_quote', 50000.0 ) );
         if ( $treatment_quote <= 0 ) {
-            $errors['treatment_quote'] = __( 'Please enter a valid treatment quote greater than $0.', 'contact-form' );
+            $errors['treatment_quote'] = __( 'Please enter a valid treatment quote greater than $0.', 'nexafi-plugin' );
         } elseif ( $max_quote > 0 && $treatment_quote > $max_quote ) {
             $errors['treatment_quote'] = sprintf(
                 /* translators: %s: maximum allowed treatment quote amount in currency format */
-                __( 'Treatment quote cannot exceed %s.', 'contact-form' ),
+                __( 'Treatment quote cannot exceed %s.', 'nexafi-plugin' ),
                 NexaFi_Calculator::format_currency( $max_quote )
             );
         }
 
         // GDG Representative Validation (Required)
         if ( empty( $rep_id_input ) ) {
-            $errors['rep_id'] = __( 'Representative ID is required.', 'contact-form' );
+            $errors['rep_id'] = __( 'Representative ID is required.', 'nexafi-plugin' );
             $rep = null;
         } else {
             $rep = $db->get_active_representative( $rep_id_input );
@@ -240,7 +240,7 @@ class NexaFi_Ajax {
                 $rep = $db->get_representative_by_id_str( $rep_id_input );
             }
             if ( ! $rep ) {
-                $errors['rep_id'] = __( 'Representative ID not found. Please verify with your GDG representative.', 'contact-form' );
+                $errors['rep_id'] = __( 'Representative ID not found. Please verify with your GDG representative.', 'nexafi-plugin' );
             }
         }
 
@@ -249,7 +249,7 @@ class NexaFi_Ajax {
 
         if ( ! empty( $errors ) ) {
             wp_send_json_error( array(
-                'message' => __( 'Please correct the highlighted fields before proceeding.', 'contact-form' ),
+                'message' => __( 'Please correct the highlighted fields before proceeding.', 'nexafi-plugin' ),
                 'errors'  => $errors,
             ) );
         }
@@ -327,7 +327,7 @@ class NexaFi_Ajax {
                 error_log( 'NexaFi Submit Error: ' . ( ! empty( $wpdb->last_error ) ? $wpdb->last_error : 'Unknown DB error' ) );
             }
             wp_send_json_error( array(
-                'message'  => __( 'Database error recording application. Please try again.', 'contact-form' ) . $db_err,
+                'message'  => __( 'Database error recording application. Please try again.', 'nexafi-plugin' ) . $db_err,
                 'db_error' => $wpdb->last_error,
             ) );
         }
@@ -353,7 +353,7 @@ class NexaFi_Ajax {
 
         if ( ! $app_id || empty( $reference ) ) {
             wp_send_json_error( array(
-                'message' => __( 'Missing application parameters.', 'contact-form' ),
+                'message' => __( 'Missing application parameters.', 'nexafi-plugin' ),
             ) );
         }
 
@@ -362,7 +362,7 @@ class NexaFi_Ajax {
 
         if ( ! $app || $app->reference_number !== $reference ) {
             wp_send_json_error( array(
-                'message' => __( 'Invalid application record.', 'contact-form' ),
+                'message' => __( 'Invalid application record.', 'nexafi-plugin' ),
             ) );
         }
 
@@ -371,11 +371,11 @@ class NexaFi_Ajax {
         if ( $success ) {
             wp_send_json_success( array(
                 'status'  => 'accepted',
-                'message' => __( 'Terms accepted successfully.', 'contact-form' ),
+                'message' => __( 'Terms accepted successfully.', 'nexafi-plugin' ),
             ) );
         } else {
             wp_send_json_error( array(
-                'message' => __( 'Could not update terms acceptance.', 'contact-form' ),
+                'message' => __( 'Could not update terms acceptance.', 'nexafi-plugin' ),
             ) );
         }
     }
@@ -388,8 +388,8 @@ class NexaFi_Ajax {
             $eval = array(
                 'result'           => $app->eligibility_result,
                 'decision_mode'    => $app->decision_mode,
-                'headline'         => ( 'approved' === $app->eligibility_result ) ? __( "YOU'RE APPROVED!", 'contact-form' ) : ( 'preliminary' === $app->eligibility_result ? __( 'Preliminary Financing Estimate', 'contact-form' ) : __( 'We’re Unable to Offer In-House Financing Right Now', 'contact-form' ) ),
-                'subtitle'         => ( 'approved' === $app->eligibility_result ) ? __( 'Your GDG Smiles in-house financing has been approved.', 'contact-form' ) : '',
+                'headline'         => ( 'approved' === $app->eligibility_result ) ? __( "YOU'RE APPROVED!", 'nexafi-plugin' ) : ( 'preliminary' === $app->eligibility_result ? __( 'Preliminary Financing Estimate', 'nexafi-plugin' ) : __( 'We’re Unable to Offer In-House Financing Right Now', 'nexafi-plugin' ) ),
+                'subtitle'         => ( 'approved' === $app->eligibility_result ) ? __( 'Your GDG Smiles in-house financing has been approved.', 'nexafi-plugin' ) : '',
                 'message'          => $app->eligibility_reason,
                 'requires_contact' => ( 'ineligible' === $app->eligibility_result ),
             );
@@ -435,7 +435,7 @@ class NexaFi_Ajax {
 
         $fallback_contact_text = get_option(
             'nexafi_contact_fallback_text',
-            __( 'Please contact your GDG representative directly or speak with our front desk.', 'contact-form' )
+            __( 'Please contact your GDG representative directly or speak with our front desk.', 'nexafi-plugin' )
         );
 
         return array(
@@ -469,7 +469,7 @@ class NexaFi_Ajax {
 
         $subject = sprintf(
             /* translators: 1: application reference number, 2: eligibility result status (e.g. APPROVED) */
-            __( '[NexaFi] New Financing Application: %1$s (%2$s)', 'contact-form' ),
+            __( '[NexaFi] New Financing Application: %1$s (%2$s)', 'nexafi-plugin' ),
             $app->reference_number,
             strtoupper( $app->eligibility_result )
         );
@@ -558,9 +558,9 @@ class NexaFi_Ajax {
         $subject = sprintf(
             $is_approved
                 /* translators: %s: application reference number */
-                ? __( 'Your NexaFi Financing Application & Approval Details [%s]', 'contact-form' )
+                ? __( 'Your NexaFi Financing Application & Approval Details [%s]', 'nexafi-plugin' )
                 /* translators: %s: application reference number */
-                : __( 'Your NexaFi Financing Application Details [%s]', 'contact-form' ),
+                : __( 'Your NexaFi Financing Application Details [%s]', 'nexafi-plugin' ),
             $app->reference_number
         );
 
@@ -604,10 +604,10 @@ class NexaFi_Ajax {
         }
 
         $status_bg    = $is_approved ? '#16a34a' : '#d97706';
-        $status_title = $is_approved ? __( "YOU'RE APPROVED!", 'contact-form' ) : __( 'APPLICATION RECEIVED', 'contact-form' );
+        $status_title = $is_approved ? __( "YOU'RE APPROVED!", 'nexafi-plugin' ) : __( 'APPLICATION RECEIVED', 'nexafi-plugin' );
         $status_desc  = $is_approved
-            ? __( 'Congratulations! Your GDG Smiles in-house financing has been approved.', 'contact-form' )
-            : __( 'Your application has been received and is being processed by our team.', 'contact-form' );
+            ? __( 'Congratulations! Your GDG Smiles in-house financing has been approved.', 'nexafi-plugin' )
+            : __( 'Your application has been received and is being processed by our team.', 'nexafi-plugin' );
 
         // Clean percent strings (e.g. 70 instead of 70.00)
         $upfront_pct_str  = rtrim( rtrim( (string) $app->upfront_pct, '0' ), '.' );
@@ -646,7 +646,7 @@ class NexaFi_Ajax {
                             <h2 style="margin: 12px 0 6px 0; color: #0f172a; font-size: 20px; font-weight: 700;">
                                 <?php
                                 /* translators: %s: applicant's first name */
-                                echo esc_html( sprintf( __( 'Hello, %s', 'contact-form' ), $app->first_name ) );
+                                echo esc_html( sprintf( __( 'Hello, %s', 'nexafi-plugin' ), $app->first_name ) );
                                 ?>
                             </h2>
                             <p style="margin: 0; color: #475569; font-size: 14px;">
@@ -661,11 +661,11 @@ class NexaFi_Ajax {
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px;">
                                 <tr>
                                     <td>
-                                        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b;"><?php esc_html_e( 'Application Reference #', 'contact-form' ); ?></div>
+                                        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b;"><?php esc_html_e( 'Application Reference #', 'nexafi-plugin' ); ?></div>
                                         <div style="font-size: 17px; font-weight: 700; color: #0f172a; margin-top: 3px; font-family: monospace;"><?php echo esc_html( $app->reference_number ); ?></div>
                                     </td>
                                     <td align="right">
-                                        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b;"><?php esc_html_e( 'Date & Time', 'contact-form' ); ?></div>
+                                        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b;"><?php esc_html_e( 'Date & Time', 'nexafi-plugin' ); ?></div>
                                         <div style="font-size: 13px; font-weight: 500; color: #334155; margin-top: 3px;"><?php echo esc_html( $date_formatted ); ?></div>
                                     </td>
                                 </tr>
@@ -677,18 +677,18 @@ class NexaFi_Ajax {
                     <tr>
                         <td style="padding: 15px 30px 10px 30px;">
                             <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #0f172a; padding-bottom: 6px;">
-                                <?php esc_html_e( 'Financing Breakdown', 'contact-form' ); ?>
+                                <?php esc_html_e( 'Financing Breakdown', 'nexafi-plugin' ); ?>
                             </h3>
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size: 14px;">
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b;"><?php esc_html_e( 'Total Treatment Quote', 'contact-form' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b;"><?php esc_html_e( 'Total Treatment Quote', 'nexafi-plugin' ); ?></td>
                                     <td align="right" style="padding: 7px 0; font-weight: 700; color: #0f172a;"><?php echo esc_html( $quote_fmt ); ?></td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;">
                                         <?php
                                         /* translators: %s: upfront percentage value */
-                                        printf( esc_html__( 'Upfront Contribution (%s%%)', 'contact-form' ), esc_html( $upfront_pct_str ) );
+                                        printf( esc_html__( 'Upfront Contribution (%s%%)', 'nexafi-plugin' ), esc_html( $upfront_pct_str ) );
                                         ?>
                                     </td>
                                     <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $upfront_fmt ); ?></td>
@@ -697,7 +697,7 @@ class NexaFi_Ajax {
                                     <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;">
                                         <?php
                                         /* translators: %s: financed percentage value */
-                                        printf( esc_html__( 'Financed Amount (%s%%)', 'contact-form' ), esc_html( $financed_pct_str ) );
+                                        printf( esc_html__( 'Financed Amount (%s%%)', 'nexafi-plugin' ), esc_html( $financed_pct_str ) );
                                         ?>
                                     </td>
                                     <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $financed_fmt ); ?></td>
@@ -706,23 +706,23 @@ class NexaFi_Ajax {
                                     <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;">
                                         <?php
                                         /* translators: %s: financing charge percentage value */
-                                        printf( esc_html__( 'Financing Charge (%s%%)', 'contact-form' ), esc_html( $charge_pct_str ) );
+                                        printf( esc_html__( 'Financing Charge (%s%%)', 'nexafi-plugin' ), esc_html( $charge_pct_str ) );
                                         ?>
                                     </td>
                                     <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $charge_fmt ); ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Repayment Term', 'contact-form' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Repayment Term', 'nexafi-plugin' ); ?></td>
                                     <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;">
-                                        <?php echo esc_html( $app->repayment_term ); ?> <?php esc_html_e( 'Months', 'contact-form' ); ?>
+                                        <?php echo esc_html( $app->repayment_term ); ?> <?php esc_html_e( 'Months', 'nexafi-plugin' ); ?>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 10px 0; color: #0f172a; font-weight: 700; border-top: 2px solid #e2e8f0; font-size: 15px;"><?php esc_html_e( 'Monthly Payment', 'contact-form' ); ?></td>
+                                    <td style="padding: 10px 0; color: #0f172a; font-weight: 700; border-top: 2px solid #e2e8f0; font-size: 15px;"><?php esc_html_e( 'Monthly Payment', 'nexafi-plugin' ); ?></td>
                                     <td align="right" style="padding: 10px 0; font-weight: 800; color: #16a34a; border-top: 2px solid #e2e8f0; font-size: 17px;"><?php echo esc_html( $monthly_fmt ); ?> <span style="font-size: 12px; color: #64748b; font-weight: normal;">/ mo</span></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Total of Monthly Payments', 'contact-form' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Total of Monthly Payments', 'nexafi-plugin' ); ?></td>
                                     <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $total_rep_fmt ); ?></td>
                                 </tr>
                             </table>
@@ -733,31 +733,31 @@ class NexaFi_Ajax {
                     <tr>
                         <td style="padding: 15px 30px 10px 30px;">
                             <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #0f172a; padding-bottom: 6px;">
-                                <?php esc_html_e( 'Your Submitted Details', 'contact-form' ); ?>
+                                <?php esc_html_e( 'Your Submitted Details', 'nexafi-plugin' ); ?>
                             </h3>
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size: 14px;">
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b; width: 36%;"><?php esc_html_e( 'Full Name', 'contact-form' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b; width: 36%;"><?php esc_html_e( 'Full Name', 'nexafi-plugin' ); ?></td>
                                     <td style="padding: 7px 0; font-weight: 600; color: #0f172a;"><?php echo esc_html( $applicant_name ); ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Email', 'contact-form' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Email', 'nexafi-plugin' ); ?></td>
                                     <td style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $app->email ); ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Phone', 'contact-form' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Phone', 'nexafi-plugin' ); ?></td>
                                     <td style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $app->phone ); ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Home Address', 'contact-form' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Home Address', 'nexafi-plugin' ); ?></td>
                                     <td style="padding: 7px 0; font-weight: 500; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo $full_address; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Employment', 'contact-form' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Employment', 'nexafi-plugin' ); ?></td>
                                     <td style="padding: 7px 0; font-weight: 500; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo $employment_line; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Monthly Income', 'contact-form' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Monthly Income', 'nexafi-plugin' ); ?></td>
                                     <td style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $monthly_income_fmt ); ?></td>
                                 </tr>
                             </table>
@@ -769,7 +769,7 @@ class NexaFi_Ajax {
                         <td style="padding: 15px 30px 25px 30px;">
                             <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px;">
                                 <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">
-                                    <?php esc_html_e( 'Assigned GDG Representative:', 'contact-form' ); ?>
+                                    <?php esc_html_e( 'Assigned GDG Representative:', 'nexafi-plugin' ); ?>
                                 </div>
                                 <div style="font-size: 14px; color: #334155; font-weight: 600;">
                                     <?php echo esc_html( $rep_name ); ?>
@@ -790,12 +790,12 @@ class NexaFi_Ajax {
 
                                 <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed #cbd5e1;">
                                     <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">
-                                        <?php esc_html_e( 'Next Steps:', 'contact-form' ); ?>
+                                        <?php esc_html_e( 'Next Steps:', 'nexafi-plugin' ); ?>
                                     </div>
                                     <ol style="margin: 0; padding-left: 18px; font-size: 13px; color: #475569; line-height: 1.6;">
-                                        <li><?php esc_html_e( 'Your GDG representative will contact you shortly to finalize your setup.', 'contact-form' ); ?></li>
-                                        <li><?php esc_html_e( 'Complete your payment arrangements.', 'contact-form' ); ?></li>
-                                        <li><?php esc_html_e( 'Lock in your appointment and get one step closer to your new smile!', 'contact-form' ); ?></li>
+                                        <li><?php esc_html_e( 'Your GDG representative will contact you shortly to finalize your setup.', 'nexafi-plugin' ); ?></li>
+                                        <li><?php esc_html_e( 'Complete your payment arrangements.', 'nexafi-plugin' ); ?></li>
+                                        <li><?php esc_html_e( 'Lock in your appointment and get one step closer to your new smile!', 'nexafi-plugin' ); ?></li>
                                     </ol>
                                 </div>
                             </div>
@@ -848,7 +848,7 @@ class NexaFi_Ajax {
 
         return array(
             'success' => (bool) $sent,
-            'message' => $sent ? __( 'Email sent successfully.', 'contact-form' ) : ( $mail_error ? $mail_error : __( 'Mail server rejected the message.', 'contact-form' ) ),
+            'message' => $sent ? __( 'Email sent successfully.', 'nexafi-plugin' ) : ( $mail_error ? $mail_error : __( 'Mail server rejected the message.', 'nexafi-plugin' ) ),
             'log_id'  => $log_id,
         );
     }
@@ -860,7 +860,7 @@ class NexaFi_Ajax {
         check_ajax_referer( 'nexafi_admin_nonce', 'security' );
 
         if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => __( 'Unauthorized access.', 'contact-form' ) ), 403 );
+            wp_send_json_error( array( 'message' => __( 'Unauthorized access.', 'nexafi-plugin' ) ), 403 );
         }
 
         $app_id = isset( $_POST['app_id'] ) ? intval( $_POST['app_id'] ) : 0;
@@ -876,12 +876,12 @@ class NexaFi_Ajax {
         }
 
         if ( ! $app_id ) {
-            wp_send_json_error( array( 'message' => __( 'Application record not specified.', 'contact-form' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Application record not specified.', 'nexafi-plugin' ) ) );
         }
 
         $app = $db->get_application( $app_id );
         if ( ! $app ) {
-            wp_send_json_error( array( 'message' => __( 'Application record not found.', 'contact-form' ) ) );
+            wp_send_json_error( array( 'message' => __( 'Application record not found.', 'nexafi-plugin' ) ) );
         }
 
         $rep = null;
@@ -897,13 +897,13 @@ class NexaFi_Ajax {
         if ( $res['success'] ) {
             wp_send_json_success( array(
                 /* translators: %s: applicant email address */
-                'message' => sprintf( __( 'Confirmation email successfully resent to %s.', 'contact-form' ), esc_html( $app->email ) ),
+                'message' => sprintf( __( 'Confirmation email successfully resent to %s.', 'nexafi-plugin' ), esc_html( $app->email ) ),
                 'log_id'  => $res['log_id'],
             ) );
         } else {
             wp_send_json_error( array(
                 /* translators: %s: error message describing the failure reason */
-                'message' => sprintf( __( 'Failed to resend email: %s', 'contact-form' ), esc_html( $res['message'] ) ),
+                'message' => sprintf( __( 'Failed to resend email: %s', 'nexafi-plugin' ), esc_html( $res['message'] ) ),
                 'log_id'  => $res['log_id'],
             ) );
         }
