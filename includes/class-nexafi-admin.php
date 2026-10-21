@@ -919,7 +919,8 @@ class NexaFi_Admin {
                             </div>
                             <div class="nexafi-form-row">
                                 <label class="nexafi-admin-label" for="rep_field_notes"><?php esc_html_e( 'Internal Notes (Optional)', 'nexafi-plugin' ); ?></label>
-                                <textarea name="notes" id="rep_field_notes" rows="2" placeholder="<?php esc_attr_e( 'Internal notes or clinic location...', 'nexafi-plugin' ); ?>"></textarea>
+                                <textarea name="notes" id="rep_field_notes" class="nexafi-admin-textarea" rows="3" placeholder="<?php esc_attr_e( 'Internal notes, assigned clinic locations, schedule preferences...', 'nexafi-plugin' ); ?>"></textarea>
+                                <p class="description" style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;"><?php esc_html_e( 'Private notes for internal clinic management. Not visible to applicants.', 'nexafi-plugin' ); ?></p>
                             </div>
                             <div class="nexafi-form-row" style="margin-top: 8px;">
                                 <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; color: #334155;">

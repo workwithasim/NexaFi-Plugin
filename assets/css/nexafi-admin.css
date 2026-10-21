@@ -953,6 +953,50 @@
   margin-bottom: 12px;
 }
 
+.nexafi-form-row input[type="text"],
+.nexafi-form-row input[type="email"],
+.nexafi-form-row textarea,
+.nexafi-modal input[type="text"],
+.nexafi-modal input[type="email"],
+.nexafi-modal textarea,
+#rep_field_notes {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  display: block !important;
+}
+
+.nexafi-modal textarea,
+.nexafi-form-row textarea,
+#rep_field_notes {
+  min-height: 84px !important;
+  padding: 10px 12px !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  border: 1px solid var(--nexafi-border) !important;
+  border-radius: var(--nexafi-radius-sm) !important;
+  color: var(--nexafi-ink) !important;
+  background-color: #ffffff !important;
+  resize: vertical !important;
+  font-family: inherit !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.nexafi-modal textarea:focus,
+.nexafi-form-row textarea:focus,
+#rep_field_notes:focus {
+  border-color: var(--nexafi-blue) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+  outline: none !important;
+}
+
+.nexafi-modal textarea::placeholder,
+.nexafi-form-row textarea::placeholder,
+#rep_field_notes::placeholder {
+  color: #94a3b8 !important;
+  font-size: 12.5px !important;
+}
+
 /* Representative Photo Upload Widget */
 .nexafi-photo-upload-wrap {
   display: flex;
@@ -1150,6 +1194,18 @@
 
   .nexafi-form-grid-2 {
     grid-template-columns: 1fr;
+  }
+
+  .nexafi-modal-dialog {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 10px auto !important;
+  }
+
+  .nexafi-photo-upload-wrap {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
   }
 
   /* Keep multi-column data tables beautifully intact inside the scroll container on small screens */
