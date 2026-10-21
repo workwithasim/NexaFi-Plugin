@@ -454,8 +454,6 @@ class NexaFi_Admin {
                 'icon'  => 'dashicons-admin-settings',
             ),
         );
-
-        $form_page_url = get_option( 'nexafi_form_page_url', home_url( '/form/' ) );
         ?>
         <header class="nexafi-topnav">
             <div class="nexafi-topnav__brand">
@@ -474,13 +472,6 @@ class NexaFi_Admin {
                     </a>
                 <?php endforeach; ?>
             </nav>
-
-            <div class="nexafi-topnav__actions">
-                <a href="<?php echo esc_url( $form_page_url ); ?>" target="_blank" rel="noopener noreferrer" class="nexafi-topnav__ext-link" title="<?php esc_attr_e( 'Open Public Patient Form', 'contact-form' ); ?>">
-                    <span class="dashicons dashicons-external"></span>
-                    <span><?php esc_html_e( 'View Form', 'contact-form' ); ?></span>
-                </a>
-            </div>
         </header>
         <?php
     }
@@ -796,22 +787,22 @@ class NexaFi_Admin {
             ?>
 
             <!-- Table of Representatives -->
-            <div class="nexafi-table-responsive">
-                <table class="wp-list-table widefat fixed striped nexafi-reps-table" style="margin-top: 10px;">
+            <div class="nexafi-table-container">
+                <table class="wp-list-table widefat fixed striped nexafi-reps-table">
                     <thead>
                         <tr>
-                            <th style="width: 70px;">Photo</th>
-                            <th style="width: 120px;">Rep ID</th>
+                            <th style="width: 56px; text-align: center;">Photo</th>
+                            <th style="width: 110px;">Rep ID</th>
                             <th>Name</th>
                             <th>Contact Details</th>
-                            <th style="width: 140px;">Applications</th>
-                            <th style="width: 110px;">Status</th>
-                            <th style="width: 180px;">Actions</th>
+                            <th style="width: 130px;">Applications</th>
+                            <th style="width: 100px;">Status</th>
+                            <th style="width: 190px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if ( empty( $reps ) ) : ?>
-                            <tr><td colspan="7" style="text-align:center; padding: 20px;"><em>No representatives found. Click "Add Representative" to create one.</em></td></tr>
+                            <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;"><em>No representatives found. Click "Add Representative" to create one.</em></td></tr>
                         <?php else : ?>
                             <?php foreach ( $reps as $r ) : ?>
                                 <?php
@@ -819,17 +810,17 @@ class NexaFi_Admin {
                                 $photo = ! empty( $r->photo_url ) ? $r->photo_url : $default_photo;
                                 ?>
                                 <tr>
-                                    <td>
-                                        <img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $r->name ); ?>" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1;" />
+                                    <td style="text-align: center;">
+                                        <img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $r->name ); ?>" class="nexafi-rep-avatar-img" />
                                     </td>
-                                    <td><strong class="nexafi-rep-code"><?php echo esc_html( $r->rep_id ); ?></strong></td>
-                                    <td><strong><?php echo esc_html( $r->name ); ?></strong></td>
+                                    <td><span class="nexafi-rep-tag"><?php echo esc_html( $r->rep_id ); ?></span></td>
+                                    <td><strong style="color: #0f172a;"><?php echo esc_html( $r->name ); ?></strong></td>
                                     <td>
-                                        <div><?php echo esc_html( $r->email ); ?></div>
+                                        <div style="color: #1e293b;"><?php echo esc_html( $r->email ); ?></div>
                                         <div class="nexafi-sub-meta"><?php echo esc_html( $r->phone ); ?></div>
                                     </td>
                                     <td>
-                                        <span class="nexafi-badge nexafi-badge-info"><?php echo intval( $r->apps_count ); ?> applications</span>
+                                        <span class="nexafi-badge nexafi-badge-info"><?php echo intval( $r->apps_count ); ?> apps</span>
                                     </td>
                                     <td>
                                         <?php if ( $r->is_active ) : ?>
@@ -840,7 +831,7 @@ class NexaFi_Admin {
                                     </td>
                                     <td>
                                         <div class="nexafi-rep-actions-wrap">
-                                            <button type="button" class="button button-small nexafi-edit-rep-btn" 
+                                            <button type="button" class="button button-small nexafi-action-btn nexafi-edit-rep-btn" 
                                                     data-id="<?php echo esc_attr( $r->id ); ?>"
                                                     data-rep-id="<?php echo esc_attr( $r->rep_id ); ?>"
                                                     data-name="<?php echo esc_attr( $r->name ); ?>"
@@ -851,13 +842,13 @@ class NexaFi_Admin {
                                                     data-active="<?php echo esc_attr( $r->is_active ); ?>">
                                                 <?php esc_html_e( 'Edit', 'contact-form' ); ?>
                                             </button>
-                                            <button type="button" class="button button-small nexafi-toggle-rep-btn" data-id="<?php echo esc_attr( $r->id ); ?>" data-active="<?php echo esc_attr( $r->is_active ); ?>">
+                                            <button type="button" class="button button-small nexafi-action-btn nexafi-toggle-rep-btn" data-id="<?php echo esc_attr( $r->id ); ?>" data-active="<?php echo esc_attr( $r->is_active ); ?>">
                                                 <?php echo $r->is_active ? esc_html__( 'Deactivate', 'contact-form' ) : esc_html__( 'Activate', 'contact-form' ); ?>
                                             </button>
                                             <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array(
                                                 'nexafi_action' => 'delete_representative',
                                                 'rep_id'        => $r->id,
-                                            ), admin_url( 'admin.php?page=nexafi-representatives' ) ), 'nexafi_delete_rep_' . $r->id, 'nexafi_delete_nonce' ) ); ?>" class="button button-small nexafi-delete-rep-btn" onclick="return confirm('<?php echo esc_js( __( 'Delete this representative?', 'contact-form' ) ); ?>');">
+                                            ), admin_url( 'admin.php?page=nexafi-representatives' ) ), 'nexafi_delete_rep_' . $r->id, 'nexafi_delete_nonce' ) ); ?>" class="button button-small nexafi-action-btn nexafi-action-btn--delete nexafi-delete-rep-btn" onclick="return confirm('<?php echo esc_js( __( 'Delete this representative?', 'contact-form' ) ); ?>');">
                                                 <?php esc_html_e( 'Delete', 'contact-form' ); ?>
                                             </a>
                                         </div>
@@ -872,7 +863,7 @@ class NexaFi_Admin {
             <!-- Add / Edit Representative Modal -->
             <div id="nexafi-rep-modal" class="nexafi-modal" style="display: none;" role="dialog">
                 <div class="nexafi-modal-backdrop"></div>
-                <div class="nexafi-modal-dialog" style="max-width: 550px;">
+                <div class="nexafi-modal-dialog">
                     <form method="post" action="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-representatives' ) ); ?>">
                         <?php wp_nonce_field( 'nexafi_save_rep_action', 'nexafi_rep_nonce' ); ?>
                         <input type="hidden" name="nexafi_action" value="save_representative" />
@@ -880,27 +871,27 @@ class NexaFi_Admin {
 
                         <div class="nexafi-modal-header">
                             <h2 class="nexafi-modal-title" id="rep-modal-title"><?php esc_html_e( 'Add Representative', 'contact-form' ); ?></h2>
-                            <button type="button" class="nexafi-modal-close">&times;</button>
+                            <button type="button" class="nexafi-modal-close" aria-label="<?php esc_attr_e( 'Close', 'contact-form' ); ?>">&times;</button>
                         </div>
                         <div class="nexafi-modal-body">
                             <div class="nexafi-form-grid-2">
                                 <div class="nexafi-form-col">
-                                    <label class="nexafi-admin-label"><?php esc_html_e( 'Representative ID (e.g. GDG1027) *', 'contact-form' ); ?></label>
-                                    <input type="text" name="rep_id" id="rep_field_id" class="widefat" required style="text-transform: uppercase;" />
+                                    <label class="nexafi-admin-label" for="rep_field_id"><?php esc_html_e( 'Representative ID *', 'contact-form' ); ?></label>
+                                    <input type="text" name="rep_id" id="rep_field_id" placeholder="e.g. GDG1027" required style="text-transform: uppercase;" />
                                 </div>
                                 <div class="nexafi-form-col">
-                                    <label class="nexafi-admin-label"><?php esc_html_e( 'Full Name *', 'contact-form' ); ?></label>
-                                    <input type="text" name="name" id="rep_field_name" class="widefat" required />
+                                    <label class="nexafi-admin-label" for="rep_field_name"><?php esc_html_e( 'Full Name *', 'contact-form' ); ?></label>
+                                    <input type="text" name="name" id="rep_field_name" placeholder="e.g. Caleb Johnson" required />
                                 </div>
                             </div>
                             <div class="nexafi-form-grid-2">
                                 <div class="nexafi-form-col">
-                                    <label class="nexafi-admin-label"><?php esc_html_e( 'Email Address', 'contact-form' ); ?></label>
-                                    <input type="email" name="email" id="rep_field_email" class="widefat" />
+                                    <label class="nexafi-admin-label" for="rep_field_email"><?php esc_html_e( 'Email Address', 'contact-form' ); ?></label>
+                                    <input type="email" name="email" id="rep_field_email" placeholder="name@gdgsmiles.com" />
                                 </div>
                                 <div class="nexafi-form-col">
-                                    <label class="nexafi-admin-label"><?php esc_html_e( 'Phone Number', 'contact-form' ); ?></label>
-                                    <input type="text" name="phone" id="rep_field_phone" class="widefat" />
+                                    <label class="nexafi-admin-label" for="rep_field_phone"><?php esc_html_e( 'Phone Number', 'contact-form' ); ?></label>
+                                    <input type="text" name="phone" id="rep_field_phone" placeholder="(555) 000-0000" />
                                 </div>
                             </div>
                             <div class="nexafi-form-row">
@@ -916,24 +907,25 @@ class NexaFi_Admin {
                                     <div class="nexafi-photo-controls">
                                         <div class="nexafi-photo-btn-group">
                                             <button type="button" class="button button-secondary" id="nexafi-upload-photo-btn">
+                                                <span class="dashicons dashicons-upload" style="font-size:14px;width:14px;height:14px;line-height:14px;margin-right:2px;vertical-align:text-top;"></span>
                                                 <span id="nexafi-upload-btn-text"><?php esc_html_e( 'Upload Photo', 'contact-form' ); ?></span>
                                             </button>
                                             <button type="button" class="button button-link-delete" id="nexafi-remove-photo-btn">
-                                                <?php esc_html_e( 'Delete Photo', 'contact-form' ); ?>
+                                                <?php esc_html_e( 'Remove', 'contact-form' ); ?>
                                             </button>
                                         </div>
-                                        <p class="description" style="margin-top: 5px;"><?php esc_html_e( 'Upload or select a photo. Click Delete Photo to remove.', 'contact-form' ); ?></p>
+                                        <p class="description" style="margin-top: 4px;"><?php esc_html_e( 'Square portrait photo (e.g. 200x200px).', 'contact-form' ); ?></p>
                                     </div>
                                 </div>
                             </div>
                             <div class="nexafi-form-row">
-                                <label class="nexafi-admin-label"><?php esc_html_e( 'Notes', 'contact-form' ); ?></label>
-                                <textarea name="notes" id="rep_field_notes" class="widefat" rows="3"></textarea>
+                                <label class="nexafi-admin-label" for="rep_field_notes"><?php esc_html_e( 'Internal Notes (Optional)', 'contact-form' ); ?></label>
+                                <textarea name="notes" id="rep_field_notes" rows="2" placeholder="<?php esc_attr_e( 'Internal notes or clinic location...', 'contact-form' ); ?>"></textarea>
                             </div>
-                            <div class="nexafi-form-row">
-                                <label>
-                                    <input type="checkbox" name="is_active" id="rep_field_active" value="1" checked />
-                                    <?php esc_html_e( 'Active (Eligible to receive applications)', 'contact-form' ); ?>
+                            <div class="nexafi-form-row" style="margin-top: 8px;">
+                                <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; color: #334155;">
+                                    <input type="checkbox" name="is_active" id="rep_field_active" value="1" checked style="margin: 0;" />
+                                    <span><?php esc_html_e( 'Active (Eligible to receive applications)', 'contact-form' ); ?></span>
                                 </label>
                             </div>
                         </div>
@@ -1203,70 +1195,74 @@ class NexaFi_Admin {
                 </div>
             </div>
 
-            <div style="margin-top: 30px;">
-                <h2>Applications Grouped by Representative</h2>
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                        <tr>
-                            <th>Rep ID</th>
-                            <th>Representative Name</th>
-                            <th>Total Applications</th>
-                            <th>Approved / Eligible</th>
-                            <th>Accepted Offers</th>
-                            <th>Total Treatment Quotes</th>
-                            <th>Total Financed Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ( empty( $rep_stats ) ) : ?>
-                            <tr><td colspan="7">No representative application data available.</td></tr>
-                        <?php else : ?>
-                            <?php foreach ( $rep_stats as $rs ) : ?>
-                                <tr>
-                                    <td><strong><?php echo esc_html( $rs->rep_id ); ?></strong></td>
-                                    <td><?php echo esc_html( $rs->name ); ?></td>
-                                    <td><strong><?php echo intval( $rs->total_apps ); ?></strong></td>
-                                    <td><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $rs->approved_apps ); ?></span></td>
-                                    <td><span class="nexafi-badge nexafi-badge-blue"><?php echo intval( $rs->accepted_apps ); ?></span></td>
-                                    <td><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_quote_amount ) ); ?></td>
-                                    <td><strong><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_financed_amount ) ); ?></strong></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+            <div class="nexafi-report-section" style="margin-top: 24px;">
+                <h2 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;"><?php esc_html_e( 'Applications Grouped by Representative', 'contact-form' ); ?></h2>
+                <div class="nexafi-table-container">
+                    <table class="wp-list-table widefat fixed striped">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">Rep ID</th>
+                                <th>Representative Name</th>
+                                <th style="width: 140px;">Total Applications</th>
+                                <th style="width: 140px;">Approved / Eligible</th>
+                                <th style="width: 130px;">Accepted Offers</th>
+                                <th style="width: 170px;">Total Treatment Quotes</th>
+                                <th style="width: 170px;">Total Financed Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ( empty( $rep_stats ) ) : ?>
+                                <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;">No representative application data available.</td></tr>
+                            <?php else : ?>
+                                <?php foreach ( $rep_stats as $rs ) : ?>
+                                    <tr>
+                                        <td><span class="nexafi-rep-tag"><?php echo esc_html( $rs->rep_id ); ?></span></td>
+                                        <td><strong style="color: #0f172a;"><?php echo esc_html( $rs->name ); ?></strong></td>
+                                        <td><strong><?php echo intval( $rs->total_apps ); ?></strong></td>
+                                        <td><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $rs->approved_apps ); ?></span></td>
+                                        <td><span class="nexafi-badge nexafi-badge-blue"><?php echo intval( $rs->accepted_apps ); ?></span></td>
+                                        <td><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_quote_amount ) ); ?></td>
+                                        <td><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_financed_amount ) ); ?></strong></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div style="margin-top: 30px;">
-                <h2>Applications by Date (Last 30 Days)</h2>
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Total Applications</th>
-                            <th>Approved</th>
-                            <th>Ineligible</th>
-                            <th>Offers Accepted</th>
-                            <th>Submitted Treatment Volume</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ( empty( $date_stats ) ) : ?>
-                            <tr><td colspan="6">No historical data recorded in the last 30 days.</td></tr>
-                        <?php else : ?>
-                            <?php foreach ( $date_stats as $ds ) : ?>
-                                <tr>
-                                    <td><strong><?php echo esc_html( wp_date( 'M j, Y (l)', strtotime( $ds->app_date ) ) ); ?></strong></td>
-                                    <td><?php echo intval( $ds->total_apps ); ?></td>
-                                    <td><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $ds->approved_apps ); ?></span></td>
-                                    <td><span class="nexafi-badge nexafi-badge-warning"><?php echo intval( $ds->ineligible_apps ); ?></span></td>
-                                    <td><span class="nexafi-badge nexafi-badge-blue"><?php echo intval( $ds->accepted_apps ); ?></span></td>
-                                    <td><strong><?php echo esc_html( NexaFi_Calculator::format_currency( $ds->total_volume ) ); ?></strong></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+            <div class="nexafi-report-section" style="margin-top: 28px;">
+                <h2 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;"><?php esc_html_e( 'Applications by Date (Last 30 Days)', 'contact-form' ); ?></h2>
+                <div class="nexafi-table-container">
+                    <table class="wp-list-table widefat fixed striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th style="width: 140px;">Total Applications</th>
+                                <th style="width: 120px;">Approved</th>
+                                <th style="width: 120px;">Ineligible</th>
+                                <th style="width: 130px;">Offers Accepted</th>
+                                <th style="width: 200px;">Submitted Treatment Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ( empty( $date_stats ) ) : ?>
+                                <tr><td colspan="6" style="text-align:center; padding: 24px; color: #64748b;">No historical data recorded in the last 30 days.</td></tr>
+                            <?php else : ?>
+                                <?php foreach ( $date_stats as $ds ) : ?>
+                                    <tr>
+                                        <td><strong style="color: #0f172a;"><?php echo esc_html( wp_date( 'M j, Y (l)', strtotime( $ds->app_date ) ) ); ?></strong></td>
+                                        <td><strong><?php echo intval( $ds->total_apps ); ?></strong></td>
+                                        <td><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $ds->approved_apps ); ?></span></td>
+                                        <td><span class="nexafi-badge nexafi-badge-warning"><?php echo intval( $ds->ineligible_apps ); ?></span></td>
+                                        <td><span class="nexafi-badge nexafi-badge-blue"><?php echo intval( $ds->accepted_apps ); ?></span></td>
+                                        <td><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $ds->total_volume ) ); ?></strong></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <?php
