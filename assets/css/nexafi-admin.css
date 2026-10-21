@@ -397,15 +397,30 @@
   background: var(--nexafi-surface);
   border: 1px solid var(--nexafi-border);
   border-radius: var(--nexafi-radius-sm);
-  box-shadow: none;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: 20px;
 }
 
+.nexafi-admin-wrap .nexafi-table-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.nexafi-admin-wrap .nexafi-table-container::-webkit-scrollbar-track {
+  background: var(--nexafi-surface-alt);
+}
+
+.nexafi-admin-wrap .nexafi-table-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
 .nexafi-admin-wrap table.wp-list-table,
 .nexafi-admin-wrap .nexafi-apps-table,
-.nexafi-admin-wrap .nexafi-reps-table {
+.nexafi-admin-wrap .nexafi-logs-table,
+.nexafi-admin-wrap .nexafi-reps-table,
+.nexafi-admin-wrap .nexafi-reports-table {
   width: 100%;
   border: none;
   box-shadow: none;
@@ -414,24 +429,51 @@
   margin: 0 !important;
 }
 
+/* Specific responsive min-widths for data tables */
+.nexafi-admin-wrap .nexafi-apps-table {
+  min-width: 1040px;
+}
+
+.nexafi-admin-wrap .nexafi-logs-table {
+  min-width: 1060px;
+}
+
+.nexafi-admin-wrap .nexafi-reps-table {
+  min-width: 860px;
+}
+
+.nexafi-admin-wrap .nexafi-reports-table {
+  min-width: 840px;
+}
+
+/* Headers */
 .nexafi-admin-wrap table.wp-list-table th,
-.nexafi-admin-wrap .nexafi-apps-table th {
-  background: var(--nexafi-surface-alt);
-  color: var(--nexafi-muted);
+.nexafi-admin-wrap .nexafi-apps-table th,
+.nexafi-admin-wrap .nexafi-logs-table th,
+.nexafi-admin-wrap .nexafi-reps-table th,
+.nexafi-admin-wrap .nexafi-reports-table th {
+  background: #f8fafc;
+  color: #475569;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
-  padding: 10px 14px;
+  letter-spacing: 0.5px;
+  padding: 12px 14px;
   border-top: none;
   border-bottom: 1px solid var(--nexafi-border);
   border-left: none;
   border-right: none;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
+/* Cells */
 .nexafi-admin-wrap table.wp-list-table td,
-.nexafi-admin-wrap .nexafi-apps-table td {
-  padding: 11px 14px;
+.nexafi-admin-wrap .nexafi-apps-table td,
+.nexafi-admin-wrap .nexafi-logs-table td,
+.nexafi-admin-wrap .nexafi-reps-table td,
+.nexafi-admin-wrap .nexafi-reports-table td {
+  padding: 12px 14px;
   font-size: 13px;
   color: var(--nexafi-ink);
   border-bottom: 1px solid var(--nexafi-border-light);
@@ -449,6 +491,163 @@
   border-bottom: none;
 }
 
+/* Column Width Proportions — Applications Table */
+.nexafi-admin-wrap .nexafi-apps-table th.column-ref,
+.nexafi-admin-wrap .nexafi-apps-table td.column-ref {
+  width: 155px;
+  white-space: nowrap;
+}
+
+.nexafi-admin-wrap .nexafi-apps-table th.column-applicant,
+.nexafi-admin-wrap .nexafi-apps-table td.column-applicant {
+  min-width: 220px;
+}
+
+.nexafi-admin-wrap .nexafi-apps-table th.column-rep,
+.nexafi-admin-wrap .nexafi-apps-table td.column-rep {
+  width: 110px;
+}
+
+.nexafi-admin-wrap .nexafi-apps-table th.column-quote,
+.nexafi-admin-wrap .nexafi-apps-table td.column-quote {
+  width: 185px;
+}
+
+.nexafi-admin-wrap .nexafi-apps-table th.column-decision,
+.nexafi-admin-wrap .nexafi-apps-table td.column-decision {
+  width: 140px;
+}
+
+.nexafi-admin-wrap .nexafi-apps-table th.column-status,
+.nexafi-admin-wrap .nexafi-apps-table td.column-status {
+  width: 140px;
+}
+
+.nexafi-admin-wrap .nexafi-apps-table th.column-date,
+.nexafi-admin-wrap .nexafi-apps-table td.column-date {
+  width: 145px;
+  white-space: nowrap;
+}
+
+.nexafi-admin-wrap .nexafi-apps-table th.column-actions,
+.nexafi-admin-wrap .nexafi-apps-table td.column-actions {
+  width: 150px;
+  text-align: right;
+}
+
+/* Column Width Proportions — Email Logs Table */
+.nexafi-admin-wrap .nexafi-logs-table th.column-id,
+.nexafi-admin-wrap .nexafi-logs-table td.column-id {
+  width: 60px;
+}
+
+.nexafi-admin-wrap .nexafi-logs-table th.column-date,
+.nexafi-admin-wrap .nexafi-logs-table td.column-date {
+  width: 145px;
+  white-space: nowrap;
+}
+
+.nexafi-admin-wrap .nexafi-logs-table th.column-recipient,
+.nexafi-admin-wrap .nexafi-logs-table td.column-recipient {
+  width: 200px;
+}
+
+.nexafi-admin-wrap .nexafi-logs-table th.column-ref,
+.nexafi-admin-wrap .nexafi-logs-table td.column-ref {
+  width: 155px;
+}
+
+.nexafi-admin-wrap .nexafi-logs-table th.column-type,
+.nexafi-admin-wrap .nexafi-logs-table td.column-type {
+  width: 130px;
+}
+
+.nexafi-admin-wrap .nexafi-logs-table th.column-status,
+.nexafi-admin-wrap .nexafi-logs-table td.column-status {
+  width: 95px;
+}
+
+.nexafi-admin-wrap .nexafi-logs-table th.column-details,
+.nexafi-admin-wrap .nexafi-logs-table td.column-details {
+  min-width: 220px;
+}
+
+.nexafi-admin-wrap .nexafi-logs-table th.column-actions,
+.nexafi-admin-wrap .nexafi-logs-table td.column-actions {
+  width: 165px;
+  text-align: right;
+}
+
+/* Reference Numbers & Monospace links */
+.nexafi-admin-wrap .nexafi-view-detail-link {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--nexafi-blue);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.nexafi-admin-wrap .nexafi-view-detail-link:hover {
+  color: var(--nexafi-blue-hover);
+  text-decoration: underline;
+}
+
+/* Applicant Cell Styling */
+.nexafi-admin-wrap .nexafi-applicant-cell strong,
+.nexafi-admin-wrap .nexafi-recipient-cell strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--nexafi-ink);
+  line-height: 1.3;
+}
+
+.nexafi-admin-wrap .nexafi-applicant-cell .nexafi-sub-meta a,
+.nexafi-admin-wrap .nexafi-recipient-cell .nexafi-sub-meta a {
+  color: var(--nexafi-blue);
+  text-decoration: none;
+}
+
+.nexafi-admin-wrap .nexafi-applicant-cell .nexafi-sub-meta a:hover,
+.nexafi-admin-wrap .nexafi-recipient-cell .nexafi-sub-meta a:hover {
+  text-decoration: underline;
+}
+
+.nexafi-admin-wrap .nexafi-sep {
+  color: #cbd5e1;
+  margin: 0 4px;
+}
+
+.nexafi-admin-wrap .nexafi-applicant-job {
+  color: #64748b;
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+/* Email Log Snippets */
+.nexafi-admin-wrap .nexafi-error-snippet {
+  color: #b91c1c;
+  font-size: 12px;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  max-width: 320px;
+  word-break: break-word;
+}
+
+.nexafi-admin-wrap .nexafi-error-snippet .nexafi-error-icon {
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.nexafi-admin-wrap .nexafi-success-snippet {
+  color: #059669;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 /* ==========================================================================
    8. Status Badges & Representative Actions
    ========================================================================== */
@@ -456,35 +655,75 @@
 .nexafi-admin-wrap .nexafi-badge {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 3px 8px;
-  border-radius: 4px;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 9999px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  line-height: 1;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.nexafi-admin-wrap .nexafi-badge-primary {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
 }
 
 .nexafi-admin-wrap .nexafi-badge-success {
   background: var(--nexafi-emerald-soft);
-  color: #065f46;
+  color: #047857;
+  border: 1px solid #a7f3d0;
 }
 
 .nexafi-admin-wrap .nexafi-badge-info,
 .nexafi-admin-wrap .nexafi-badge-blue {
   background: var(--nexafi-blue-light);
   color: #1e40af;
+  border: 1px solid #bfdbfe;
 }
 
 .nexafi-admin-wrap .nexafi-badge-warning {
   background: var(--nexafi-amber-soft);
-  color: #92400e;
+  color: #b45309;
+  border: 1px solid #fde68a;
 }
 
 .nexafi-admin-wrap .nexafi-badge-danger {
   background: var(--nexafi-rose-soft);
-  color: #991b1b;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Email Type Tags */
+.nexafi-admin-wrap .nexafi-type-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.nexafi-admin-wrap .nexafi-type-alert {
+  background: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+.nexafi-admin-wrap .nexafi-type-applicant {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.nexafi-admin-wrap .nexafi-type-resend {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
 }
 
 .nexafi-admin-wrap .nexafi-rep-tag {
@@ -524,11 +763,14 @@
   margin: 0 auto;
 }
 
+.nexafi-admin-wrap .nexafi-table-actions,
 .nexafi-admin-wrap .nexafi-rep-actions-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  justify-content: flex-end;
+  gap: 6px;
   flex-wrap: nowrap;
+  width: 100%;
 }
 
 .nexafi-admin-wrap .nexafi-action-btn {
@@ -536,7 +778,7 @@
   line-height: 26px !important;
   padding: 0 9px !important;
   font-size: 11.5px !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   border: 1px solid var(--nexafi-border) !important;
   background: #ffffff !important;
   color: #334155 !important;
@@ -545,9 +787,19 @@
   transition: all 0.15s ease !important;
   display: inline-flex !important;
   align-items: center !important;
+  gap: 4px !important;
   white-space: nowrap !important;
   text-decoration: none !important;
   cursor: pointer;
+}
+
+.nexafi-admin-wrap .nexafi-action-btn .dashicons {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  line-height: 14px !important;
+  vertical-align: middle !important;
+  color: inherit;
 }
 
 .nexafi-admin-wrap .nexafi-action-btn:hover {
@@ -556,12 +808,34 @@
   color: #0f172a !important;
 }
 
+.nexafi-admin-wrap .nexafi-action-btn-view:hover {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+.nexafi-admin-wrap .nexafi-action-btn-view:hover .dashicons {
+  color: #2563eb !important;
+}
+
+.nexafi-admin-wrap .nexafi-action-btn-resend:hover {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+.nexafi-admin-wrap .nexafi-action-btn-resend:hover .dashicons {
+  color: #2563eb !important;
+}
+
+.nexafi-admin-wrap .nexafi-action-btn-delete,
 .nexafi-admin-wrap .nexafi-action-btn--delete {
   color: #dc2626 !important;
   border-color: #fee2e2 !important;
   background: #ffffff !important;
 }
 
+.nexafi-admin-wrap .nexafi-action-btn-delete:hover,
 .nexafi-admin-wrap .nexafi-action-btn--delete:hover {
   background: #fef2f2 !important;
   color: #b91c1c !important;
@@ -878,5 +1152,30 @@
 
   .nexafi-form-grid-2 {
     grid-template-columns: 1fr;
+  }
+
+  /* Keep multi-column data tables beautifully intact inside the scroll container on small screens */
+  .nexafi-admin-wrap .nexafi-table-container table.wp-list-table {
+    display: table !important;
+  }
+  .nexafi-admin-wrap .nexafi-table-container table.wp-list-table thead {
+    display: table-header-group !important;
+  }
+  .nexafi-admin-wrap .nexafi-table-container table.wp-list-table tbody {
+    display: table-row-group !important;
+  }
+  .nexafi-admin-wrap .nexafi-table-container table.wp-list-table tr {
+    display: table-row !important;
+  }
+  .nexafi-admin-wrap .nexafi-table-container table.wp-list-table th,
+  .nexafi-admin-wrap .nexafi-table-container table.wp-list-table td {
+    display: table-cell !important;
+  }
+  .nexafi-admin-wrap .nexafi-table-container table.wp-list-table td::before {
+    display: none !important;
+  }
+  .nexafi-admin-wrap .nexafi-table-container table.wp-list-table th.column-actions,
+  .nexafi-admin-wrap .nexafi-table-container table.wp-list-table td.column-actions {
+    text-align: right !important;
   }
 }
