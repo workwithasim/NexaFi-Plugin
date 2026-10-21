@@ -1,0 +1,2362 @@
+/**
+ * NexaFi Financing Application - Frontend Stylesheet
+ *
+ * Implements the 5-screen patient financing workflow matching
+ * the reference image design system.
+ * Pure Vanilla CSS - Zero external dependencies.
+ *
+ * @package NexaFi_Financing
+ */
+
+:root {
+  --nexafi-navy: #0b275b;
+  --nexafi-navy-dark: #07132b;
+  --nexafi-navy-deep: #050e1f;
+  --nexafi-blue: #1d72f2;
+  --nexafi-blue-hover: #1565d8;
+  --nexafi-blue-active: #0d54b8;
+  --nexafi-blue-light: #eff6ff;
+  --nexafi-blue-soft: #f0f7ff;
+  --nexafi-cyan: #38bdf8;
+  --nexafi-bg: #f8fafc;
+  --nexafi-card-bg: #ffffff;
+  --nexafi-border: #e2e8f0;
+  --nexafi-border-hover: #cbd5e1;
+  --nexafi-border-light: #f1f5f9;
+  --nexafi-text-dark: #0f172a;
+  --nexafi-text-body: #334155;
+  --nexafi-text-muted: #64748b;
+  --nexafi-text-light: #94a3b8;
+  --nexafi-green: #10b981;
+  --nexafi-green-dark: #059669;
+  --nexafi-green-bg: #ecfdf5;
+  --nexafi-green-border: #a7f3d0;
+  --nexafi-amber: #f59e0b;
+  --nexafi-amber-bg: #fffbeb;
+  --nexafi-error: #ef4444;
+  --nexafi-error-bg: #fef2f2;
+  --nexafi-radius-input: 10px;
+  --nexafi-radius-card: 28px;
+  --nexafi-radius-pill: 9999px;
+  --nexafi-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --nexafi-serif: 'Playfair Display', Georgia, serif;
+  --nexafi-script: 'Caveat', 'Playfair Display', cursive, serif;
+  --nexafi-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+}
+
+/* ==========================================================================
+   Outer Container & Wrapper
+   ========================================================================== */
+.nexafi-app-wrapper {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin: 1rem auto;
+  padding: 0 16px;
+  font-family: var(--nexafi-font);
+  color: var(--nexafi-text-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (min-width: 640px) {
+  .nexafi-app-wrapper {
+    max-width: 560px;
+    margin: 2rem auto;
+    padding: 0 16px;
+  }
+}
+
+@media (min-width: 992px) {
+  .nexafi-app-wrapper {
+    max-width: 580px;
+    margin: 2.5rem auto;
+    padding: 0;
+  }
+}
+
+@media (min-width: 1400px) {
+  .nexafi-app-wrapper {
+    max-width: 600px;
+    margin: 3rem auto;
+  }
+
+  .nexafi-topbar {
+    margin-bottom: 28px;
+    min-height: 74px;
+  }
+
+  .nexafi-topbar-logo .nexafi-svg-logo {
+    height: 74px;
+    max-width: 280px;
+  }
+
+  .nexafi-welcome-header .nexafi-svg-logo {
+    height: 78px;
+    max-width: 300px;
+  }
+}
+
+.nexafi-app-wrapper *,
+.nexafi-app-wrapper *::before,
+.nexafi-app-wrapper *::after {
+  box-sizing: border-box;
+}
+
+/* Screen visibility toggling */
+.nexafi-screen {
+  display: none;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.nexafi-screen.nexafi-active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Card Bases
+   ========================================================================== */
+.nexafi-card {
+  background: var(--nexafi-card-bg);
+  border-radius: var(--nexafi-radius-card);
+  border: 1px solid var(--nexafi-border-light);
+  box-shadow: var(--nexafi-shadow);
+  padding: 24px 20px 28px;
+  overflow: hidden;
+  transition: padding 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .nexafi-card {
+    padding: 34px 36px 38px;
+    border-radius: 24px;
+  }
+}
+
+@media (min-width: 992px) {
+  .nexafi-card {
+    padding: 42px 50px 46px;
+    border-radius: 28px;
+    box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.03);
+  }
+}
+
+/* ==========================================================================
+   SCREEN 1 — WELCOME (Dark Navy Card Matching Reference Screen 1)
+   ========================================================================== */
+.nexafi-welcome-card {
+  background: linear-gradient(180deg, #091734 0%, #061126 100%);
+  border-radius: var(--nexafi-radius-card);
+  box-shadow: 0 20px 35px -10px rgba(7, 19, 43, 0.5);
+  padding: 32px 24px 30px;
+  color: #ffffff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nexafi-welcome-header {
+  margin-bottom: 20px;
+}
+
+.nexafi-welcome-header .nexafi-svg-logo {
+  height: 52px;
+  width: auto;
+  max-width: 220px;
+}
+
+.nexafi-welcome-headline-box {
+  margin-bottom: 24px;
+}
+
+.nexafi-welcome-title {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.nexafi-serif-accent {
+  display: block;
+  font-family: var(--nexafi-serif);
+  font-style: italic;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 2px;
+}
+
+.nexafi-welcome-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.nexafi-benefits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.nexafi-benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nexafi-benefit-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(29, 114, 242, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.nexafi-benefit-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.nexafi-benefit-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #e2e8f0;
+  line-height: 1.2;
+}
+
+.nexafi-welcome-hero-image {
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.nexafi-hero-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));
+}
+
+.nexafi-welcome-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.nexafi-btn-get-started {
+  width: 100%;
+}
+
+.nexafi-security-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.nexafi-security-badge svg {
+  width: 13px;
+  height: 13px;
+  stroke: #94a3b8;
+}
+
+.nexafi-partner-branding {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   Top Navigation Bar (Screens 2 - 5)
+   ========================================================================== */
+.nexafi-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.nexafi-topbar-center {
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.nexafi-app-wrapper button.nexafi-nav-back,
+.nexafi-app-wrapper a.nexafi-nav-back,
+.nexafi-app-wrapper .nexafi-nav-back {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 6px 8px !important;
+  margin: 0 !important;
+  color: var(--nexafi-navy, #0b275b) !important;
+  cursor: pointer !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  box-sizing: border-box !important;
+  transition: transform 0.15s ease, opacity 0.15s ease !important;
+}
+
+.nexafi-app-wrapper button.nexafi-nav-back:hover,
+.nexafi-app-wrapper a.nexafi-nav-back:hover,
+.nexafi-app-wrapper .nexafi-nav-back:hover {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--nexafi-blue, #1d72f2) !important;
+  transform: translateX(-2px) !important;
+  opacity: 0.8 !important;
+}
+
+.nexafi-app-wrapper button.nexafi-nav-back:active,
+.nexafi-app-wrapper a.nexafi-nav-back:active,
+.nexafi-app-wrapper .nexafi-nav-back:active {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: translateX(-3px) !important;
+}
+
+.nexafi-app-wrapper button.nexafi-nav-back svg,
+.nexafi-app-wrapper a.nexafi-nav-back svg,
+.nexafi-app-wrapper .nexafi-nav-back svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke: var(--nexafi-navy, #0b275b) !important;
+  color: var(--nexafi-navy, #0b275b) !important;
+  fill: none !important;
+  stroke-width: 2.5 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  display: block !important;
+  transition: stroke 0.15s ease !important;
+}
+
+button.nexafi-nav-back:hover svg,
+a.nexafi-nav-back:hover svg,
+.nexafi-nav-back:hover svg {
+  stroke: var(--nexafi-blue, #1d72f2) !important;
+}
+
+.nexafi-topbar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+}
+
+.nexafi-topbar-logo .nexafi-svg-logo {
+  height: 42px;
+  width: auto;
+  max-width: 180px;
+  display: block;
+}
+
+.nexafi-nav-spacer {
+  width: 32px !important;
+  flex: 0 0 32px;
+}
+
+@media (min-width: 640px) {
+  .nexafi-topbar {
+    margin-bottom: 22px;
+  }
+
+  .nexafi-topbar-logo .nexafi-svg-logo {
+    height: 52px;
+    max-width: 210px;
+  }
+
+  .nexafi-nav-spacer {
+    width: 36px !important;
+    flex: 0 0 36px;
+  }
+}
+
+/* ==========================================================================
+   Progress Indicators (Step 1 of 2 / Step 2 of 2)
+   ========================================================================== */
+.nexafi-progress-wrapper {
+  margin-bottom: 22px;
+}
+
+.nexafi-progress-meta {
+  margin-bottom: 8px;
+}
+
+.nexafi-step-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nexafi-blue);
+  letter-spacing: 0.01em;
+}
+
+.nexafi-progress-track {
+  width: 100%;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.nexafi-progress-bar {
+  height: 100%;
+  background: var(--nexafi-blue);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/* ==========================================================================
+   Headings & Subtitles
+   ========================================================================== */
+.nexafi-heading-group {
+  margin-bottom: 20px;
+}
+
+.nexafi-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--nexafi-text-dark);
+  margin: 0 0 6px 0;
+  line-height: 1.25;
+}
+
+.nexafi-card-subtitle {
+  font-size: 13.5px;
+  color: var(--nexafi-text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   Form Fields, Inputs & Layout Grid
+   ========================================================================== */
+.nexafi-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.nexafi-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.nexafi-grid > * {
+  min-width: 0;
+}
+
+/* 2-column layout (First/Last Name, Employer/Job Title, Time/Income) stays 2 columns on ALL screens including mobile */
+.nexafi-grid-2 {
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* 3-column layout (City, State, ZIP) stays in 1 row on ALL screens including mobile */
+.nexafi-grid-3 {
+  grid-template-columns: minmax(0, 1.65fr) minmax(58px, 0.9fr) minmax(68px, 1.15fr);
+  gap: 8px;
+}
+
+.nexafi-grid-3 .nexafi-field-group {
+  min-width: 0;
+}
+
+.nexafi-grid-3 .nexafi-label {
+  white-space: nowrap;
+}
+
+.nexafi-grid-3 select.nexafi-select {
+  padding-left: 8px !important;
+  padding-right: 22px !important;
+  background-position: right 6px center !important;
+  background-size: 11px !important;
+  font-size: 13px !important;
+  text-overflow: ellipsis;
+}
+
+.nexafi-grid-3 input.nexafi-input {
+  padding-left: 10px !important;
+  padding-right: 8px !important;
+  font-size: 13.5px !important;
+}
+
+/* Phone & Email: 1 column on mobile for clean breathing room, 2 columns on desktop */
+.nexafi-grid-contact {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .nexafi-grid-3 {
+    grid-template-columns: 1.8fr 1fr 1.2fr;
+    gap: 12px;
+  }
+
+  .nexafi-grid-3 select.nexafi-select {
+    padding-left: 12px !important;
+    padding-right: 32px !important;
+    background-position: right 12px center !important;
+    background-size: 14px !important;
+    font-size: 14px !important;
+  }
+
+  .nexafi-grid-3 input.nexafi-input {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    font-size: 14px !important;
+  }
+}
+
+.nexafi-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  width: 100%;
+}
+
+.nexafi-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  letter-spacing: 0.01em;
+  margin-bottom: 2px;
+  line-height: 1.35;
+}
+
+.nexafi-req {
+  color: var(--nexafi-error);
+  font-weight: 700;
+}
+
+.nexafi-input,
+.nexafi-select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  height: 44px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--nexafi-text-dark);
+  background: #ffffff;
+  border: 1px solid var(--nexafi-border);
+  border-radius: var(--nexafi-radius-input);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.nexafi-input:hover,
+.nexafi-select:hover {
+  border-color: var(--nexafi-border-hover, #cbd5e1);
+}
+
+.nexafi-input:focus,
+.nexafi-select:focus {
+  border-color: var(--nexafi-blue);
+  box-shadow: 0 0 0 3px rgba(29, 114, 242, 0.12);
+}
+
+.nexafi-input.nexafi-input-invalid,
+.nexafi-select.nexafi-input-invalid {
+  border-color: var(--nexafi-error) !important;
+  background-color: var(--nexafi-error-bg);
+}
+
+.nexafi-select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  padding-right: 34px;
+}
+
+/* Currency & Icon Input Wrappers */
+.nexafi-input-currency-wrap,
+.nexafi-input-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Professional Currency Symbol ($) */
+.nexafi-currency-symbol {
+  position: absolute !important;
+  left: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--nexafi-text-muted, #64748b) !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  transition: color 0.15s ease !important;
+}
+
+.nexafi-input.nexafi-currency-input,
+input.nexafi-currency-input,
+.nexafi-currency-input {
+  padding-left: 32px !important;
+}
+
+.nexafi-currency-input:focus ~ .nexafi-currency-symbol,
+.nexafi-input-currency-wrap:focus-within .nexafi-currency-symbol {
+  color: var(--nexafi-blue, #1d72f2) !important;
+}
+
+.nexafi-quote-wrap {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+  box-sizing: border-box !important;
+}
+
+.nexafi-quote-wrap .nexafi-currency-symbol {
+  font-size: 22px !important;
+  left: 16px !important;
+  font-weight: 700 !important;
+  color: var(--nexafi-blue, #1d72f2) !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+  line-height: 1 !important;
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.nexafi-input.nexafi-quote-input,
+input.nexafi-quote-input,
+.nexafi-quote-input {
+  height: 52px !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  padding-left: 42px !important;
+  padding-right: 16px !important;
+  color: var(--nexafi-text-dark) !important;
+  letter-spacing: -0.01em !important;
+  border-radius: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Light, clean placeholder styles */
+.nexafi-app-wrapper .nexafi-input::placeholder,
+.nexafi-app-wrapper input::placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+  opacity: 1 !important;
+}
+
+.nexafi-app-wrapper .nexafi-input::-webkit-input-placeholder,
+.nexafi-app-wrapper input::-webkit-input-placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+  opacity: 1 !important;
+}
+
+.nexafi-app-wrapper .nexafi-input::-moz-placeholder,
+.nexafi-app-wrapper input::-moz-placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+  opacity: 1 !important;
+}
+
+.nexafi-app-wrapper .nexafi-quote-input::placeholder,
+.nexafi-quote-input::placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+  opacity: 0.75 !important;
+}
+
+.nexafi-app-wrapper .nexafi-quote-input::-webkit-input-placeholder,
+.nexafi-quote-input::-webkit-input-placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+  opacity: 0.75 !important;
+}
+
+.nexafi-app-wrapper .nexafi-quote-input::-moz-placeholder,
+.nexafi-quote-input::-moz-placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+  opacity: 0.75 !important;
+}
+
+/* Professional Date Input & Calendar Icon */
+.nexafi-input[type="date"],
+input[type="date"].nexafi-input {
+  padding-right: 42px !important;
+  cursor: pointer;
+}
+
+/* Hide default browser calendar picker indicator icon to avoid double/overlapping icons,
+   while keeping it full size so clicking anywhere opens the date picker */
+.nexafi-input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  cursor: pointer !important;
+  background: transparent !important;
+  color: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.nexafi-input[type="date"]::-webkit-inner-spin-button,
+.nexafi-input[type="date"]::-webkit-clear-button {
+  display: none !important;
+}
+
+.nexafi-input-icon {
+  position: absolute !important;
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+  color: #64748b !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1 !important;
+  transition: color 0.15s ease !important;
+}
+
+.nexafi-input-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: #64748b !important;
+  stroke-width: 2 !important;
+  display: block !important;
+  transition: stroke 0.15s ease !important;
+}
+
+.nexafi-input[type="date"]:focus ~ .nexafi-input-icon svg,
+.nexafi-input-icon-wrap:focus-within .nexafi-input-icon svg {
+  stroke: var(--nexafi-blue, #1d72f2) !important;
+}
+
+/* ==========================================================================
+   Declarations & Consent Checkboxes
+   ========================================================================== */
+.nexafi-declarations-box {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  margin-top: 8px !important;
+  margin-bottom: 6px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.nexafi-checkbox-card {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 12px 14px !important;
+  background: #f8fafc !important;
+  background-color: #f8fafc !important;
+  border: 1px solid var(--nexafi-border-light, #e2e8f0) !important;
+  border-radius: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  min-height: 48px !important;
+}
+
+.nexafi-checkbox-card:hover {
+  background: #f1f5f9 !important;
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+.nexafi-checkbox-card:active {
+  transform: translateY(0) !important;
+}
+
+.nexafi-checkbox {
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}
+
+.nexafi-checkbox-indicator {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  border-radius: 6px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  margin-top: 2px !important;
+  transition: all 0.15s ease !important;
+  box-sizing: border-box !important;
+}
+
+.nexafi-checkbox:focus-visible + .nexafi-checkbox-indicator {
+  box-shadow: 0 0 0 3px rgba(29, 114, 242, 0.25) !important;
+  border-color: var(--nexafi-blue, #1d72f2) !important;
+}
+
+.nexafi-checkbox:checked + .nexafi-checkbox-indicator {
+  background-color: var(--nexafi-blue, #1d72f2) !important;
+  border-color: var(--nexafi-blue, #1d72f2) !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='20 6 9 17 4 12'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 13px !important;
+}
+
+.nexafi-checkbox:checked + .nexafi-checkbox-indicator::after {
+  display: none !important;
+}
+
+.nexafi-checkbox-label {
+  flex: 1 !important;
+  min-width: 0 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #334155 !important;
+  line-height: 1.45 !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  margin: 0 !important;
+}
+
+/* Tablet & Desktop Refinements (min-width: 481px) */
+@media (min-width: 481px) {
+  .nexafi-checkbox-card {
+    padding: 13px 16px !important;
+    gap: 13px !important;
+    border-radius: 14px !important;
+  }
+
+  .nexafi-checkbox-label {
+    font-size: 13.5px !important;
+    line-height: 1.45 !important;
+  }
+}
+
+/* Mobile Small Screen Refinements (max-width: 380px) */
+@media (max-width: 380px) {
+  .nexafi-checkbox-card {
+    padding: 10px 11px !important;
+    gap: 10px !important;
+    border-radius: 12px !important;
+  }
+
+  .nexafi-checkbox-indicator {
+    width: 19px !important;
+    height: 19px !important;
+    min-width: 19px !important;
+    min-height: 19px !important;
+    margin-top: 1px !important;
+  }
+
+  .nexafi-checkbox-label {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+}
+
+/* ==========================================================================
+   Representative Lookup & Preview Card (Screen 3)
+   ========================================================================== */
+/* Screen 3 Layout Spacing & Separation */
+.nexafi-form-step-3 {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+}
+
+.nexafi-form-section-quote {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+  margin-bottom: 0 !important;
+}
+
+.nexafi-input-rep-wrap {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+  box-sizing: border-box !important;
+}
+
+.nexafi-rep-input {
+  height: 48px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  padding: 0 16px !important;
+  border-radius: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.nexafi-rep-input::placeholder {
+  color: #64748b !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  opacity: 1 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.nexafi-rep-input::-webkit-input-placeholder {
+  color: #64748b !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  opacity: 1 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.nexafi-rep-input::-moz-placeholder {
+  color: #64748b !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  opacity: 1 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.nexafi-rep-input:-ms-input-placeholder {
+  color: #64748b !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  opacity: 1 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.nexafi-rep-spinner {
+  position: absolute !important;
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 18px !important;
+  height: 18px !important;
+  border: 2px solid #e2e8f0 !important;
+  border-top-color: var(--nexafi-blue) !important;
+  border-radius: 50% !important;
+  animation: nexafi-spin 0.6s linear infinite !important;
+}
+
+.nexafi-rep-status-text {
+  font-size: 12px !important;
+  color: var(--nexafi-error) !important;
+  margin-top: 5px !important;
+  display: block !important;
+}
+
+.nexafi-rep-card {
+  display: none;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 14px 16px !important;
+  background: #f8fafc !important;
+  border: 1px solid var(--nexafi-border, #e2e8f0) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  margin-top: 8px !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+}
+
+.nexafi-rep-avatar-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid var(--nexafi-blue-light);
+}
+
+.nexafi-rep-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nexafi-rep-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.nexafi-rep-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--nexafi-text-dark);
+}
+
+.nexafi-rep-code {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nexafi-text-muted);
+}
+
+.nexafi-rep-role {
+  font-size: 11px;
+  color: var(--nexafi-blue);
+  font-weight: 500;
+}
+
+.nexafi-info-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 12px;
+  background: #f0f7ff;
+  border-radius: 10px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #1e40af;
+  line-height: 1.35;
+}
+
+.nexafi-info-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.nexafi-consent-group {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nexafi-privacy-link-wrap {
+  text-align: center;
+}
+
+.nexafi-privacy-link {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--nexafi-blue);
+  text-decoration: underline;
+}
+
+.nexafi-privacy-link:hover {
+  color: var(--nexafi-blue-hover);
+}
+
+/* ==========================================================================
+   Buttons & Interactive Elements (Scoped strictly to .nexafi-app-wrapper)
+   ========================================================================== */
+.nexafi-app-wrapper .nexafi-form-action {
+  width: 100% !important;
+  margin-top: 24px !important;
+  display: flex !important;
+}
+
+.nexafi-app-wrapper .nexafi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.nexafi-app-wrapper button.nexafi-btn-primary,
+.nexafi-app-wrapper .nexafi-btn.nexafi-btn-primary,
+.nexafi-app-wrapper .nexafi-btn-continue,
+.nexafi-app-wrapper .nexafi-btn-submit {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0 24px !important;
+  background: #1d72f2 !important;
+  background-color: #1d72f2 !important;
+  color: #ffffff !important;
+  font-family: inherit !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  border-radius: 9999px !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 4px 14px rgba(29, 114, 242, 0.3) !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.nexafi-app-wrapper button.nexafi-btn-primary:hover,
+.nexafi-app-wrapper .nexafi-btn.nexafi-btn-primary:hover,
+.nexafi-app-wrapper .nexafi-btn-continue:hover,
+.nexafi-app-wrapper .nexafi-btn-submit:hover,
+.nexafi-app-wrapper .nexafi-btn-accept:hover {
+  background: #1565d8 !important;
+  background-color: #1565d8 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(29, 114, 242, 0.4) !important;
+}
+
+.nexafi-app-wrapper button.nexafi-btn-primary:active,
+.nexafi-app-wrapper .nexafi-btn.nexafi-btn-primary:active,
+.nexafi-app-wrapper .nexafi-btn-continue:active,
+.nexafi-app-wrapper .nexafi-btn-submit:active,
+.nexafi-app-wrapper .nexafi-btn-accept:active {
+  background: #0d54b8 !important;
+  background-color: #0d54b8 !important;
+  transform: translateY(1px) !important;
+  box-shadow: 0 2px 8px rgba(29, 114, 242, 0.25) !important;
+}
+
+.nexafi-app-wrapper .nexafi-btn-label {
+  display: inline-block;
+}
+
+.nexafi-app-wrapper button.nexafi-btn-primary .nexafi-btn-label,
+.nexafi-app-wrapper .nexafi-btn.nexafi-btn-primary .nexafi-btn-label,
+.nexafi-app-wrapper .nexafi-btn-continue .nexafi-btn-label,
+.nexafi-app-wrapper .nexafi-btn-submit .nexafi-btn-label,
+.nexafi-app-wrapper .nexafi-btn-accept .nexafi-btn-label {
+  color: #ffffff !important;
+}
+
+.nexafi-app-wrapper .nexafi-btn-arrow {
+  font-size: 18px !important;
+  line-height: 1 !important;
+  display: inline-block !important;
+  color: #ffffff !important;
+  margin-left: 2px !important;
+  transition: transform 0.15s ease !important;
+}
+
+.nexafi-app-wrapper button.nexafi-btn-primary:hover .nexafi-btn-arrow,
+.nexafi-app-wrapper .nexafi-btn-continue:hover .nexafi-btn-arrow,
+.nexafi-app-wrapper .nexafi-btn-submit:hover .nexafi-btn-arrow,
+.nexafi-app-wrapper .nexafi-btn-accept:hover .nexafi-btn-arrow {
+  transform: translateX(3px) !important;
+}
+
+.nexafi-btn-large {
+  height: 52px;
+  font-size: 16px;
+}
+
+.nexafi-btn-outline {
+  background: #ffffff;
+  border: 1.5px solid var(--nexafi-blue);
+  color: var(--nexafi-blue);
+  height: 44px;
+}
+
+.nexafi-btn-outline:hover {
+  background: var(--nexafi-blue-light);
+  color: var(--nexafi-blue-hover);
+}
+
+.nexafi-app-wrapper .nexafi-btn-secondary,
+.nexafi-app-wrapper a.nexafi-btn-secondary,
+.nexafi-btn-secondary {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #334155 !important;
+  height: 48px !important;
+  border-radius: var(--nexafi-radius-pill) !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  width: 100% !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.nexafi-app-wrapper .nexafi-btn-secondary .nexafi-btn-label,
+.nexafi-btn-secondary .nexafi-btn-label {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+.nexafi-app-wrapper .nexafi-btn-secondary:hover,
+.nexafi-btn-secondary:hover {
+  background: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+.nexafi-app-wrapper .nexafi-btn-secondary:hover .nexafi-btn-label,
+.nexafi-btn-secondary:hover .nexafi-btn-label {
+  color: #0f172a !important;
+}
+
+.nexafi-icon-arrow {
+  width: 16px;
+  height: 16px;
+  stroke: #ffffff;
+}
+
+/* Spinner */
+.nexafi-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: nexafi-spin 0.6s linear infinite;
+}
+
+
+@keyframes nexafi-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   SCREEN 4 — DECISION (Approval Breakdown Card Matching Reference Image)
+   ========================================================================== */
+.nexafi-celebration-badge-wrap {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.nexafi-check-circle {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.28);
+  position: relative;
+  z-index: 2;
+}
+
+.nexafi-check-circle svg {
+  width: 28px;
+  height: 28px;
+  stroke: #ffffff;
+  display: block;
+}
+
+.nexafi-confetti-particle-box {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 90px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.nexafi-confetti {
+  position: absolute;
+  width: 6px;
+  height: 10px;
+  border-radius: 2px;
+  opacity: 0.85;
+}
+
+.nexafi-confetti.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.nexafi-confetti.c1 { top: 12px; left: 24px; background: #f97316; transform: rotate(15deg); }
+.nexafi-confetti.c2 { top: 4px; left: 60px; background: #38bdf8; transform: rotate(-25deg); }
+.nexafi-confetti.c3 { top: 18px; right: 28px; background: #ec4899; transform: rotate(35deg); }
+.nexafi-confetti.c4 { top: 40px; right: 14px; background: #10b981; transform: rotate(-15deg); }
+.nexafi-confetti.c5 { top: 38px; left: 16px; background: #8b5cf6; transform: rotate(45deg); }
+.nexafi-confetti.c6 { top: 2px; right: 65px; background: #f59e0b; transform: rotate(-40deg); }
+.nexafi-confetti.c7 { top: 28px; left: 45px; background: #10b981; }
+.nexafi-confetti.c8 { top: 32px; right: 48px; background: #fb923c; transform: rotate(20deg); }
+.nexafi-confetti.c9 { top: 0px; left: 85px; background: #38bdf8; }
+.nexafi-confetti.c10 { top: 6px; right: 85px; background: #ec4899; }
+
+.nexafi-decision-title-group {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.nexafi-congrats-text {
+  font-size: 19px;
+  font-weight: 700;
+  color: #0b275b;
+  display: block;
+  line-height: 1.25;
+}
+
+.nexafi-approved-heading {
+  font-size: 24px;
+  font-weight: 800;
+  color: #16a34a;
+  margin: 3px 0 6px 0;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.nexafi-approved-subtext {
+  font-size: 13.5px;
+  color: #475569;
+  margin: 0 auto;
+  line-height: 1.4;
+  max-width: 290px;
+}
+
+/* Feature Mint Cards (Approved Financing Amount & Your Monthly Payment) */
+.nexafi-amount-featured-card,
+.nexafi-monthly-featured-box {
+  text-align: center;
+  padding: 16px 20px;
+  background: #edfbf2;
+  border: 1px solid rgba(22, 163, 74, 0.08);
+  border-radius: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.04);
+}
+
+.nexafi-featured-label,
+.nexafi-monthly-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1e293b;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.nexafi-featured-val,
+.nexafi-monthly-val {
+  font-size: 38px;
+  font-weight: 800;
+  color: #0a6634;
+  margin: 2px 0 0 0;
+  line-height: 1.15;
+}
+
+.nexafi-monthly-sub {
+  font-size: 12.5px;
+  color: #475569;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* Payment Breakdown (Clean list without card background, matching reference image) */
+.nexafi-breakdown-wrap {
+  margin: 18px 0;
+  text-align: left;
+}
+
+.nexafi-breakdown-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0b275b;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.nexafi-breakdown-table {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nexafi-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.nexafi-row-label {
+  color: #475569;
+  font-weight: 500;
+}
+
+.nexafi-row-val {
+  font-weight: 700;
+  color: #0b275b;
+  font-size: 14.5px;
+}
+
+.nexafi-row-total {
+  border-top: none;
+  padding-top: 6px;
+  margin-top: 0;
+}
+
+.nexafi-row-total .nexafi-row-label {
+  color: #475569;
+  font-weight: 500;
+}
+
+.nexafi-row-total .nexafi-row-val {
+  font-weight: 700;
+  color: #0b275b;
+  font-size: 15px;
+}
+
+/* Motivation Banner */
+.nexafi-motivation-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #edfbf2;
+  border: 1px solid rgba(22, 163, 74, 0.08);
+  border-radius: 16px;
+  margin-top: 16px;
+  margin-bottom: 22px;
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.04);
+}
+
+.nexafi-gift-icon-wrap {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nexafi-gift-svg {
+  width: 26px;
+  height: 26px;
+}
+
+.nexafi-motivation-text {
+  flex: 1;
+  text-align: left;
+}
+
+.nexafi-motivation-heading {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0b275b;
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+
+.nexafi-motivation-desc {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.35;
+}
+
+.nexafi-terms-accept-box {
+  margin-bottom: 0;
+}
+
+/* Outcome B & Preliminary Special Styles */
+.nexafi-badge-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.nexafi-badge-blue {
+  background: var(--nexafi-blue-light);
+  color: var(--nexafi-blue);
+}
+
+.nexafi-badge-amber {
+  background: var(--nexafi-amber-bg);
+  color: var(--nexafi-amber);
+}
+
+.nexafi-ineligible-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0 0 6px 0;
+}
+
+.nexafi-ineligible-reason {
+  font-size: 13px;
+  color: #b45309;
+  margin: 0;
+}
+
+.nexafi-ineligible-msg-box {
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: #713f12;
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+.nexafi-rep-contact-box {
+  background: #ffffff;
+  border: 1px solid var(--nexafi-border-light);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 18px;
+}
+
+.nexafi-rep-contact-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.nexafi-rep-contact-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--nexafi-text-dark);
+}
+
+.nexafi-rep-contact-id {
+  font-size: 12px;
+  color: var(--nexafi-blue);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.nexafi-safe-notice-box {
+  background: #f0f7ff;
+  border-left: 3px solid var(--nexafi-blue);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: #1e3a8a;
+  margin-bottom: 16px;
+}/* ==========================================================================
+   SCREEN 5 — CONFIRMATION (Outcome Appropriate Screen)
+   ========================================================================== */
+.nexafi-confirm-card {
+  padding: 24px 18px 26px;
+}
+
+.nexafi-confirm-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.nexafi-party-icon-wrap {
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.nexafi-party-emoji {
+  font-size: 44px;
+  line-height: 1;
+  display: inline-block;
+  animation: nexafi-bounce 1.2s ease infinite;
+}
+
+@keyframes nexafi-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.nexafi-confirm-title {
+  font-size: 25px;
+  font-weight: 800;
+  color: var(--nexafi-navy, #0b275b);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.nexafi-confirm-subtitle {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0 auto;
+  max-width: 320px;
+  line-height: 1.45;
+}
+
+/* Reference Card */
+.nexafi-reference-card {
+  background: #f0f6ff;
+  border: 1px solid #dce8fc;
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 18px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(11, 39, 91, 0.03);
+}
+
+.nexafi-ref-header-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e1ecfa;
+}
+
+.nexafi-ref-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.nexafi-ref-header-block .nexafi-ref-number {
+  font-family: var(--nexafi-font);
+  font-size: 16.5px;
+  font-weight: 800;
+  color: var(--nexafi-navy, #0b275b);
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+
+.nexafi-ref-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e1ecfa;
+}
+
+.nexafi-ref-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.nexafi-ref-col .nexafi-ref-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--nexafi-navy, #0b275b);
+  line-height: 1.25;
+}
+
+.nexafi-ref-footer-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 12px;
+}
+
+.nexafi-ref-footer-block .nexafi-ref-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--nexafi-navy, #0b275b);
+  line-height: 1.25;
+}
+
+.nexafi-ref-val {
+  font-weight: 700;
+  color: var(--nexafi-navy, #0b275b);
+}
+
+.nexafi-badge-status {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--nexafi-green-bg);
+  color: var(--nexafi-green-dark);
+  text-transform: uppercase;
+}
+
+/* Next Steps Vertical Timeline Stepper */
+.nexafi-next-steps-section {
+  margin-bottom: 24px;
+}
+
+.nexafi-next-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--nexafi-navy, #0b275b);
+  margin: 0 0 16px 0;
+  letter-spacing: -0.01em;
+}
+
+.nexafi-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nexafi-step-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 22px;
+}
+
+.nexafi-step-item:last-child {
+  padding-bottom: 0;
+}
+
+/* Connecting vertical line between step 1 -> 2 -> 3 */
+.nexafi-step-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 28px;
+  bottom: 0;
+  width: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.nexafi-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--nexafi-blue, #1d72f2);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  margin-top: 0;
+  box-shadow: 0 2px 5px rgba(29, 114, 242, 0.25);
+}
+
+.nexafi-step-desc {
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.45;
+  padding-top: 4px;
+}
+
+/* Tagline Card */
+.nexafi-tagline-card,
+.nexafi-tagline-box {
+  background: #eff6ff;
+  border: 1px solid rgba(191, 219, 254, 0.45);
+  border-radius: 20px;
+  padding: 24px 20px 22px;
+  text-align: center;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 6px rgba(29, 114, 242, 0.04);
+}
+
+.nexafi-tagline-script {
+  font-family: var(--nexafi-script, 'Caveat', 'Playfair Display', cursive, serif);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--nexafi-blue, #1d72f2);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  display: inline-block;
+  transform: rotate(-1.5deg);
+}
+
+.nexafi-tagline-brand {
+  font-family: var(--nexafi-font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #2563eb;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+/* Return Button */
+.nexafi-btn-return {
+  border-radius: var(--nexafi-radius-pill, 9999px) !important;
+  width: 100% !important;
+  padding: 15px 24px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--nexafi-blue, #1d72f2) !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 14px rgba(29, 114, 242, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+.nexafi-btn-return:hover {
+  background: var(--nexafi-blue-hover, #1565d8) !important;
+  box-shadow: 0 6px 18px rgba(29, 114, 242, 0.4) !important;
+  transform: translateY(-1px) !important;
+  color: #ffffff !important;
+}
+
+.nexafi-btn-return:active {
+  background: var(--nexafi-blue-active, #0d54b8) !important;
+  transform: translateY(1px) !important;
+  box-shadow: 0 2px 8px rgba(29, 114, 242, 0.3) !important;
+}
+
+/* ==========================================================================
+   Alerts & Feedback
+   ========================================================================== */
+.nexafi-alert {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nexafi-alert-error {
+  background: var(--nexafi-error-bg);
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+/* ==========================================================================
+   Desktop & Tablet Enhanced Responsive System
+   ========================================================================== */
+@media (min-width: 992px) {
+  /* Typography & Headings */
+  .nexafi-card-title {
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+
+  .nexafi-card-subtitle {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .nexafi-heading-group {
+    margin-bottom: 24px;
+  }
+
+  /* Navigation & Progress */
+  .nexafi-topbar {
+    margin-bottom: 26px;
+    min-height: 68px;
+  }
+
+  .nexafi-topbar-logo {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .nexafi-topbar-logo .nexafi-svg-logo {
+    height: 68px;
+    width: auto;
+    max-width: 260px;
+    display: block;
+    filter: drop-shadow(0 2px 5px rgba(11, 39, 91, 0.04));
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+
+  .nexafi-welcome-header .nexafi-svg-logo {
+    height: 72px;
+    max-width: 280px;
+  }
+
+  .nexafi-app-wrapper button.nexafi-nav-back,
+  .nexafi-app-wrapper a.nexafi-nav-back,
+  .nexafi-app-wrapper .nexafi-nav-back {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    padding: 9px !important;
+    border-radius: 10px !important;
+  }
+
+  .nexafi-app-wrapper button.nexafi-nav-back svg,
+  .nexafi-app-wrapper a.nexafi-nav-back svg,
+  .nexafi-app-wrapper .nexafi-nav-back svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .nexafi-nav-spacer {
+    width: 42px !important;
+    min-width: 42px !important;
+    flex: 0 0 42px;
+  }
+
+  .nexafi-progress-wrapper {
+    margin-bottom: 26px;
+  }
+
+  .nexafi-step-tag {
+    font-size: 13px;
+  }
+
+  .nexafi-progress-track {
+    height: 5px;
+  }
+
+  /* Form Layout & Fields */
+  .nexafi-form-section {
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  .nexafi-grid {
+    gap: 16px;
+  }
+
+  .nexafi-grid-2 {
+    gap: 16px;
+  }
+
+  .nexafi-grid-contact {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .nexafi-grid-3 {
+    grid-template-columns: 1.8fr 1fr 1.2fr;
+    gap: 16px;
+  }
+
+  .nexafi-field-group {
+    gap: 6px;
+  }
+
+  .nexafi-label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .nexafi-input,
+  .nexafi-select {
+    height: 48px;
+    font-size: 15px;
+    padding: 0 16px;
+    border-radius: 12px;
+  }
+
+  .nexafi-select {
+    padding-right: 40px;
+    background-position: right 14px center;
+  }
+
+  .nexafi-currency-symbol {
+    left: 16px !important;
+    font-size: 16px !important;
+  }
+
+  .nexafi-input.nexafi-currency-input,
+  input.nexafi-currency-input,
+  .nexafi-currency-input {
+    padding-left: 36px !important;
+  }
+
+  /* Checkbox Cards */
+  .nexafi-checkbox-card {
+    padding: 15px 18px !important;
+    border-radius: 14px !important;
+    gap: 14px !important;
+  }
+
+  .nexafi-checkbox-indicator {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    border-radius: 6px !important;
+  }
+
+  .nexafi-checkbox-label {
+    font-size: 14px !important;
+    line-height: 1.45 !important;
+  }
+
+  .nexafi-declarations-box {
+    gap: 12px;
+  }
+
+  /* Action Buttons */
+  .nexafi-app-wrapper .nexafi-form-action {
+    margin-top: 28px !important;
+  }
+
+  .nexafi-app-wrapper button.nexafi-btn-primary,
+  .nexafi-app-wrapper .nexafi-btn.nexafi-btn-primary,
+  .nexafi-app-wrapper .nexafi-btn-continue,
+  .nexafi-app-wrapper .nexafi-btn-submit {
+    height: 52px !important;
+    font-size: 16px !important;
+  }
+
+  /* Screen 1 Welcome on Desktop */
+  .nexafi-welcome-card {
+    padding: 44px 50px 40px;
+    border-radius: 32px;
+  }
+
+  .nexafi-welcome-title {
+    font-size: 32px;
+    line-height: 1.25;
+  }
+
+  .nexafi-welcome-body {
+    gap: 32px;
+    margin-bottom: 34px;
+  }
+
+  .nexafi-welcome-hero-image {
+    width: 210px;
+  }
+
+  .nexafi-benefit-text {
+    font-size: 14.5px;
+  }
+
+  .nexafi-benefit-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Screen 3 Rep Preview on Desktop */
+  .nexafi-rep-card {
+    padding: 16px 20px;
+    border-radius: 16px;
+    gap: 16px;
+    margin-top: 14px;
+  }
+
+  .nexafi-rep-avatar-wrap {
+    width: 54px;
+    height: 54px;
+  }
+
+  .nexafi-rep-name {
+    font-size: 16px;
+  }
+
+  .nexafi-rep-code {
+    font-size: 13px;
+  }
+
+  .nexafi-info-callout {
+    padding: 12px 16px;
+    font-size: 13px;
+    border-radius: 12px;
+    margin-top: 14px;
+  }
+
+  /* Screen 4 Decision on Desktop */
+  .nexafi-amount-featured-card,
+  .nexafi-monthly-featured-box {
+    padding: 20px 24px;
+    border-radius: 20px;
+  }
+
+  .nexafi-featured-val,
+  .nexafi-monthly-val {
+    font-size: 42px;
+  }
+
+  .nexafi-breakdown-row {
+    font-size: 14.5px;
+    padding: 6px 0;
+  }
+
+  .nexafi-row-val {
+    font-size: 15.5px;
+  }
+
+  .nexafi-motivation-banner {
+    padding: 16px 20px;
+  }
+
+  /* Screen 5 Confirmation on Desktop */
+  .nexafi-confirm-card {
+    padding: 38px 46px 42px;
+  }
+
+  .nexafi-confirm-title {
+    font-size: 28px;
+  }
+
+  .nexafi-reference-card {
+    padding: 20px 24px;
+    border-radius: 18px;
+  }
+
+  .nexafi-ref-header-block .nexafi-ref-number {
+    font-size: 18px;
+  }
+
+  .nexafi-step-item {
+    gap: 16px;
+    padding-bottom: 24px;
+  }
+
+  .nexafi-step-desc {
+    font-size: 14px;
+  }
+
+  .nexafi-tagline-card,
+  .nexafi-tagline-box {
+    padding: 28px 24px 26px;
+    border-radius: 22px;
+  }
+
+  .nexafi-tagline-script {
+    font-size: 36px;
+  }
+}
+
+/* Mobile responsive enhancements */
+@media (max-width: 540px) {
+  .nexafi-app-wrapper {
+    padding: 0 10px;
+    margin: 0.75rem auto 1.5rem;
+  }
+
+  .nexafi-card {
+    padding: 22px 16px 24px;
+    border-radius: 20px;
+  }
+
+  .nexafi-topbar {
+    margin-bottom: 18px;
+  }
+
+  .nexafi-topbar-logo .nexafi-svg-logo {
+    height: 38px;
+    max-width: 150px;
+  }
+
+  .nexafi-heading-group {
+    margin-bottom: 18px;
+  }
+
+  .nexafi-card-title {
+    font-size: 20px;
+  }
+
+  .nexafi-card-subtitle {
+    font-size: 13px;
+  }
+
+  /* Form & Fields */
+  .nexafi-form-section {
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .nexafi-form-step-3 {
+    gap: 16px !important;
+  }
+
+  .nexafi-form-section-quote {
+    gap: 16px !important;
+  }
+
+  .nexafi-quote-input {
+    height: 50px !important;
+    font-size: 20px !important;
+    padding-left: 38px !important;
+  }
+
+  .nexafi-quote-wrap .nexafi-currency-symbol {
+    font-size: 20px !important;
+    left: 14px !important;
+  }
+
+  .nexafi-rep-input {
+    height: 46px !important;
+    font-size: 14px !important;
+  }
+
+  .nexafi-rep-card {
+    padding: 12px 14px !important;
+    gap: 12px !important;
+  }
+
+  .nexafi-rep-avatar-wrap {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .nexafi-rep-name {
+    font-size: 14px !important;
+  }
+
+  .nexafi-rep-code {
+    font-size: 12px !important;
+  }
+
+  /* Screen 4 Decision Mobile */
+  .nexafi-featured-val,
+  .nexafi-monthly-val {
+    font-size: 32px !important;
+  }
+
+  .nexafi-approved-heading {
+    font-size: 22px !important;
+  }
+
+  .nexafi-congrats-text {
+    font-size: 16px !important;
+  }
+
+  .nexafi-breakdown-row {
+    font-size: 13px !important;
+  }
+
+  .nexafi-row-val {
+    font-size: 14px !important;
+  }
+
+  /* Screen 5 Confirmation Mobile */
+  .nexafi-confirm-title {
+    font-size: 22px !important;
+  }
+
+  .nexafi-ref-header-block .nexafi-ref-number {
+    font-size: 16px !important;
+  }
+
+  .nexafi-step-item {
+    gap: 12px !important;
+    padding-bottom: 18px !important;
+  }
+
+  .nexafi-step-desc {
+    font-size: 13px !important;
+  }
+
+  .nexafi-tagline-script {
+    font-size: 28px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .nexafi-app-wrapper {
+    padding: 0 6px;
+  }
+
+  .nexafi-card {
+    padding: 18px 12px 20px;
+    border-radius: 16px;
+  }
+
+  .nexafi-grid-2 {
+    gap: 8px;
+  }
+
+  .nexafi-grid-3 {
+    gap: 6px;
+  }
+
+  .nexafi-quote-input {
+    font-size: 18px !important;
+    padding-left: 34px !important;
+  }
+
+  .nexafi-quote-wrap .nexafi-currency-symbol {
+    font-size: 18px !important;
+    left: 12px !important;
+  }
+
+  .nexafi-checkbox-card {
+    padding: 10px 11px !important;
+  }
+
+  .nexafi-featured-val,
+  .nexafi-monthly-val {
+    font-size: 28px !important;
+  }
+}

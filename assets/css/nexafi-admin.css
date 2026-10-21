@@ -1,0 +1,813 @@
+/**
+ * NexaFi Admin Dashboard Stylesheet
+ *
+ * Professional fintech admin UI for NexaFi / GDG Smiles.
+ *
+ * @package NexaFi_Financing
+ */
+
+.nexafi-admin-wrap {
+  margin-top: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.nexafi-brand-text {
+  color: #0b275b;
+  font-weight: 800;
+}
+
+.nexafi-admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-top: 4px;
+}
+
+.nexafi-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  align-self: flex-end;
+}
+
+.nexafi-export-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 36px !important;
+  line-height: 34px !important;
+  padding: 0 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  margin-top: 8px !important;
+}
+
+.nexafi-admin-badge-count {
+  display: inline-block;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Stat Cards */
+.nexafi-stat-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.nexafi-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.nexafi-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.nexafi-stat-val {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.nexafi-stat-green .nexafi-stat-val { color: #10b981; }
+.nexafi-stat-blue .nexafi-stat-val { color: #1d72f2; }
+.nexafi-stat-amber .nexafi-stat-val { color: #f59e0b; }
+.nexafi-stat-purple .nexafi-stat-val { color: #8b5cf6; }
+
+/* Filter Bar */
+.nexafi-filter-bar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.nexafi-filter-inputs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nexafi-admin-input,
+.nexafi-admin-select,
+.nexafi-admin-input-date {
+  height: 34px !important;
+  font-size: 13px !important;
+}
+
+.nexafi-admin-input {
+  min-width: 240px;
+  flex: 1;
+}
+
+/* Tables */
+.nexafi-table-container {
+  background: #ffffff;
+  border: 1px solid #c3c4c7;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nexafi-apps-table {
+  min-width: 1040px;
+  width: 100%;
+}
+
+.nexafi-apps-table th,
+.nexafi-apps-table td {
+  vertical-align: middle !important;
+}
+
+.nexafi-sub-meta {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.nexafi-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.nexafi-badge-success { background: #d1fae5; color: #065f46; }
+.nexafi-badge-info    { background: #dbeafe; color: #1e40af; }
+.nexafi-badge-warning { background: #fef3c7; color: #92400e; }
+.nexafi-badge-danger  { background: #fee2e2; color: #991b1b; }
+.nexafi-badge-blue    { background: #eff6ff; color: #1d72f2; }
+
+.nexafi-rep-tag {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #0b275b;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.nexafi-quick-status-select {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  height: 32px !important;
+  line-height: 28px !important;
+  padding: 2px 30px 2px 10px !important;
+  min-width: 140px !important;
+  width: 140px !important;
+  max-width: 100% !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  background-position: right 8px center !important;
+  box-sizing: border-box !important;
+  cursor: pointer;
+  white-space: nowrap !important;
+  vertical-align: middle;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nexafi-quick-status-select:focus {
+  border-color: #1d72f2 !important;
+  box-shadow: 0 0 0 2px rgba(29, 114, 242, 0.2) !important;
+  outline: none !important;
+}
+
+/* Modal Window */
+.nexafi-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.nexafi-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.nexafi-modal-dialog {
+  position: relative;
+  background: #ffffff;
+  border-radius: 12px;
+  max-width: 820px;
+  width: 90%;
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+  overflow: hidden;
+}
+
+.nexafi-modal-dialog > form,
+.nexafi-modal-dialog form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(100vh - 32px);
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.nexafi-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nexafi-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.nexafi-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 0;
+  line-height: 1;
+}
+
+.nexafi-modal-close:hover {
+  color: #0f172a;
+}
+
+.nexafi-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.nexafi-modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.nexafi-modal-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.nexafi-modal-footer .button {
+  padding: 7px 18px;
+  height: auto;
+  line-height: 1.4;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nexafi-modal-footer .nexafi-modal-delete-rep-btn {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626 !important;
+  text-decoration: none;
+}
+
+.nexafi-modal-footer .nexafi-modal-delete-rep-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c !important;
+}
+
+.nexafi-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .nexafi-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nexafi-form-row {
+  margin-bottom: 14px;
+}
+
+.nexafi-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.nexafi-form-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.nexafi-form-col .widefat {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 520px) {
+  .nexafi-form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.nexafi-admin-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+/* Responsive Table Container */
+.nexafi-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 10px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Representatives Table & Action Buttons */
+.nexafi-rep-actions-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.nexafi-rep-actions-wrap .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  height: 28px;
+  line-height: 26px;
+  border-radius: 5px;
+  transition: all 0.15s ease-in-out;
+  white-space: nowrap;
+}
+
+.nexafi-rep-actions-wrap .nexafi-edit-rep-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.nexafi-rep-actions-wrap .nexafi-edit-rep-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.nexafi-rep-actions-wrap .nexafi-toggle-rep-btn {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.nexafi-rep-actions-wrap .nexafi-toggle-rep-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.nexafi-rep-actions-wrap .nexafi-delete-rep-btn {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626 !important;
+}
+
+.nexafi-rep-actions-wrap .nexafi-delete-rep-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c !important;
+}
+
+/* Photo Upload Control & Preview */
+.nexafi-photo-upload-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.nexafi-photo-upload-wrap:hover {
+  border-color: #94a3b8;
+}
+
+.nexafi-photo-preview-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.nexafi-photo-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nexafi-photo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.nexafi-photo-placeholder .dashicons {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nexafi-photo-controls {
+  flex: 1;
+  min-width: 0;
+}
+
+.nexafi-photo-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nexafi-photo-btn-group .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  line-height: 32px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.nexafi-photo-btn-group #nexafi-upload-photo-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+}
+
+.nexafi-photo-btn-group #nexafi-upload-photo-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.nexafi-photo-btn-group .button-link-delete {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626 !important;
+  text-decoration: none;
+}
+
+.nexafi-photo-btn-group .button-link-delete:hover {
+  background: #fca5a5;
+  border-color: #f87171;
+  color: #991b1b !important;
+}
+
+.nexafi-photo-controls .description {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.nexafi-settings-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.nexafi-settings-box h2 {
+  margin-top: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+}
+
+.nexafi-policy-box {
+  border-left: 4px solid #1d72f2;
+}
+
+/* Responsive Button Adjustments */
+@media (max-width: 640px) {
+  .nexafi-admin-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .nexafi-admin-actions {
+    margin-top: 0;
+    align-self: stretch;
+  }
+
+  .nexafi-export-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0 !important;
+  }
+
+  .nexafi-admin-header button#nexafi-add-rep-btn {
+    width: 100%;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  .nexafi-modal {
+    padding: 8px !important;
+  }
+
+  .nexafi-modal-dialog {
+    width: 100% !important;
+    max-height: calc(100vh - 16px) !important;
+  }
+
+  .nexafi-modal-dialog > form,
+  .nexafi-modal-dialog form {
+    max-height: calc(100vh - 16px) !important;
+  }
+
+  .nexafi-modal-body {
+    padding: 14px !important;
+  }
+
+  .nexafi-modal-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .nexafi-modal-footer-actions {
+    flex-direction: column-reverse;
+    width: 100%;
+    gap: 10px;
+    margin-left: 0;
+  }
+
+  .nexafi-modal-footer .button,
+  .nexafi-modal-footer-actions .button {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    height: 38px;
+    line-height: 36px;
+    font-size: 14px;
+  }
+
+  .nexafi-photo-upload-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .nexafi-photo-btn-group {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .nexafi-photo-btn-group .button {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+    height: 36px;
+  }
+
+  .nexafi-rep-actions-wrap {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .nexafi-rep-actions-wrap .button {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+}
+
+/* ==========================================================================
+   Table Action Buttons (Applications, Email Logs, etc.)
+   ========================================================================== */
+.nexafi-table-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.nexafi-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  height: 28px !important;
+  line-height: 26px !important;
+  padding: 0 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.nexafi-action-btn .dashicons {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  line-height: 14px !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+}
+
+/* View Button */
+.nexafi-action-btn-view {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+.nexafi-action-btn-view .dashicons {
+  color: #475569 !important;
+}
+
+.nexafi-action-btn-view:hover,
+.nexafi-action-btn-view:focus {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+.nexafi-action-btn-view:hover .dashicons,
+.nexafi-action-btn-view:focus .dashicons {
+  color: #0f172a !important;
+}
+
+/* Resend Button */
+.nexafi-action-btn-resend {
+  background: #1d72f2 !important;
+  border: 1px solid #1d72f2 !important;
+  color: #ffffff !important;
+}
+
+.nexafi-action-btn-resend .dashicons {
+  color: #ffffff !important;
+}
+
+.nexafi-action-btn-resend:hover,
+.nexafi-action-btn-resend:focus {
+  background: #1558b8 !important;
+  border-color: #1558b8 !important;
+  color: #ffffff !important;
+}
+
+/* Delete Button */
+.nexafi-action-btn-delete {
+  background: #ffffff !important;
+  border: 1px solid #fecaca !important;
+  color: #dc2626 !important;
+}
+
+.nexafi-action-btn-delete .dashicons {
+  color: #dc2626 !important;
+}
+
+.nexafi-action-btn-delete:hover,
+.nexafi-action-btn-delete:focus {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.nexafi-action-btn-delete:hover .dashicons,
+.nexafi-action-btn-delete:focus .dashicons {
+  color: #ffffff !important;
+}
+
+@media (max-width: 782px) {
+  .nexafi-table-actions {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .nexafi-action-btn {
+    height: 30px !important;
+    line-height: 28px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+  }
+}
+
