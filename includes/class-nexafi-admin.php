@@ -608,76 +608,79 @@ class NexaFi_Admin {
 
             <!-- Applications Table -->
             <div class="nexafi-table-container">
-                <table class="wp-list-table widefat fixed striped nexafi-apps-table">
+                <table class="wp-list-table widefat striped nexafi-apps-table">
                     <thead>
                         <tr>
-                            <th style="width: 170px;">Reference #</th>
-                            <th>Applicant</th>
-                            <th>Representative</th>
-                            <th>Quote / Financed</th>
-                            <th>Eligibility Decision</th>
-                            <th style="width: 155px; min-width: 145px;">Application Status</th>
-                            <th style="width: 140px;">Submitted</th>
-                            <th style="width: 175px; min-width: 160px;"><?php esc_html_e( 'Actions', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-ref"><?php esc_html_e( 'Reference #', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-applicant column-primary"><?php esc_html_e( 'Applicant', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-rep"><?php esc_html_e( 'Representative', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-quote"><?php esc_html_e( 'Quote / Financed', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-decision"><?php esc_html_e( 'Eligibility Decision', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-status"><?php esc_html_e( 'Application Status', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-date"><?php esc_html_e( 'Submitted', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'contact-form' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if ( empty( $applications ) ) : ?>
                             <tr>
                                 <td colspan="8" style="text-align: center; padding: 30px;">
-                                    <em>No applications found matching your criteria.</em>
+                                    <em><?php esc_html_e( 'No applications found matching your criteria.', 'contact-form' ); ?></em>
                                 </td>
                             </tr>
                         <?php else : ?>
                             <?php foreach ( $applications as $app ) : ?>
                                 <tr>
-                                    <td>
-                                        <strong>
-                                            <a href="#" class="nexafi-view-detail-link" data-app-id="<?php echo esc_attr( $app->id ); ?>">
-                                                <?php echo esc_html( $app->reference_number ); ?>
-                                            </a>
-                                        </strong>
+                                    <td class="column-ref" data-colname="<?php esc_attr_e( 'Reference #', 'contact-form' ); ?>">
+                                        <a href="#" class="nexafi-view-detail-link" data-app-id="<?php echo esc_attr( $app->id ); ?>" title="<?php esc_attr_e( 'View application details', 'contact-form' ); ?>">
+                                            <?php echo esc_html( $app->reference_number ); ?>
+                                        </a>
                                     </td>
-                                    <td>
+                                    <td class="column-applicant column-primary" data-colname="<?php esc_attr_e( 'Applicant', 'contact-form' ); ?>">
                                         <div class="nexafi-applicant-cell">
                                             <strong><?php echo esc_html( $app->first_name . ' ' . $app->last_name ); ?></strong>
-                                            <div class="nexafi-sub-meta"><?php echo esc_html( $app->email ); ?> | <?php echo esc_html( $app->phone ); ?></div>
+                                            <div class="nexafi-sub-meta">
+                                                <a href="mailto:<?php echo esc_attr( $app->email ); ?>"><?php echo esc_html( $app->email ); ?></a>
+                                                <?php if ( ! empty( $app->phone ) ) : ?>
+                                                    <span class="nexafi-sep">|</span> <a href="tel:<?php echo esc_attr( $app->phone ); ?>"><?php echo esc_html( $app->phone ); ?></a>
+                                                <?php endif; ?>
+                                            </div>
                                             <?php if ( ! empty( $app->employer_name ) || ! empty( $app->job_title ) ) : ?>
-                                                <div class="nexafi-sub-meta" style="color: #64748b; font-size: 11px; margin-top: 2px;">
+                                                <div class="nexafi-sub-meta nexafi-applicant-job">
                                                     💼 <?php echo esc_html( trim( ( $app->job_title ?: '' ) . ( ( $app->job_title && $app->employer_name ) ? ' at ' : '' ) . ( $app->employer_name ?: '' ) ) ); ?>
                                                 </div>
                                             <?php endif; ?>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="column-rep" data-colname="<?php esc_attr_e( 'Representative', 'contact-form' ); ?>">
                                         <span class="nexafi-rep-tag"><?php echo esc_html( $app->rep_id_str ); ?></span>
                                     </td>
-                                    <td>
+                                    <td class="column-quote" data-colname="<?php esc_attr_e( 'Quote / Financed', 'contact-form' ); ?>">
                                         <div><strong>Quote:</strong> <?php echo esc_html( NexaFi_Calculator::format_currency( $app->treatment_quote ) ); ?></div>
                                         <div class="nexafi-sub-meta">Financed: <?php echo esc_html( NexaFi_Calculator::format_currency( $app->financed_amount ) ); ?> (<?php echo esc_html( NexaFi_Calculator::format_currency( $app->monthly_payment ) ); ?>/mo)</div>
                                     </td>
-                                    <td>
+                                    <td class="column-decision" data-colname="<?php esc_attr_e( 'Eligibility Decision', 'contact-form' ); ?>">
                                         <?php if ( 'approved' === $app->eligibility_result || 'approved' === $app->application_status ) : ?>
-                                            <span class="nexafi-badge nexafi-badge-success">Approved</span>
-                                            <div class="nexafi-sub-meta" style="font-size:11px;">Automated Rule</div>
+                                            <span class="nexafi-badge nexafi-badge-success"><?php esc_html_e( 'Approved', 'contact-form' ); ?></span>
+                                            <div class="nexafi-sub-meta"><?php esc_html_e( 'Automated Rule', 'contact-form' ); ?></div>
                                         <?php else : ?>
-                                            <span class="nexafi-badge nexafi-badge-warning">Ineligible</span>
-                                            <div class="nexafi-sub-meta" style="font-size:11px;">Criteria Unmet</div>
+                                            <span class="nexafi-badge nexafi-badge-warning"><?php esc_html_e( 'Ineligible', 'contact-form' ); ?></span>
+                                            <div class="nexafi-sub-meta"><?php esc_html_e( 'Criteria Unmet', 'contact-form' ); ?></div>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
+                                    <td class="column-status" data-colname="<?php esc_attr_e( 'Application Status', 'contact-form' ); ?>">
                                         <?php if ( ! empty( $app->terms_accepted ) || 'accepted' === $app->application_status ) : ?>
-                                            <span class="nexafi-badge nexafi-badge-primary" style="background:#2563eb;color:#fff;font-weight:600;padding:4px 10px;border-radius:12px;display:inline-block;">Accepted Offer</span>
+                                            <span class="nexafi-badge nexafi-badge-primary"><?php esc_html_e( 'Accepted Offer', 'contact-form' ); ?></span>
                                         <?php elseif ( 'approved' === $app->eligibility_result || 'approved' === $app->application_status ) : ?>
-                                            <span class="nexafi-badge nexafi-badge-success" style="background:#10b981;color:#fff;font-weight:600;padding:4px 10px;border-radius:12px;display:inline-block;">Approved</span>
+                                            <span class="nexafi-badge nexafi-badge-success"><?php esc_html_e( 'Approved', 'contact-form' ); ?></span>
                                         <?php else : ?>
-                                            <span class="nexafi-badge nexafi-badge-warning" style="background:#f59e0b;color:#fff;font-weight:600;padding:4px 10px;border-radius:12px;display:inline-block;">Ineligible</span>
+                                            <span class="nexafi-badge nexafi-badge-warning"><?php esc_html_e( 'Ineligible', 'contact-form' ); ?></span>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
+                                    <td class="column-date" data-colname="<?php esc_attr_e( 'Submitted', 'contact-form' ); ?>">
                                         <?php echo esc_html( wp_date( 'M j, Y g:i A', strtotime( $app->created_at ) ) ); ?>
                                     </td>
-                                    <td>
+                                    <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'contact-form' ); ?>">
                                         <div class="nexafi-table-actions">
                                             <button type="button" class="button button-small nexafi-action-btn nexafi-action-btn-view nexafi-view-detail-btn" data-app-id="<?php echo esc_attr( $app->id ); ?>" title="<?php esc_attr_e( 'View application details', 'contact-form' ); ?>">
                                                 <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
@@ -788,21 +791,21 @@ class NexaFi_Admin {
 
             <!-- Table of Representatives -->
             <div class="nexafi-table-container">
-                <table class="wp-list-table widefat fixed striped nexafi-reps-table">
+                <table class="wp-list-table widefat striped nexafi-reps-table">
                     <thead>
                         <tr>
-                            <th style="width: 56px; text-align: center;">Photo</th>
-                            <th style="width: 110px;">Rep ID</th>
-                            <th>Name</th>
-                            <th>Contact Details</th>
-                            <th style="width: 130px;">Applications</th>
-                            <th style="width: 100px;">Status</th>
-                            <th style="width: 190px;">Actions</th>
+                            <th scope="col" class="manage-column column-photo" style="width: 56px; text-align: center;"><?php esc_html_e( 'Photo', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-repid"><?php esc_html_e( 'Rep ID', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-name column-primary"><?php esc_html_e( 'Name', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-contact"><?php esc_html_e( 'Contact Details', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-apps"><?php esc_html_e( 'Applications', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'contact-form' ); ?></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if ( empty( $reps ) ) : ?>
-                            <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;"><em>No representatives found. Click "Add Representative" to create one.</em></td></tr>
+                            <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;"><em><?php esc_html_e( 'No representatives found. Click "Add Representative" to create one.', 'contact-form' ); ?></em></td></tr>
                         <?php else : ?>
                             <?php foreach ( $reps as $r ) : ?>
                                 <?php
@@ -810,26 +813,26 @@ class NexaFi_Admin {
                                 $photo = ! empty( $r->photo_url ) ? $r->photo_url : $default_photo;
                                 ?>
                                 <tr>
-                                    <td style="text-align: center;">
+                                    <td class="column-photo" data-colname="<?php esc_attr_e( 'Photo', 'contact-form' ); ?>" style="text-align: center;">
                                         <img src="<?php echo esc_url( $photo ); ?>" alt="<?php echo esc_attr( $r->name ); ?>" class="nexafi-rep-avatar-img" />
                                     </td>
-                                    <td><span class="nexafi-rep-tag"><?php echo esc_html( $r->rep_id ); ?></span></td>
-                                    <td><strong style="color: #0f172a;"><?php echo esc_html( $r->name ); ?></strong></td>
-                                    <td>
-                                        <div style="color: #1e293b;"><?php echo esc_html( $r->email ); ?></div>
+                                    <td class="column-repid" data-colname="<?php esc_attr_e( 'Rep ID', 'contact-form' ); ?>"><span class="nexafi-rep-tag"><?php echo esc_html( $r->rep_id ); ?></span></td>
+                                    <td class="column-name column-primary" data-colname="<?php esc_attr_e( 'Name', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( $r->name ); ?></strong></td>
+                                    <td class="column-contact" data-colname="<?php esc_attr_e( 'Contact Details', 'contact-form' ); ?>">
+                                        <div style="color: #1e293b;"><a href="mailto:<?php echo esc_attr( $r->email ); ?>"><?php echo esc_html( $r->email ); ?></a></div>
                                         <div class="nexafi-sub-meta"><?php echo esc_html( $r->phone ); ?></div>
                                     </td>
-                                    <td>
-                                        <span class="nexafi-badge nexafi-badge-info"><?php echo intval( $r->apps_count ); ?> apps</span>
+                                    <td class="column-apps" data-colname="<?php esc_attr_e( 'Applications', 'contact-form' ); ?>">
+                                        <span class="nexafi-badge nexafi-badge-info"><?php echo intval( $r->apps_count ); ?> <?php esc_html_e( 'apps', 'contact-form' ); ?></span>
                                     </td>
-                                    <td>
+                                    <td class="column-status" data-colname="<?php esc_attr_e( 'Status', 'contact-form' ); ?>">
                                         <?php if ( $r->is_active ) : ?>
-                                            <span class="nexafi-badge nexafi-badge-success">Active</span>
+                                            <span class="nexafi-badge nexafi-badge-success"><?php esc_html_e( 'Active', 'contact-form' ); ?></span>
                                         <?php else : ?>
-                                            <span class="nexafi-badge nexafi-badge-warning">Inactive</span>
+                                            <span class="nexafi-badge nexafi-badge-warning"><?php esc_html_e( 'Inactive', 'contact-form' ); ?></span>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
+                                    <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'contact-form' ); ?>">
                                         <div class="nexafi-rep-actions-wrap">
                                             <button type="button" class="button button-small nexafi-action-btn nexafi-edit-rep-btn" 
                                                     data-id="<?php echo esc_attr( $r->id ); ?>"
@@ -840,16 +843,18 @@ class NexaFi_Admin {
                                                     data-photo="<?php echo esc_attr( $r->photo_url ); ?>"
                                                     data-notes="<?php echo esc_attr( $r->notes ); ?>"
                                                     data-active="<?php echo esc_attr( $r->is_active ); ?>">
-                                                <?php esc_html_e( 'Edit', 'contact-form' ); ?>
+                                                <span class="dashicons dashicons-edit" aria-hidden="true"></span>
+                                                <span><?php esc_html_e( 'Edit', 'contact-form' ); ?></span>
                                             </button>
                                             <button type="button" class="button button-small nexafi-action-btn nexafi-toggle-rep-btn" data-id="<?php echo esc_attr( $r->id ); ?>" data-active="<?php echo esc_attr( $r->is_active ); ?>">
-                                                <?php echo $r->is_active ? esc_html__( 'Deactivate', 'contact-form' ) : esc_html__( 'Activate', 'contact-form' ); ?>
+                                                <span><?php echo $r->is_active ? esc_html__( 'Deactivate', 'contact-form' ) : esc_html__( 'Activate', 'contact-form' ); ?></span>
                                             </button>
                                             <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array(
                                                 'nexafi_action' => 'delete_representative',
                                                 'rep_id'        => $r->id,
-                                            ), admin_url( 'admin.php?page=nexafi-representatives' ) ), 'nexafi_delete_rep_' . $r->id, 'nexafi_delete_nonce' ) ); ?>" class="button button-small nexafi-action-btn nexafi-action-btn--delete nexafi-delete-rep-btn" onclick="return confirm('<?php echo esc_js( __( 'Delete this representative?', 'contact-form' ) ); ?>');">
-                                                <?php esc_html_e( 'Delete', 'contact-form' ); ?>
+                                            ), admin_url( 'admin.php?page=nexafi-representatives' ) ), 'nexafi_delete_rep_' . $r->id, 'nexafi_delete_nonce' ) ); ?>" class="button button-small nexafi-action-btn nexafi-action-btn-delete nexafi-delete-rep-btn" onclick="return confirm('<?php echo esc_js( __( 'Delete this representative?', 'contact-form' ) ); ?>');">
+                                                <span class="dashicons dashicons-trash" aria-hidden="true"></span>
+                                                <span><?php esc_html_e( 'Delete', 'contact-form' ); ?></span>
                                             </a>
                                         </div>
                                     </td>
@@ -1032,100 +1037,107 @@ class NexaFi_Admin {
             </div>
 
             <!-- Email Logs Table -->
-            <table class="wp-list-table widefat fixed striped nexafi-admin-table" style="margin-top: 15px;">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;"><?php esc_html_e( 'ID', 'contact-form' ); ?></th>
-                        <th style="width: 140px;"><?php esc_html_e( 'Date & Time', 'contact-form' ); ?></th>
-                        <th style="width: 180px;"><?php esc_html_e( 'Recipient', 'contact-form' ); ?></th>
-                        <th style="width: 140px;"><?php esc_html_e( 'Application Ref #', 'contact-form' ); ?></th>
-                        <th style="width: 130px;"><?php esc_html_e( 'Email Type', 'contact-form' ); ?></th>
-                        <th style="width: 90px;"><?php esc_html_e( 'Status', 'contact-form' ); ?></th>
-                        <th><?php esc_html_e( 'Delivery Details / Error', 'contact-form' ); ?></th>
-                        <th style="width: 195px; min-width: 180px; text-align: left;"><?php esc_html_e( 'Actions', 'contact-form' ); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if ( empty( $logs ) ) : ?>
+            <div class="nexafi-table-container">
+                <table class="wp-list-table widefat striped nexafi-admin-table nexafi-logs-table">
+                    <thead>
                         <tr>
-                            <td colspan="8" style="text-align: center; padding: 30px; color: #64748b;">
-                                <?php esc_html_e( 'No email delivery logs recorded yet. Outgoing emails from NexaFi will appear here.', 'contact-form' ); ?>
-                            </td>
+                            <th scope="col" class="manage-column column-id" style="width: 60px;"><?php esc_html_e( 'ID', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-date"><?php esc_html_e( 'Date & Time', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-recipient column-primary"><?php esc_html_e( 'Recipient', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-ref"><?php esc_html_e( 'Application Ref #', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-type"><?php esc_html_e( 'Email Type', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-details"><?php esc_html_e( 'Delivery Details / Error', 'contact-form' ); ?></th>
+                            <th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'contact-form' ); ?></th>
                         </tr>
-                    <?php else : ?>
-                        <?php foreach ( $logs as $log ) : 
-                            $is_sent = ( 'sent' === $log->status );
-                            $type_label = ( 'resend' === $log->email_type ) ? __( 'Resend Notification', 'contact-form' ) : ( ( 'admin_notification' === $log->email_type ) ? __( 'Admin Alert', 'contact-form' ) : __( 'Applicant Email', 'contact-form' ) );
-                            $type_bg = ( 'resend' === $log->email_type ) ? '#fef3c7;color:#92400e;' : ( ( 'admin_notification' === $log->email_type ) ? '#e0e7ff;color:#3730a3;' : '#f1f5f9;color:#334155;' );
-                        ?>
-                        <tr id="nexafi-log-row-<?php echo intval( $log->id ); ?>">
-                            <td>#<?php echo intval( $log->id ); ?></td>
-                            <td><?php echo esc_html( wp_date( 'M j, Y g:i A', strtotime( $log->sent_at ) ) ); ?></td>
-                            <td>
-                                <strong><?php echo esc_html( $log->recipient_name ? $log->recipient_name : 'Applicant' ); ?></strong><br>
-                                <a href="mailto:<?php echo esc_attr( $log->recipient_email ); ?>" style="font-size: 12px; color: #2563eb;"><?php echo esc_html( $log->recipient_email ); ?></a>
-                            </td>
-                            <td>
-                                <?php if ( ! empty( $log->reference_number ) ) : ?>
-                                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-financing&search=' . urlencode( $log->reference_number ) ) ); ?>" class="nexafi-view-detail-btn" data-app-id="<?php echo esc_attr( $log->application_id ); ?>" style="font-family: monospace; font-weight: 700;">
-                                        <?php echo esc_html( $log->reference_number ); ?>
-                                    </a>
-                                <?php else : ?>
-                                    <span style="color: #94a3b8;">—</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <span style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: <?php echo esc_attr( $type_bg ); ?>">
-                                    <?php echo esc_html( $type_label ); ?>
-                                </span>
-                            </td>
-                            <td class="nexafi-log-status-cell">
-                                <?php if ( $is_sent ) : ?>
-                                    <span class="nexafi-badge nexafi-badge-success" style="background:#dcfce7;color:#15803d;padding:4px 8px;border-radius:4px;font-weight:700;font-size:11px;display:inline-block;">&#10003; Sent</span>
-                                <?php else : ?>
-                                    <span class="nexafi-badge nexafi-badge-danger" style="background:#fee2e2;color:#b91c1c;padding:4px 8px;border-radius:4px;font-weight:700;font-size:11px;display:inline-block;">&#10007; Failed</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="nexafi-log-error-cell">
-                                <?php if ( ! empty( $log->error_message ) ) : ?>
-                                    <span style="color: #b91c1c; font-size: 12px; line-height: 1.4; display: block; max-width: 320px; word-break: break-word;">
-                                        ⚠️ <?php echo esc_html( $log->error_message ); ?>
-                                    </span>
-                                <?php else : ?>
-                                    <span style="color: #64748b; font-size: 12px;">Delivered to mail server</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <div class="nexafi-table-actions">
-                                    <?php if ( ! empty( $log->application_id ) ) : ?>
-                                        <button type="button" 
-                                                class="button button-small nexafi-action-btn nexafi-action-btn-resend nexafi-resend-email-btn" 
-                                                data-log-id="<?php echo esc_attr( $log->id ); ?>" 
-                                                data-app-id="<?php echo esc_attr( $log->application_id ); ?>"
-                                                title="<?php esc_attr_e( 'Resend confirmation email to applicant', 'contact-form' ); ?>">
-                                            <span class="dashicons dashicons-email-alt" aria-hidden="true"></span>
-                                            <span><?php esc_html_e( 'Resend', 'contact-form' ); ?></span>
-                                        </button>
+                    </thead>
+                    <tbody>
+                        <?php if ( empty( $logs ) ) : ?>
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 30px; color: #64748b;">
+                                    <em><?php esc_html_e( 'No email delivery logs recorded yet. Outgoing emails from NexaFi will appear here.', 'contact-form' ); ?></em>
+                                </td>
+                            </tr>
+                        <?php else : ?>
+                            <?php foreach ( $logs as $log ) : 
+                                $is_sent = ( 'sent' === $log->status );
+                                $type_label = ( 'resend' === $log->email_type ) ? __( 'Resend Notification', 'contact-form' ) : ( ( 'admin_notification' === $log->email_type ) ? __( 'Admin Alert', 'contact-form' ) : __( 'Applicant Email', 'contact-form' ) );
+                                $type_class = ( 'resend' === $log->email_type ) ? 'nexafi-type-resend' : ( ( 'admin_notification' === $log->email_type ) ? 'nexafi-type-alert' : 'nexafi-type-applicant' );
+                            ?>
+                            <tr id="nexafi-log-row-<?php echo intval( $log->id ); ?>">
+                                <td class="column-id" data-colname="<?php esc_attr_e( 'ID', 'contact-form' ); ?>"><strong>#<?php echo intval( $log->id ); ?></strong></td>
+                                <td class="column-date" data-colname="<?php esc_attr_e( 'Date & Time', 'contact-form' ); ?>"><?php echo esc_html( wp_date( 'M j, Y g:i A', strtotime( $log->sent_at ) ) ); ?></td>
+                                <td class="column-recipient column-primary" data-colname="<?php esc_attr_e( 'Recipient', 'contact-form' ); ?>">
+                                    <div class="nexafi-recipient-cell">
+                                        <strong><?php echo esc_html( $log->recipient_name ? $log->recipient_name : 'Applicant' ); ?></strong>
+                                        <div class="nexafi-sub-meta">
+                                            <a href="mailto:<?php echo esc_attr( $log->recipient_email ); ?>"><?php echo esc_html( $log->recipient_email ); ?></a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="column-ref" data-colname="<?php esc_attr_e( 'Application Ref #', 'contact-form' ); ?>">
+                                    <?php if ( ! empty( $log->reference_number ) ) : ?>
+                                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-financing&search=' . urlencode( $log->reference_number ) ) ); ?>" class="nexafi-view-detail-link" data-app-id="<?php echo esc_attr( $log->application_id ); ?>">
+                                            <?php echo esc_html( $log->reference_number ); ?>
+                                        </a>
+                                    <?php else : ?>
+                                        <span style="color: #94a3b8;">—</span>
                                     <?php endif; ?>
-                                    <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array(
-                                        'page'          => 'nexafi-email-logs',
-                                        'nexafi_action' => 'delete_email_log',
-                                        'log_id'        => $log->id,
-                                    ), admin_url( 'admin.php' ) ), 'nexafi_delete_log_' . $log->id, 'nexafi_delete_nonce' ) ); ?>" 
-                                       class="button button-small nexafi-action-btn nexafi-action-btn-delete nexafi-delete-email-log-btn" 
-                                       data-log-id="<?php echo esc_attr( $log->id ); ?>" 
-                                       data-nonce="<?php echo esc_attr( wp_create_nonce( 'nexafi_delete_log_' . $log->id ) ); ?>"
-                                       title="<?php esc_attr_e( 'Delete log', 'contact-form' ); ?>">
-                                        <span class="dashicons dashicons-trash" aria-hidden="true"></span>
-                                        <span><?php esc_html_e( 'Delete', 'contact-form' ); ?></span>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                                </td>
+                                <td class="column-type" data-colname="<?php esc_attr_e( 'Email Type', 'contact-form' ); ?>">
+                                    <span class="nexafi-type-tag <?php echo esc_attr( $type_class ); ?>">
+                                        <?php echo esc_html( $type_label ); ?>
+                                    </span>
+                                </td>
+                                <td class="column-status nexafi-log-status-cell" data-colname="<?php esc_attr_e( 'Status', 'contact-form' ); ?>">
+                                    <?php if ( $is_sent ) : ?>
+                                        <span class="nexafi-badge nexafi-badge-success">&#10003; <?php esc_html_e( 'Sent', 'contact-form' ); ?></span>
+                                    <?php else : ?>
+                                        <span class="nexafi-badge nexafi-badge-danger">&#10007; <?php esc_html_e( 'Failed', 'contact-form' ); ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="column-details nexafi-log-error-cell" data-colname="<?php esc_attr_e( 'Delivery Details / Error', 'contact-form' ); ?>">
+                                    <?php if ( ! empty( $log->error_message ) ) : ?>
+                                        <div class="nexafi-error-snippet" title="<?php echo esc_attr( $log->error_message ); ?>">
+                                            <span class="nexafi-error-icon">⚠️</span>
+                                            <span><?php echo esc_html( $log->error_message ); ?></span>
+                                        </div>
+                                    <?php else : ?>
+                                        <span class="nexafi-success-snippet">&#10003; <?php esc_html_e( 'Delivered to mail server', 'contact-form' ); ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="column-actions" data-colname="<?php esc_attr_e( 'Actions', 'contact-form' ); ?>">
+                                    <div class="nexafi-table-actions">
+                                        <?php if ( ! empty( $log->application_id ) ) : ?>
+                                            <button type="button" 
+                                                    class="button button-small nexafi-action-btn nexafi-action-btn-resend nexafi-resend-email-btn" 
+                                                    data-log-id="<?php echo esc_attr( $log->id ); ?>" 
+                                                    data-app-id="<?php echo esc_attr( $log->application_id ); ?>"
+                                                    title="<?php esc_attr_e( 'Resend confirmation email to applicant', 'contact-form' ); ?>">
+                                                <span class="dashicons dashicons-email-alt" aria-hidden="true"></span>
+                                                <span><?php esc_html_e( 'Resend', 'contact-form' ); ?></span>
+                                            </button>
+                                        <?php endif; ?>
+                                        <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array(
+                                            'page'          => 'nexafi-email-logs',
+                                            'nexafi_action' => 'delete_email_log',
+                                            'log_id'        => $log->id,
+                                        ), admin_url( 'admin.php' ) ), 'nexafi_delete_log_' . $log->id, 'nexafi_delete_nonce' ) ); ?>" 
+                                           class="button button-small nexafi-action-btn nexafi-action-btn-delete nexafi-delete-email-log-btn" 
+                                           data-log-id="<?php echo esc_attr( $log->id ); ?>" 
+                                           data-nonce="<?php echo esc_attr( wp_create_nonce( 'nexafi_delete_log_' . $log->id ) ); ?>"
+                                           title="<?php esc_attr_e( 'Delete log', 'contact-form' ); ?>">
+                                            <span class="dashicons dashicons-trash" aria-hidden="true"></span>
+                                            <span><?php esc_html_e( 'Delete', 'contact-form' ); ?></span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination -->
             <?php if ( $total_pages > 1 ) : ?>
@@ -1198,31 +1210,31 @@ class NexaFi_Admin {
             <div class="nexafi-report-section" style="margin-top: 24px;">
                 <h2 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;"><?php esc_html_e( 'Applications Grouped by Representative', 'contact-form' ); ?></h2>
                 <div class="nexafi-table-container">
-                    <table class="wp-list-table widefat fixed striped">
+                    <table class="wp-list-table widefat striped nexafi-reports-table">
                         <thead>
                             <tr>
-                                <th style="width: 120px;">Rep ID</th>
-                                <th>Representative Name</th>
-                                <th style="width: 140px;">Total Applications</th>
-                                <th style="width: 140px;">Approved / Eligible</th>
-                                <th style="width: 130px;">Accepted Offers</th>
-                                <th style="width: 170px;">Total Treatment Quotes</th>
-                                <th style="width: 170px;">Total Financed Amount</th>
+                                <th scope="col" class="manage-column column-repid" style="width: 120px;"><?php esc_html_e( 'Rep ID', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-repname column-primary"><?php esc_html_e( 'Representative Name', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-totalapps"><?php esc_html_e( 'Total Applications', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-approved"><?php esc_html_e( 'Approved / Eligible', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-accepted"><?php esc_html_e( 'Accepted Offers', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-quotes"><?php esc_html_e( 'Total Treatment Quotes', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-financed"><?php esc_html_e( 'Total Financed Amount', 'contact-form' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if ( empty( $rep_stats ) ) : ?>
-                                <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;">No representative application data available.</td></tr>
+                                <tr><td colspan="7" style="text-align:center; padding: 24px; color: #64748b;"><?php esc_html_e( 'No representative application data available.', 'contact-form' ); ?></td></tr>
                             <?php else : ?>
                                 <?php foreach ( $rep_stats as $rs ) : ?>
                                     <tr>
-                                        <td><span class="nexafi-rep-tag"><?php echo esc_html( $rs->rep_id ); ?></span></td>
-                                        <td><strong style="color: #0f172a;"><?php echo esc_html( $rs->name ); ?></strong></td>
-                                        <td><strong><?php echo intval( $rs->total_apps ); ?></strong></td>
-                                        <td><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $rs->approved_apps ); ?></span></td>
-                                        <td><span class="nexafi-badge nexafi-badge-blue"><?php echo intval( $rs->accepted_apps ); ?></span></td>
-                                        <td><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_quote_amount ) ); ?></td>
-                                        <td><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_financed_amount ) ); ?></strong></td>
+                                        <td class="column-repid" data-colname="<?php esc_attr_e( 'Rep ID', 'contact-form' ); ?>"><span class="nexafi-rep-tag"><?php echo esc_html( $rs->rep_id ); ?></span></td>
+                                        <td class="column-repname column-primary" data-colname="<?php esc_attr_e( 'Representative Name', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( $rs->name ); ?></strong></td>
+                                        <td class="column-totalapps" data-colname="<?php esc_attr_e( 'Total Applications', 'contact-form' ); ?>"><strong><?php echo intval( $rs->total_apps ); ?></strong></td>
+                                        <td class="column-approved" data-colname="<?php esc_attr_e( 'Approved / Eligible', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $rs->approved_apps ); ?></span></td>
+                                        <td class="column-accepted" data-colname="<?php esc_attr_e( 'Accepted Offers', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-info"><?php echo intval( $rs->accepted_apps ); ?></span></td>
+                                        <td class="column-quotes" data-colname="<?php esc_attr_e( 'Total Treatment Quotes', 'contact-form' ); ?>"><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_quote_amount ) ); ?></td>
+                                        <td class="column-financed" data-colname="<?php esc_attr_e( 'Total Financed Amount', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $rs->total_financed_amount ) ); ?></strong></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -1234,29 +1246,29 @@ class NexaFi_Admin {
             <div class="nexafi-report-section" style="margin-top: 28px;">
                 <h2 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;"><?php esc_html_e( 'Applications by Date (Last 30 Days)', 'contact-form' ); ?></h2>
                 <div class="nexafi-table-container">
-                    <table class="wp-list-table widefat fixed striped">
+                    <table class="wp-list-table widefat striped nexafi-reports-table">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th style="width: 140px;">Total Applications</th>
-                                <th style="width: 120px;">Approved</th>
-                                <th style="width: 120px;">Ineligible</th>
-                                <th style="width: 130px;">Offers Accepted</th>
-                                <th style="width: 200px;">Submitted Treatment Volume</th>
+                                <th scope="col" class="manage-column column-date column-primary"><?php esc_html_e( 'Date', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-totalapps"><?php esc_html_e( 'Total Applications', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-approved"><?php esc_html_e( 'Approved', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-ineligible"><?php esc_html_e( 'Ineligible', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-accepted"><?php esc_html_e( 'Offers Accepted', 'contact-form' ); ?></th>
+                                <th scope="col" class="manage-column column-volume"><?php esc_html_e( 'Submitted Treatment Volume', 'contact-form' ); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if ( empty( $date_stats ) ) : ?>
-                                <tr><td colspan="6" style="text-align:center; padding: 24px; color: #64748b;">No historical data recorded in the last 30 days.</td></tr>
+                                <tr><td colspan="6" style="text-align:center; padding: 24px; color: #64748b;"><?php esc_html_e( 'No historical data recorded in the last 30 days.', 'contact-form' ); ?></td></tr>
                             <?php else : ?>
                                 <?php foreach ( $date_stats as $ds ) : ?>
                                     <tr>
-                                        <td><strong style="color: #0f172a;"><?php echo esc_html( wp_date( 'M j, Y (l)', strtotime( $ds->app_date ) ) ); ?></strong></td>
-                                        <td><strong><?php echo intval( $ds->total_apps ); ?></strong></td>
-                                        <td><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $ds->approved_apps ); ?></span></td>
-                                        <td><span class="nexafi-badge nexafi-badge-warning"><?php echo intval( $ds->ineligible_apps ); ?></span></td>
-                                        <td><span class="nexafi-badge nexafi-badge-blue"><?php echo intval( $ds->accepted_apps ); ?></span></td>
-                                        <td><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $ds->total_volume ) ); ?></strong></td>
+                                        <td class="column-date column-primary" data-colname="<?php esc_attr_e( 'Date', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( wp_date( 'M j, Y (l)', strtotime( $ds->app_date ) ) ); ?></strong></td>
+                                        <td class="column-totalapps" data-colname="<?php esc_attr_e( 'Total Applications', 'contact-form' ); ?>"><strong><?php echo intval( $ds->total_apps ); ?></strong></td>
+                                        <td class="column-approved" data-colname="<?php esc_attr_e( 'Approved', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-success"><?php echo intval( $ds->approved_apps ); ?></span></td>
+                                        <td class="column-ineligible" data-colname="<?php esc_attr_e( 'Ineligible', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-warning"><?php echo intval( $ds->ineligible_apps ); ?></span></td>
+                                        <td class="column-accepted" data-colname="<?php esc_attr_e( 'Offers Accepted', 'contact-form' ); ?>"><span class="nexafi-badge nexafi-badge-info"><?php echo intval( $ds->accepted_apps ); ?></span></td>
+                                        <td class="column-volume" data-colname="<?php esc_attr_e( 'Submitted Treatment Volume', 'contact-form' ); ?>"><strong style="color: #0f172a;"><?php echo esc_html( NexaFi_Calculator::format_currency( $ds->total_volume ) ); ?></strong></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>

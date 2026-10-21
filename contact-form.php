@@ -18,7 +18,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-// kjbkjk
+
 // Plugin constants
 define( 'NEXAFI_CF_VERSION', '2.4.3' );
 define( 'NEXAFI_CF_PLUGIN_FILE', __FILE__ );
