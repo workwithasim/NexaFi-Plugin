@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.10
+Stable tag: 2.4.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,10 @@ NexaFi Financing Application & Contact Form provides an advanced multi-step fina
 Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
+
+= 2.4.11 =
+* Fixed auto-updater package extraction: implemented content-based package detection, multi-strategy atomic renaming (direct rename, WP_Filesystem, copy_dir fallback), and safe error abort preventing "files not found" deactivation.
+* Switched tag archive downloads to direct GitHub archive URLs to eliminate unauthenticated API rate limits.
 
 = 2.4.10 =
 * Added setting in NexaFi Settings to enable or disable admin notification emails upon new application submission.

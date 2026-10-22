@@ -44,7 +44,7 @@ class NexaFi_Updater {
      *
      * @var string
      */
-    private $current_version = '2.4.10';
+    private $current_version = '2.4.11';
 
     /**
      * GitHub repository path (owner/repo)
@@ -98,8 +98,8 @@ class NexaFi_Updater {
         // Provide plugin information popup on "View version X.X.X details"
         add_filter( 'plugins_api', array( $this, 'plugin_information' ), 20, 3 );
 
-        // Ensure the downloaded GitHub zip extracts to the correct plugin directory
-        add_filter( 'upgrader_source_selection', array( $this, 'fix_source_directory' ), 10, 4 );
+        // Ensure the downloaded GitHub zip extracts to the correct plugin directory (priority 5 runs before check_package at 10)
+        add_filter( 'upgrader_source_selection', array( $this, 'fix_source_directory' ), 5, 4 );
 
         // Purge update cache after plugin upgrade
         add_action( 'upgrader_process_complete', array( $this, 'purge_cache' ), 10, 2 );
@@ -231,42 +231,100 @@ class NexaFi_Updater {
      * Ensure the downloaded GitHub zip file is renamed to the expected plugin directory name
      *
      * When GitHub generates zip archives (either for releases or branch commits),
-     * the root folder inside the zip is named e.g. "NexaFi-Plugin-main" or "workwithasim-NexaFi-Plugin-abc".
-     * This filter moves it to "contact-form" so WordPress updates the existing plugin in place.
+     * the root folder inside the zip is named e.g. "workwithasim-NexaFi-Plugin-abc" or "NexaFi-Plugin-main".
+     * This filter renames it to "contact-form" so WordPress updates the existing plugin in place.
      *
-     * @param string      $source        Path to current source folder.
-     * @param string      $remote_source Remote source path.
-     * @param WP_Upgrader $upgrader      WP_Upgrader instance.
-     * @param array|null  $hook_extra    Extra hook data.
+     * @param string|WP_Error $source        Path to current source folder.
+     * @param string          $remote_source Remote source path.
+     * @param WP_Upgrader     $upgrader      WP_Upgrader instance.
+     * @param array|null      $hook_extra    Extra hook data.
      * @return string|WP_Error
      */
     public function fix_source_directory( $source, $remote_source, $upgrader, $hook_extra = null ) {
         global $wp_filesystem;
 
-        if ( ! isset( $hook_extra['plugin'] ) || $hook_extra['plugin'] !== $this->plugin_basename ) {
-            return $source;
-        }
-
         if ( is_wp_error( $source ) ) {
             return $source;
         }
 
-        $source_path = untrailingslashit( $source );
-        if ( basename( $source_path ) === $this->slug ) {
+        $source_clean = untrailingslashit( $source );
+
+        // Robust detection: verify if this package is actually our NexaFi plugin
+        $is_our_plugin = false;
+
+        // 1. Check hook_extra plugin parameter
+        if ( ! empty( $hook_extra['plugin'] ) ) {
+            if ( $hook_extra['plugin'] === $this->plugin_basename || false !== strpos( $hook_extra['plugin'], 'contact-form.php' ) ) {
+                $is_our_plugin = true;
+            }
+        }
+
+        // 2. Direct filesystem inspection: check if contact-form.php exists in the root of the source directory
+        if ( ! $is_our_plugin && ( file_exists( $source_clean . '/contact-form.php' ) || ( $wp_filesystem && $wp_filesystem->exists( $source_clean . '/contact-form.php' ) ) ) ) {
+            $is_our_plugin = true;
+        }
+
+        // If this is not our plugin, do not touch the source path
+        if ( ! $is_our_plugin ) {
             return $source;
         }
 
-        $new_source = trailingslashit( dirname( $source_path ) ) . $this->slug . '/';
+        $target_slug = ! empty( $this->slug ) ? $this->slug : 'contact-form';
 
-        if ( $wp_filesystem->exists( $new_source ) ) {
+        // If the folder is already correctly named, return as-is
+        if ( basename( $source_clean ) === $target_slug ) {
+            return trailingslashit( $source_clean );
+        }
+
+        // Destination path in upgrade directory without trailing slash for atomic rename
+        $new_source = untrailingslashit( dirname( $source_clean ) ) . '/' . $target_slug;
+
+        // Remove any stale directory that might already exist with this target name
+        if ( $wp_filesystem && $wp_filesystem->exists( $new_source ) ) {
             $wp_filesystem->delete( $new_source, true );
+        } elseif ( file_exists( $new_source ) ) {
+            // phpcs:ignore WordPress.WP.AlternativeFileSystem
+            @unlink( $new_source );
         }
 
-        if ( $wp_filesystem->move( $source, $new_source ) ) {
-            return $new_source;
+        $renamed = false;
+
+        // Strategy A: Native PHP rename without trailing slashes
+        if ( @rename( $source_clean, $new_source ) ) {
+            $renamed = true;
         }
 
-        return $source;
+        // Strategy B: WP_Filesystem move
+        if ( ! $renamed && $wp_filesystem && $wp_filesystem->move( $source_clean, $new_source, true ) ) {
+            $renamed = true;
+        }
+
+        // Strategy C: Copy directory and delete source
+        if ( ! $renamed && function_exists( 'copy_dir' ) ) {
+            $copy_res = copy_dir( $source_clean, $new_source );
+            if ( ! is_wp_error( $copy_res ) ) {
+                if ( $wp_filesystem ) {
+                    $wp_filesystem->delete( $source_clean, true );
+                }
+                $renamed = true;
+            }
+        }
+
+        // If all rename strategies failed, return a WP_Error to ABORT upgrade safely,
+        // preventing WordPress from deleting the existing plugin and breaking the installation.
+        if ( ! $renamed ) {
+            return new WP_Error(
+                'nexafi_folder_rename_error',
+                sprintf(
+                    /* translators: 1: original folder name, 2: target slug */
+                    __( 'NexaFi Updater: Unable to rename update directory "%1$s" to "%2$s". Upgrade aborted to protect the existing plugin files.', 'nexafi-plugin' ),
+                    esc_html( basename( $source_clean ) ),
+                    esc_html( $target_slug )
+                )
+            );
+        }
+
+        return trailingslashit( $new_source );
     }
 
     /**
@@ -347,7 +405,8 @@ class NexaFi_Updater {
 
             if ( ! empty( $tags ) && is_array( $tags ) && ! empty( $tags[0]['name'] ) ) {
                 $version  = ltrim( sanitize_text_field( $tags[0]['name'] ), 'vV' );
-                $download = ! empty( $tags[0]['zipball_url'] ) ? esc_url_raw( $tags[0]['zipball_url'] ) : 'https://github.com/' . $this->github_repo . '/archive/refs/tags/' . $tags[0]['name'] . '.zip';
+                // Direct archive URL avoids GitHub API unauthenticated rate limits (60 req/hr)
+                $download = 'https://github.com/' . $this->github_repo . '/archive/refs/tags/' . $tags[0]['name'] . '.zip';
 
                 $candidates[] = (object) array(
                     'new_version'  => $version,
