@@ -383,6 +383,12 @@ class NexaFi_Admin {
         update_option( 'nexafi_return_url', esc_url_raw( wp_unslash( $_POST['nexafi_return_url'] ?? '' ) ) );
         update_option( 'nexafi_contact_fallback_text', sanitize_text_field( wp_unslash( $_POST['nexafi_contact_fallback_text'] ?? '' ) ) );
 
+        // Email Notification Settings
+        $admin_email_enabled = ! empty( $_POST['nexafi_admin_email_enabled'] ) ? '1' : '0';
+        $admin_email_custom  = sanitize_email( wp_unslash( $_POST['nexafi_admin_email'] ?? '' ) );
+        update_option( 'nexafi_admin_email_enabled', $admin_email_enabled );
+        update_option( 'nexafi_admin_email', $admin_email_custom );
+
         wp_safe_redirect( add_query_arg( array( 'page' => 'nexafi-settings', 'updated' => 1 ), admin_url( 'admin.php' ) ) );
         exit;
     }
@@ -1299,6 +1305,10 @@ class NexaFi_Admin {
             __( 'Please contact your GDG representative directly or speak with our front desk.', 'nexafi-plugin' )
         );
 
+        $admin_email_enabled = get_option( 'nexafi_admin_email_enabled', '1' );
+        $admin_email_custom  = get_option( 'nexafi_admin_email', '' );
+        $wp_admin_email      = get_option( 'admin_email' );
+
         ?>
         <div class="wrap nexafi-admin-wrap">
             <?php $this->render_top_navigation( 'settings' ); ?>
@@ -1425,6 +1435,40 @@ class NexaFi_Admin {
                             <td>
                                 <input type="text" name="nexafi_contact_fallback_text" id="nexafi_contact_fallback_text" value="<?php echo esc_attr( $fallback_rep_text ); ?>" class="regular-text" />
                                 <p class="description">Fallback displayed when a representative does not have phone/email configured.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- SECTION 4: Email Notification Settings -->
+                <div class="nexafi-settings-box">
+                    <h2>4. Admin Notification Email Settings</h2>
+                    <p class="description"><?php esc_html_e( 'Configure whether email alerts are sent to the site administrator when a new financing application is submitted, and customize the recipient email address.', 'nexafi-plugin' ); ?></p>
+
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="nexafi_admin_email_enabled"><?php esc_html_e( 'Admin Email Notifications', 'nexafi-plugin' ); ?></label></th>
+                            <td>
+                                <label for="nexafi_admin_email_enabled" style="font-weight: 600; cursor: pointer;">
+                                    <input type="checkbox" name="nexafi_admin_email_enabled" id="nexafi_admin_email_enabled" value="1" <?php checked( '1', $admin_email_enabled ); ?> style="margin-top: -2px;" />
+                                    <?php esc_html_e( 'Send email notification to admin upon new application', 'nexafi-plugin' ); ?>
+                                </label>
+                                <p class="description"><?php esc_html_e( 'When checked, an alert email with full applicant details is sent whenever an application is submitted.', 'nexafi-plugin' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr id="nexafi_admin_email_field_row">
+                            <th scope="row"><label for="nexafi_admin_email"><?php esc_html_e( 'Admin Notification Email', 'nexafi-plugin' ); ?></label></th>
+                            <td>
+                                <input type="email" name="nexafi_admin_email" id="nexafi_admin_email" value="<?php echo esc_attr( $admin_email_custom ); ?>" class="regular-text" placeholder="<?php echo esc_attr( $wp_admin_email ); ?>" />
+                                <p class="description">
+                                    <?php
+                                    printf(
+                                        /* translators: %s: default WordPress administration email */
+                                        esc_html__( 'Enter the email address where admin notifications should be delivered. Leave blank to default to the WordPress administrator email (%s).', 'nexafi-plugin' ),
+                                        '<code>' . esc_html( $wp_admin_email ) . '</code>'
+                                    );
+                                    ?>
+                                </p>
                             </td>
                         </tr>
                     </table>

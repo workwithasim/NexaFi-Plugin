@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.9
+Stable tag: 2.4.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,11 @@ NexaFi Financing Application & Contact Form provides an advanced multi-step fina
 Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
+
+= 2.4.10 =
+* Added setting in NexaFi Settings to enable or disable admin notification emails upon new application submission.
+* Added custom admin recipient email field with fallback to default WordPress administrator email.
+* Integrated dynamic UI toggle for admin recipient email input in settings dashboard.
 
 = 2.4.9 =
 * Transformed admin notification email into a comprehensive, beautifully styled HTML template including full applicant profile, address, employment, financing calculations, and representative details.

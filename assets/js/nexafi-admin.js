@@ -358,4 +358,20 @@ jQuery(document).ready(function ($) {
       }
     });
   });
+
+  // 6. Settings Page: Toggle Admin Email field visibility
+  var $adminEmailToggle = $('#nexafi_admin_email_enabled');
+  var $adminEmailRow = $('#nexafi_admin_email_field_row');
+  if ($adminEmailToggle.length && $adminEmailRow.length) {
+    function toggleAdminEmailField() {
+      if ($adminEmailToggle.is(':checked')) {
+        $adminEmailRow.show();
+      } else {
+        $adminEmailRow.hide();
+      }
+    }
+    toggleAdminEmailField();
+    $adminEmailToggle.on('change', toggleAdminEmailField);
+  }
 });
+

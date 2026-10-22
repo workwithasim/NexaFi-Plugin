@@ -462,8 +462,15 @@ class NexaFi_Ajax {
      * Send email notification to site admin on new application
      */
     private function maybe_send_admin_notification( $app, $rep ) {
-        $to = get_option( 'admin_email' );
-        if ( empty( $to ) ) {
+        $admin_email_enabled = get_option( 'nexafi_admin_email_enabled', '1' );
+        if ( '1' !== (string) $admin_email_enabled ) {
+            return;
+        }
+
+        $custom_admin_email = sanitize_email( get_option( 'nexafi_admin_email', '' ) );
+        $to                 = ! empty( $custom_admin_email ) ? $custom_admin_email : get_option( 'admin_email' );
+
+        if ( empty( $to ) || ! is_email( $to ) ) {
             return;
         }
 
@@ -486,7 +493,11 @@ class NexaFi_Ajax {
         $headers = array(
             'Content-Type: text/html; charset=UTF-8',
         );
-        $headers[] = 'From: ' . wp_specialchars_decode( $site_name, ENT_QUOTES ) . ' <' . sanitize_email( $to ) . '>';
+        $from_email = get_option( 'admin_email' );
+        if ( empty( $from_email ) || ! is_email( $from_email ) ) {
+            $from_email = $to;
+        }
+        $headers[] = 'From: ' . wp_specialchars_decode( $site_name, ENT_QUOTES ) . ' <' . sanitize_email( $from_email ) . '>';
         if ( ! empty( $app->email ) && is_email( $app->email ) ) {
             $headers[] = 'Reply-To: ' . sanitize_email( $app->email );
         }
