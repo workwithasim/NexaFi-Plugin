@@ -692,10 +692,10 @@ class NexaFi_Ajax {
                                 </tr>
                             </table>
 
-                            <!-- Section 4: Assigned Representative & Declarations -->
+                            <!-- Section 4: Assigned Representative -->
                             <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 22px;">
                                 <tr>
-                                    <td width="48%" valign="top" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; font-size: 12.5px;">
+                                    <td width="100%" valign="top" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; font-size: 12.5px;">
                                         <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Assigned Representative</div>
                                         <div style="color: #0f172a; font-weight: 600; font-size: 13.5px;"><?php echo esc_html( $rep_name ); ?></div>
                                         <div style="color: #64748b; font-size: 12px; margin-top: 2px;">Rep ID: <strong style="color: #0f172a;"><?php echo esc_html( $rep_id ); ?></strong></div>
@@ -705,13 +705,6 @@ class NexaFi_Ajax {
                                         <?php if ( ! empty( $rep_email ) ) : ?>
                                             <div style="color: #64748b; font-size: 12px; margin-top: 2px;">Email: <?php echo esc_html( $rep_email ); ?></div>
                                         <?php endif; ?>
-                                    </td>
-                                    <td width="4%">&nbsp;</td>
-                                    <td width="48%" valign="top" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; font-size: 12.5px;">
-                                        <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Declarations & Consent</div>
-                                        <div style="color: #16a34a; font-weight: 600; margin-bottom: 3px;">&#10003; Valid Photo ID Declared</div>
-                                        <div style="color: #16a34a; font-weight: 600; margin-bottom: 3px;">&#10003; Traditional Debit Card Declared</div>
-                                        <div style="color: #0f172a; font-size: 11.5px; margin-top: 4px;">Terms Accepted: <strong style="color: #16a34a;"><?php echo $app->consent_status ? 'Yes' : 'No'; ?></strong></div>
                                     </td>
                                 </tr>
                             </table>
