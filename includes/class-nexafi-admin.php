@@ -1390,67 +1390,6 @@ class NexaFi_Admin {
         $admin_email_enabled = get_option( 'nexafi_admin_email_enabled', '1' );
         $admin_email_custom  = get_option( 'nexafi_admin_email', '' );
         $wp_admin_email      = get_option( 'admin_email' );
-
-        $db = NexaFi_DB::get_instance();
-
-        // Pre-launch checklist evaluations
-        $chk_has_return_url = ( ! empty( $return_url ) && 0 === strpos( $return_url, 'https://' ) );
-        $chk_has_active_rep = $db->has_active_representative();
-        $chk_terms_verified = (bool) get_option( 'nexafi_terms_verified', false );
-        $chk_decision_mode  = get_option( 'nexafi_decision_mode', '' );
-        $chk_is_final_mode  = ( 'final_authorized' === $chk_decision_mode );
-        $chk_has_disclosure = ( ! empty( $disclosure_text ) && false === strpos( strtolower( $disclosure_text ), 'pending verification' ) );
-        $chk_plan_fee_raw   = get_option( 'nexafi_plan_fee', null );
-        $chk_has_plan_fee   = ( null !== $chk_plan_fee_raw && false !== $chk_plan_fee_raw && '' !== (string) $chk_plan_fee_raw );
-
-        $checklist_items = array(
-            'return_url' => array(
-                'label'       => __( 'Return URL', 'nexafi-plugin' ),
-                'is_done'     => $chk_has_return_url,
-                'status_done' => $return_url,
-                'status_fail' => __( 'Unset — Add GDG Smiles homepage URL', 'nexafi-plugin' ),
-                'anchor'      => '#nexafi_return_url',
-            ),
-            'active_rep' => array(
-                'label'       => __( 'Active Representative', 'nexafi-plugin' ),
-                'is_done'     => $chk_has_active_rep,
-                'status_done' => __( 'Active representative available', 'nexafi-plugin' ),
-                'status_fail' => __( 'Unset — Add at least one active GDG rep', 'nexafi-plugin' ),
-                'anchor'      => admin_url( 'admin.php?page=nexafi-representatives' ),
-            ),
-            'terms_verified' => array(
-                'label'       => __( 'Terms Verified', 'nexafi-plugin' ),
-                'is_done'     => $chk_terms_verified,
-                'status_done' => __( 'Terms verified gate enabled', 'nexafi-plugin' ),
-                'status_fail' => __( 'Unset — Verification checkbox unchecked', 'nexafi-plugin' ),
-                'anchor'      => '#nexafi_terms_verified',
-            ),
-            'decision_mode' => array(
-                'label'       => __( 'Decision Mode', 'nexafi-plugin' ),
-                'is_done'     => $chk_is_final_mode,
-                'status_done' => __( 'Final Approval Authorized', 'nexafi-plugin' ),
-                'status_fail' => empty( $chk_decision_mode ) ? __( 'Unset — Configure decision policy mode', 'nexafi-plugin' ) : __( 'Preliminary Only mode', 'nexafi-plugin' ),
-                'anchor'      => '#nexafi_decision_mode',
-            ),
-            'disclosure_text' => array(
-                'label'       => __( 'Disclosure Text', 'nexafi-plugin' ),
-                'is_done'     => $chk_has_disclosure,
-                'status_done' => __( 'Disclosures configured', 'nexafi-plugin' ),
-                'status_fail' => __( 'Unset — Pending verification placeholder', 'nexafi-plugin' ),
-                'anchor'      => '#nexafi_disclosure_text',
-            ),
-            'plan_fee' => array(
-                'label'       => __( 'Plan Fee', 'nexafi-plugin' ),
-                'is_done'     => $chk_has_plan_fee,
-                'status_done' => sprintf( __( 'Configured (%s)', 'nexafi-plugin' ), NexaFi_Calculator::format_currency( $plan_fee ) ),
-                'status_fail' => __( 'Unset — Configure plan / admin fee', 'nexafi-plugin' ),
-                'anchor'      => '#nexafi_plan_fee',
-            ),
-        );
-
-        $unset_items = array_filter( $checklist_items, function( $it ) { return ! $it['is_done']; } );
-        $unset_count = count( $unset_items );
-
         ?>
         <div class="wrap nexafi-admin-wrap">
             <?php $this->render_top_navigation( 'settings' ); ?>
@@ -1472,63 +1411,6 @@ class NexaFi_Admin {
             endif;
             // phpcs:enable WordPress.Security.NonceVerification.Recommended
             ?>
-
-            <!-- Pre-Launch Checklist Box -->
-            <div class="nexafi-settings-box nexafi-checklist-box" style="margin-bottom: 24px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 18px 24px; background: #ffffff;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-                    <div>
-                        <h2 style="margin: 0 0 2px 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px;">
-                            <span class="dashicons dashicons-clipboard" style="color: #2563eb; font-size: 18px; width: 18px; height: 18px;"></span>
-                            <?php esc_html_e( 'Pre-Launch Checklist', 'nexafi-plugin' ); ?>
-                        </h2>
-                        <p class="description" style="margin: 0; font-size: 12px;">
-                            <?php
-                            if ( $unset_count > 0 ) {
-                                /* translators: %d: count of unset items */
-                                echo esc_html( sprintf( _n( '%d required pre-launch configuration item is currently unset:', '%d required pre-launch configuration items are currently unset:', $unset_count, 'nexafi-plugin' ), $unset_count ) );
-                            } else {
-                                esc_html_e( 'All required pre-launch items are configured and ready for live operation.', 'nexafi-plugin' );
-                            }
-                            ?>
-                        </p>
-                    </div>
-                    <div>
-                        <?php if ( $unset_count > 0 ) : ?>
-                            <span class="nexafi-badge nexafi-badge-warning">
-                                <?php echo esc_html( sprintf( _n( '%d item unset', '%d items unset', $unset_count, 'nexafi-plugin' ), $unset_count ) ); ?>
-                            </span>
-                        <?php else : ?>
-                            <span class="nexafi-badge nexafi-badge-success">
-                                ✓ <?php esc_html_e( 'Ready for Launch', 'nexafi-plugin' ); ?>
-                            </span>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
-                    <?php foreach ( $checklist_items as $item_key => $item ) : ?>
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 6px; border: 1px solid <?php echo $item['is_done'] ? '#e2e8f0' : '#fed7aa'; ?>; background: <?php echo $item['is_done'] ? '#f8fafc' : '#fffbeb'; ?>;">
-                            <div>
-                                <div style="font-weight: 600; font-size: 13px; color: #0f172a;">
-                                    <a href="<?php echo esc_url( $item['anchor'] ); ?>" style="text-decoration: none; color: inherit;">
-                                        <?php echo esc_html( $item['label'] ); ?>
-                                    </a>
-                                </div>
-                                <div style="font-size: 11px; color: <?php echo $item['is_done'] ? '#64748b' : '#b45309'; ?>; margin-top: 1px;">
-                                    <?php echo esc_html( $item['is_done'] ? $item['status_done'] : $item['status_fail'] ); ?>
-                                </div>
-                            </div>
-                            <div style="margin-left: 10px;">
-                                <?php if ( $item['is_done'] ) : ?>
-                                    <span class="nexafi-badge nexafi-badge-success" style="font-size: 10px; padding: 2px 7px;">✓ <?php esc_html_e( 'Done', 'nexafi-plugin' ); ?></span>
-                                <?php else : ?>
-                                    <span class="nexafi-badge nexafi-badge-warning" style="font-size: 10px; padding: 2px 7px;">✕ <?php esc_html_e( 'Not Done', 'nexafi-plugin' ); ?></span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
 
             <form method="post" action="<?php echo esc_url( admin_url( 'admin.php?page=nexafi-settings' ) ); ?>" class="nexafi-settings-form">
                 <?php wp_nonce_field( 'nexafi_save_settings_action', 'nexafi_settings_nonce' ); ?>

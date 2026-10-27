@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.18
+Stable tag: 2.4.19
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,9 @@ NexaFi Financing Application & Contact Form provides an advanced multi-step fina
 Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
+
+= 2.4.19 =
+* Settings interface cleanup: removed the pre-launch checklist overview container from the NexaFi settings administration page.
 
 = 2.4.18 =
 * Screen 4 terms acknowledgment workflow: initialized the financing terms checkbox as unchecked by default and kept "See Your Next Steps" action button disabled until applicant manually checks the acknowledgment, enabling dynamic gating upon manual review.
