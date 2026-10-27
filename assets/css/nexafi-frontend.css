@@ -828,7 +828,8 @@ input[type="date"].nexafi-input {
   transform: translateY(0) !important;
 }
 
-.nexafi-checkbox {
+.nexafi-checkbox,
+.nexafi-terms-checkbox {
   position: absolute !important;
   opacity: 0 !important;
   width: 0 !important;
@@ -856,12 +857,14 @@ input[type="date"].nexafi-input {
   box-sizing: border-box !important;
 }
 
-.nexafi-checkbox:focus-visible + .nexafi-checkbox-indicator {
+.nexafi-checkbox:focus-visible + .nexafi-checkbox-indicator,
+.nexafi-terms-checkbox:focus-visible + .nexafi-checkbox-indicator {
   box-shadow: 0 0 0 3px rgba(29, 114, 242, 0.25) !important;
   border-color: var(--nexafi-blue, #1d72f2) !important;
 }
 
-.nexafi-checkbox:checked + .nexafi-checkbox-indicator {
+.nexafi-checkbox:checked + .nexafi-checkbox-indicator,
+.nexafi-terms-checkbox:checked + .nexafi-checkbox-indicator {
   background-color: var(--nexafi-blue, #1d72f2) !important;
   border-color: var(--nexafi-blue, #1d72f2) !important;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='20 6 9 17 4 12'%3e%3c/polyline%3e%3c/svg%3e") !important;
@@ -870,7 +873,8 @@ input[type="date"].nexafi-input {
   background-size: 13px !important;
 }
 
-.nexafi-checkbox:checked + .nexafi-checkbox-indicator::after {
+.nexafi-checkbox:checked + .nexafi-checkbox-indicator::after,
+.nexafi-terms-checkbox:checked + .nexafi-checkbox-indicator::after {
   display: none !important;
 }
 

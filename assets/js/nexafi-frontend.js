@@ -763,11 +763,12 @@
             }
           }
 
-          // Acknowledgment Checkbox: See Your Next Steps > button disabled until checked (§4.1)
+          // Acknowledgment Checkbox: Checked by default on approval screen (§4.1)
           const ackCheckbox = outcomeApproved.querySelector('.nexafi-terms-checkbox');
           const btnAccept = outcomeApproved.querySelector('.nexafi-btn-accept');
           if (ackCheckbox && btnAccept) {
-            btnAccept.disabled = !ackCheckbox.checked;
+            ackCheckbox.checked = true;
+            btnAccept.disabled = false;
             ackCheckbox.addEventListener('change', function () {
               btnAccept.disabled = !ackCheckbox.checked;
             });
