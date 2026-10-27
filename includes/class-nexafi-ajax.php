@@ -504,6 +504,7 @@ class NexaFi_Ajax {
             'terms_accepted'             => (bool) $app->terms_accepted,
             'disclosure_text'            => get_option( 'nexafi_disclosure_text', __( 'Financing disclosures pending verification.', 'nexafi-plugin' ) ),
             'provider_disclosure'        => get_option( 'nexafi_provider_disclosure', '' ),
+            'reconciliation_note'        => $calc['reconciliation_note'] ?? '',
             'booking_deposit'            => floatval( $calc['booking_deposit'] ?? 0.00 ),
             'remaining_down_payment'     => floatval( $calc['remaining_down_payment'] ?? 0.00 ),
             'formatted_booking_deposit'  => $calc['formatted_booking_deposit'] ?? '',
@@ -1017,6 +1018,29 @@ class NexaFi_Ajax {
                                     <td style="padding: 10px 0; color: #0f172a; font-weight: 700; border-top: 2px solid #e2e8f0; font-size: 15px;"><?php esc_html_e( 'Your Monthly Payment', 'nexafi-plugin' ); ?></td>
                                     <td align="right" style="padding: 10px 0; font-weight: 800; color: #16a34a; border-top: 2px solid #e2e8f0; font-size: 17px;"><?php echo $terms_verified_val ? ( esc_html( $monthly_fmt ) . ' <span style="font-size: 12px; color: #64748b; font-weight: normal;">/ mo</span>' ) : '—'; ?></td>
                                 </tr>
+                                <?php
+                                $calc_reconciliation_note = '';
+                                if ( $terms_verified_val ) {
+                                    $email_calc = NexaFi_Calculator::calculate( $app->treatment_quote, array(
+                                        'upfront_pct'        => $app->upfront_pct,
+                                        'financed_pct'       => $app->financed_pct,
+                                        'charge_pct'         => $app->charge_pct,
+                                        'repayment_term'     => $app->repayment_term,
+                                        'charge_basis'       => ! empty( $app->charge_basis ) ? $app->charge_basis : 'financed_amount',
+                                        'plan_fee'           => ! empty( $app->plan_fee ) ? $app->plan_fee : 0.00,
+                                        'plan_fee_treatment' => get_option( 'nexafi_plan_fee_treatment', 'financed' ),
+                                        'terms_verified'     => true,
+                                    ) );
+                                    $calc_reconciliation_note = $email_calc['reconciliation_note'] ?? '';
+                                }
+                                if ( ! empty( $calc_reconciliation_note ) ) :
+                                ?>
+                                <tr>
+                                    <td colspan="2" style="padding: 10px 0 0 0; color: #0b275b; font-size: 13px; font-weight: 600; border-top: 1px dashed #cbd5e1;">
+                                        <?php echo esc_html( $calc_reconciliation_note ); ?>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
                             </table>
                         </td>
                     </tr>

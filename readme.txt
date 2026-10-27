@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.13
+Stable tag: 2.4.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,14 @@ NexaFi Financing Application & Contact Form provides an advanced multi-step fina
 Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
+
+= 2.4.14 =
+* Fixed upfront plan fee calculation: Required Down Payment includes plan fee without reducing Amount Financed; Financing Charge and Total Installment Payments exclude the upfront fee.
+* Separated base_down_payment and plan_fee in calculator return structure, ensuring upfront_amount consistently reflects total required down payment across Screen 4, emails, admin details, and CSV exports.
+* Removed static placeholder sample texts and dates from Screen 5 markup, replacing with clean neutral dashes prior to submission data load.
+* Removed hardcoded representative fallback names and IDs across shortcode and assets.
+* Added monthly payment reconciliation notice on Screen 4 and applicant notification email when remainder cents differs and terms are verified.
+* Added administrative guidance and explanations on the NexaFi Settings page for Financing Terms Verification Gate, Decision Mode, and Plan Fee Treatment.
 
 = 2.4.13 =
 * Form UX improvements: added autocomplete="bday" to DOB, enforced inputmode="numeric" on currency fields, full state names on mobile with full-width native select, and 16px font-size to prevent iOS Safari auto-zoom.

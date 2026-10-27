@@ -663,7 +663,7 @@
             if (calc.booking_deposit && parseFloat(calc.booking_deposit) > 0) {
               depositBreakdown.style.display = 'block';
               setValText(depositBreakdown, '.nexafi-val-deposit-credited', calc.formatted_booking_deposit || '—');
-              setValText(depositBreakdown, '.nexafi-val-deposit-remaining', calc.formatted_remaining_down_payment || '—');
+              setValText(depositBreakdown, '.nexafi-val-deposit-remaining', calc.formatted_remaining_down_payment || calc.formatted_remaining_down || '—');
             } else {
               depositBreakdown.style.display = 'none';
             }
@@ -684,6 +684,19 @@
           }
           if (data.provider_disclosure) {
             setValText(outcomeApproved, '.nexafi-provider-disclosure-text', data.provider_disclosure);
+          }
+
+          // Reconciliation note (§3: when remainder_cents != 0 and terms verified)
+          const reconciliationEl = outcomeApproved.querySelector('.nexafi-val-reconciliation');
+          if (reconciliationEl) {
+            const reconNote = calc.reconciliation_note || data.reconciliation_note;
+            if (termsVerified && calc.remainder_cents && calc.remainder_cents !== 0 && reconNote) {
+              reconciliationEl.textContent = reconNote;
+              reconciliationEl.style.display = 'block';
+            } else {
+              reconciliationEl.textContent = '';
+              reconciliationEl.style.display = 'none';
+            }
           }
 
           // Acknowledgment Checkbox: See Your Next Steps > button disabled until checked (§4.1)

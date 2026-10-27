@@ -89,13 +89,10 @@ class NexaFi_Shortcode {
 
         // Active default representative from database
         $db = NexaFi_DB::get_instance();
-        $default_rep = $db->get_active_representative( 'GDG1027' );
-        if ( ! $default_rep ) {
-            $default_rep = $db->get_default_representative();
-        }
-        $default_rep_id = ( $default_rep && ! empty( $default_rep->rep_id ) ) ? $default_rep->rep_id : 'GDG1027';
-        $default_rep_name = ( $default_rep && ! empty( $default_rep->name ) ) ? $default_rep->name : 'Caleb Johnson';
-        $default_rep_photo = ( $default_rep && ! empty( $default_rep->photo_url ) ) ? $default_rep->photo_url : plugins_url( 'assets/images/rep-caleb.png', dirname( __FILE__ ) );
+        $default_rep = $db->get_default_representative();
+        $default_rep_id = ( $default_rep && ! empty( $default_rep->rep_id ) ) ? $default_rep->rep_id : '';
+        $default_rep_name = ( $default_rep && ! empty( $default_rep->name ) ) ? $default_rep->name : '';
+        $default_rep_photo = ( $default_rep && ! empty( $default_rep->photo_url ) ) ? $default_rep->photo_url : '';
 
         ob_start();
         ?>
@@ -525,6 +522,7 @@ class NexaFi_Shortcode {
                             <div class="nexafi-disclosures-text nexafi-val-disclosures">
                                 <?php echo esc_html( $disclosure_text ); ?>
                             </div>
+                            <div class="nexafi-disclosures-reconciliation nexafi-val-reconciliation" style="display: none;"></div>
                             <?php if ( ! empty( $provider_disclosure ) ) : ?>
                                 <div class="nexafi-provider-disclosure-text">
                                     <?php echo esc_html( $provider_disclosure ); ?>
@@ -627,21 +625,21 @@ class NexaFi_Shortcode {
                     <div class="nexafi-reference-card">
                         <div class="nexafi-ref-header-block">
                             <span class="nexafi-ref-label">Application Reference #</span>
-                            <span class="nexafi-ref-val nexafi-ref-number">NEXA-20250826-1047</span>
+                            <span class="nexafi-ref-val nexafi-ref-number">&mdash;</span>
                         </div>
                         <div class="nexafi-ref-grid">
                             <div class="nexafi-ref-col">
                                 <span class="nexafi-ref-label">Date</span>
-                                <span class="nexafi-ref-val nexafi-ref-date">August 26, 2025</span>
+                                <span class="nexafi-ref-val nexafi-ref-date">&mdash;</span>
                             </div>
                             <div class="nexafi-ref-col">
                                 <span class="nexafi-ref-label">Time</span>
-                                <span class="nexafi-ref-val nexafi-ref-time">10:47 AM</span>
+                                <span class="nexafi-ref-val nexafi-ref-time">&mdash;</span>
                             </div>
                         </div>
                         <div class="nexafi-ref-footer-block">
                             <span class="nexafi-ref-label">Representative</span>
-                            <span class="nexafi-ref-val nexafi-ref-rep"><?php echo esc_html( $default_rep_name ? ( $default_rep_name . ( $default_rep_id ? " ({$default_rep_id})" : '' ) ) : '' ); ?></span>
+                            <span class="nexafi-ref-val nexafi-ref-rep"><?php echo esc_html( $default_rep_name ? ( $default_rep_name . ( $default_rep_id ? " ({$default_rep_id})" : '' ) ) : '&mdash;' ); ?></span>
                         </div>
                         <div class="nexafi-ref-row nexafi-ref-status-row" style="display: none !important;">
                             <span class="nexafi-ref-label">Status</span>

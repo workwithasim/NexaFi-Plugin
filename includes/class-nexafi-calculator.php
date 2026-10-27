@@ -30,23 +30,24 @@ class NexaFi_Calculator {
      * Calculate financing terms for a given treatment quote using integer cents arithmetic.
      *
      * Formulas (performed in integer cents):
-     * - Down Payment (Cents) = round( Quote_Cents × ( Upfront_% ÷ 100 ) )
-     * - Financed Amount (Cents) = Quote_Cents - Down_Payment_Cents
+     * - Base Down Payment (Cents) = round( Quote_Cents × ( Upfront_% ÷ 100 ) )
+     * - Financed Amount (Cents) = Quote_Cents - Base_Down_Payment_Cents
      * - Percentage Charge Base:
      *     * If charge_basis === 'treatment_price': Base = Quote_Cents
      *     * If charge_basis === 'financed_amount': Base = Financed_Amount_Cents
      * - Percentage Charge (Cents) = round( Base × ( Charge_% ÷ 100 ) )
      * - Plan Fee Treatment:
      *     * If plan_fee_treatment === 'financed':
+     *         Required Down Payment (Cents) = Base_Down_Payment_Cents
      *         Charge Amount (Cents) = Percentage_Charge_Cents + Plan_Fee_Cents
      *         Total Installment Payments (Cents) = Financed_Amount_Cents + Charge_Amount_Cents
      *     * If plan_fee_treatment === 'upfront':
+     *         Required Down Payment (Cents) = Base_Down_Payment_Cents + Plan_Fee_Cents
      *         Charge Amount (Cents) = Percentage_Charge_Cents
      *         Total Installment Payments (Cents) = Financed_Amount_Cents + Percentage_Charge_Cents
-     *         (Plan fee is credited to upfront payment requirements)
      * - Monthly Payment (Cents) = round( Total_Installments_Cents ÷ Term )
      * - Monthly Reconciliation: Remainder_Cents = Total_Installments_Cents - ( Monthly_Cents × Term )
-     *   Final Payment = ( Monthly_Cents + Remainder_Cents )
+     *   Final Payment (Cents) = ( Monthly_Cents + Remainder_Cents )
      *
      * @param float $quote Total treatment quote amount.
      * @param array $custom_settings Optional overrides for financing parameters.
@@ -78,20 +79,25 @@ class NexaFi_Calculator {
         // Integer cents conversion
         $quote_cents = (int) round( $quote * 100 );
 
-        // Down payment & financed amount (split cents cleanly)
-        $down_payment_cents = (int) round( $quote_cents * ( $upfront_pct / 100 ) );
-        $financed_cents     = $quote_cents - $down_payment_cents;
+        // Base down payment & financed amount (split cents cleanly)
+        $base_down_payment_cents = (int) round( $quote_cents * ( $upfront_pct / 100 ) );
+        $financed_cents          = $quote_cents - $base_down_payment_cents;
 
         // Base for percentage charge
-        $base_cents = ( 'treatment_price' === $charge_basis ) ? $quote_cents : $financed_cents;
+        $base_cents       = ( 'treatment_price' === $charge_basis ) ? $quote_cents : $financed_cents;
         $pct_charge_cents = (int) round( $base_cents * ( $charge_pct / 100 ) );
 
         $plan_fee_cents = (int) round( $plan_fee * 100 );
 
         if ( 'financed' === $plan_fee_treatment ) {
+            $down_payment_cents       = $base_down_payment_cents;
             $charge_amount_cents      = $pct_charge_cents + $plan_fee_cents;
             $total_installments_cents = $financed_cents + $charge_amount_cents;
         } else {
+            // 'upfront': Required Down Payment (cents) = round(quote x upfront%) + plan_fee_cents.
+            // Amount Financed stays quote - base down payment, so fee does not reduce financed amount.
+            // Financing Charge and Total Installment Payments exclude fee.
+            $down_payment_cents       = $base_down_payment_cents + $plan_fee_cents;
             $charge_amount_cents      = $pct_charge_cents;
             $total_installments_cents = $financed_cents + $pct_charge_cents;
         }
@@ -106,13 +112,26 @@ class NexaFi_Calculator {
         $remaining_down_cents  = max( 0, $down_payment_cents - $booking_deposit_cents );
 
         // Convert back to currency floats
-        $upfront_amount         = $down_payment_cents / 100;
+        $base_down_payment      = $base_down_payment_cents / 100;
+        $upfront_amount         = $down_payment_cents / 100; // Required Down Payment including fee
         $financed_amount        = $financed_cents / 100;
         $charge_amount          = $charge_amount_cents / 100;
         $total_installments     = $total_installments_cents / 100;
         $monthly_payment        = $monthly_cents / 100;
         $final_payment          = $final_payment_cents / 100;
         $remaining_down_payment = $remaining_down_cents / 100;
+
+        // Final payment reconciliation notice (Section 3: when remainder_cents != 0 and terms verified)
+        $first_payments_count = $repayment_term - 1;
+        $reconciliation_note  = ( $terms_verified && 0 !== $remainder_cents && $repayment_term > 1 )
+            ? sprintf(
+                /* translators: 1: number of payments, 2: monthly payment amount, 3: final payment amount */
+                __( 'Your first %1$d payments are %2$s. Your final payment is %3$s.', 'nexafi-plugin' ),
+                $first_payments_count,
+                self::format_currency( $monthly_payment, false ),
+                self::format_currency( $final_payment, false )
+            )
+            : '';
 
         return array(
             'treatment_quote'             => $quote,
@@ -125,6 +144,7 @@ class NexaFi_Calculator {
             'plan_fee_treatment'          => $plan_fee_treatment,
             'terms_verified'              => $terms_verified,
             'booking_deposit'             => $booking_deposit,
+            'base_down_payment'           => $base_down_payment,
             'remaining_down_payment'      => $remaining_down_payment,
             'upfront_amount'              => $upfront_amount,
             'financed_amount'             => $financed_amount,
@@ -134,16 +154,21 @@ class NexaFi_Calculator {
             'monthly_payment'             => $monthly_payment,
             'remainder_cents'             => $remainder_cents,
             'final_payment'               => $final_payment,
+            'reconciliation_note'         => $reconciliation_note,
             // Formatted strings matching reference design ($10,000, $3,000 etc.)
             'formatted_quote'             => self::format_currency( $quote, true ),
+            'formatted_base_down'         => self::format_currency( $base_down_payment, true ),
+            'formatted_plan_fee'          => self::format_currency( $plan_fee, true ),
             'formatted_upfront'           => self::format_currency( $upfront_amount, true ),
             'formatted_financed'          => self::format_currency( $financed_amount, true ),
             'formatted_charge'            => $terms_verified ? self::format_currency( $charge_amount, true ) : '—',
             'formatted_repayment'         => $terms_verified ? self::format_currency( $total_installments, true ) : '—',
             'formatted_total_installments'=> $terms_verified ? self::format_currency( $total_installments, true ) : '—',
             'formatted_monthly'           => $terms_verified ? self::format_currency( $monthly_payment, false ) : '—',
+            'formatted_final_payment'     => $terms_verified ? self::format_currency( $final_payment, false ) : '—',
             'formatted_booking_deposit'   => ( $booking_deposit > 0 ) ? self::format_currency( $booking_deposit, true ) : '',
             'formatted_remaining_down'    => self::format_currency( $remaining_down_payment, true ),
+            'formatted_remaining_down_payment' => self::format_currency( $remaining_down_payment, true ),
         );
     }
 

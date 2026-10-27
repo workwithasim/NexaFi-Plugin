@@ -69,12 +69,9 @@ class NexaFi_Assets {
         $form_page_url = get_option( 'nexafi_form_page_url', home_url( '/form/' ) );
 
         $db = NexaFi_DB::get_instance();
-        $default_rep = $db->get_active_representative( 'GDG1027' );
-        if ( ! $default_rep ) {
-            $default_rep = $db->get_default_representative();
-        }
-        $default_rep_id = ( $default_rep && ! empty( $default_rep->rep_id ) ) ? $default_rep->rep_id : 'GDG1027';
-        $default_rep_name = ( $default_rep && ! empty( $default_rep->name ) ) ? $default_rep->name : 'Caleb Johnson';
+        $default_rep = $db->get_default_representative();
+        $default_rep_id = ( $default_rep && ! empty( $default_rep->rep_id ) ) ? $default_rep->rep_id : '';
+        $default_rep_name = ( $default_rep && ! empty( $default_rep->name ) ) ? $default_rep->name : '';
 
         wp_localize_script(
             'nexafi-frontend-js',

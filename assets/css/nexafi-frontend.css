@@ -1471,6 +1471,14 @@ input[type="date"].nexafi-input {
   margin-bottom: 8px;
 }
 
+.nexafi-disclosures-reconciliation {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #0b275b;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
 .nexafi-disclosure-checkbox-wrap {
   margin-top: 10px;
 }

@@ -1405,6 +1405,7 @@ class NexaFi_Admin {
                             <td>
                                 $ <input type="number" step="0.01" min="0" name="nexafi_plan_fee" id="nexafi_plan_fee" value="<?php echo esc_attr( number_format( $plan_fee, 2, '.', '' ) ); ?>" class="small-text" />
                                 <p class="description">Optional administrative or plan setup fee (e.g. $35.00). Default: $0.00.</p>
+                                <p class="description"><strong>Financed vs. Upfront:</strong> <em>Financed</em> adds the fee into the installment balance (increasing Financing Charge and Total Installment Payments). <em>Upfront</em> adds the fee to the Required Down Payment at booking without reducing the amount financed (Financing Charge and Total Installments exclude the fee).</p>
                             </td>
                         </tr>
                         <tr>
@@ -1414,7 +1415,7 @@ class NexaFi_Admin {
                                     <option value="financed" <?php selected( 'financed', $plan_fee_treatment ); ?>>Financed (Added into installment balance)</option>
                                     <option value="upfront" <?php selected( 'upfront', $plan_fee_treatment ); ?>>Upfront (Collected at clinic with down payment)</option>
                                 </select>
-                                <p class="description">Controls whether the plan fee is financed over the installment term or due upfront at booking.</p>
+                                <p class="description">Controls whether the plan fee is financed over the installment term or due upfront at booking. <em>Financed</em> adds the fee into installment balance; <em>Upfront</em> adds it to Required Down Payment without reducing financed amount.</p>
                             </td>
                         </tr>
                         <tr>
@@ -1424,6 +1425,7 @@ class NexaFi_Admin {
                                     <input type="checkbox" name="nexafi_terms_verified" id="nexafi_terms_verified" value="1" <?php checked( true, $terms_verified ); ?> style="margin-top: -2px;" />
                                     <?php esc_html_e( 'Financing terms verified by GDG/legal', 'nexafi-plugin' ); ?>
                                 </label>
+                                <p class="description" style="font-weight: 600; color: #0b275b; margin-top: 4px;">Patients see the approval screen only when Decision Mode is Final Authorized AND this box is ticked. Otherwise eligible patients see the 'your representative will confirm' screen.</p>
                                 <p class="description">When unchecked (default off), unverified calculation figures (Financing Charge, Total Installment Payments, Monthly Payment) are displayed as neutral placeholders ("— / Your representative will confirm") on patient-facing screens and emails until verified.</p>
                             </td>
                         </tr>
@@ -1467,6 +1469,7 @@ class NexaFi_Admin {
                         <tr>
                             <th scope="row">Decision Policy Mode</th>
                             <td>
+                                <p class="description" style="font-weight: 600; color: #0b275b; margin-top: 0; margin-bottom: 8px;">Patients see the approval screen only when Decision Mode is Final Authorized AND this box is ticked. Otherwise eligible patients see the 'your representative will confirm' screen.</p>
                                 <fieldset>
                                     <label style="display: block; margin-bottom: 12px; cursor: pointer;">
                                         <input type="radio" name="nexafi_decision_mode" value="preliminary_only" <?php checked( 'preliminary_only', $decision_mode ); ?> />
