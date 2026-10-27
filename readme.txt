@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.17
+Stable tag: 2.4.18
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,9 +27,11 @@ Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
 
+= 2.4.18 =
+* Screen 4 terms acknowledgment workflow: initialized the financing terms checkbox as unchecked by default and kept "See Your Next Steps" action button disabled until applicant manually checks the acknowledgment, enabling dynamic gating upon manual review.
+
 = 2.4.17 =
-* Screen 4 financing terms checkbox: pre-checked the "I have reviewed the financing terms above" acknowledgment checkbox by default on the approval screen and enabled the "See Your Next Steps" button on initial render, while preserving dynamic toggle gating if unchecked.
-* Screen 4 checkbox styling: added .nexafi-checkbox class and styling to hide the duplicate native browser checkbox input while displaying the custom styled indicator with blue background and checkmark icon.
+* Screen 4 checkbox styling: added .nexafi-checkbox class and styling to hide duplicate native browser checkbox input while displaying the custom styled indicator with blue background and checkmark icon.
 
 = 2.4.16 =
 * Button arrow consistency: updated "See Your Next Steps" button on Screen 4 to use &rarr; in an aria-hidden span matching all other form action buttons while preserving consent gating and navigation.

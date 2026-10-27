@@ -533,7 +533,7 @@ class NexaFi_Shortcode {
                             <?php endif; ?>
                             <div class="nexafi-disclosure-checkbox-wrap">
                                 <label class="nexafi-checkbox-card nexafi-ack-card">
-                                    <input type="checkbox" name="accept_financing_terms" class="nexafi-checkbox nexafi-terms-checkbox" value="1" checked="checked" />
+                                    <input type="checkbox" name="accept_financing_terms" class="nexafi-checkbox nexafi-terms-checkbox" value="1" />
                                     <span class="nexafi-checkbox-indicator"></span>
                                     <span class="nexafi-checkbox-label">
                                         <?php esc_html_e( 'I have reviewed the financing terms above.', 'nexafi-plugin' ); ?>
@@ -544,7 +544,7 @@ class NexaFi_Shortcode {
 
                         <!-- Screen 4 Action: See Your Next Steps → -->
                         <div class="nexafi-form-action">
-                            <button type="button" class="nexafi-btn nexafi-btn-primary nexafi-btn-accept" data-target-screen="5">
+                            <button type="button" class="nexafi-btn nexafi-btn-primary nexafi-btn-accept" data-target-screen="5" disabled>
                                 <span class="nexafi-btn-label"><?php esc_html_e( 'See Your Next Steps', 'nexafi-plugin' ); ?></span>
                                 <span class="nexafi-btn-arrow" aria-hidden="true">&rarr;</span>
                             </button>

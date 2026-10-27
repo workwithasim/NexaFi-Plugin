@@ -763,15 +763,18 @@
             }
           }
 
-          // Acknowledgment Checkbox: Checked by default on approval screen (§4.1)
+          // Acknowledgment Checkbox: Starts unchecked, user must manually check to enable next steps (§4.1)
           const ackCheckbox = outcomeApproved.querySelector('.nexafi-terms-checkbox');
           const btnAccept = outcomeApproved.querySelector('.nexafi-btn-accept');
           if (ackCheckbox && btnAccept) {
-            ackCheckbox.checked = true;
-            btnAccept.disabled = false;
-            ackCheckbox.addEventListener('change', function () {
-              btnAccept.disabled = !ackCheckbox.checked;
-            });
+            ackCheckbox.checked = false;
+            btnAccept.disabled = true;
+            if (!ackCheckbox._hasChangeListener) {
+              ackCheckbox._hasChangeListener = true;
+              ackCheckbox.addEventListener('change', function () {
+                btnAccept.disabled = !ackCheckbox.checked;
+              });
+            }
           }
         }
       } else {
