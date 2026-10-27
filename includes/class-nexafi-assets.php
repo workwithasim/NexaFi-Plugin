@@ -82,7 +82,7 @@ class NexaFi_Assets {
                 'default_rep_id'   => $default_rep_id,
                 'default_rep_name' => $default_rep_name,
                 'home_url'         => home_url( '/' ),
-                'return_url'       => esc_url( get_option( 'nexafi_return_url', home_url( '/' ) ) ),
+                'return_url'       => esc_url( get_option( 'nexafi_return_url', '' ) ),
                 'form_url'        => esc_url( $form_page_url ),
                 'min_quote'       => floatval( get_option( 'nexafi_min_quote', 0.0 ) ),
                 'max_quote'       => floatval( get_option( 'nexafi_max_quote', 50000.0 ) ),

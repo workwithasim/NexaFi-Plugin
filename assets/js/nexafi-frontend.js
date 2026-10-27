@@ -862,8 +862,13 @@
           }
 
           const returnBtn = outcomeIneligible.querySelector('.nexafi-btn-return-home');
-          if (returnBtn && (config.return_url || config.home_url)) {
-            returnBtn.href = config.return_url || config.home_url;
+          if (returnBtn) {
+            if (config.return_url) {
+              returnBtn.href = config.return_url;
+              returnBtn.style.display = 'flex';
+            } else {
+              returnBtn.style.display = 'none';
+            }
           }
         }
       }
@@ -951,6 +956,20 @@
         }
         if (stepsEligible) stepsEligible.style.display = 'none';
         if (stepsIneligible) stepsIneligible.style.display = 'block';
+      }
+
+      // Return button on Screen 5: plain direct link to nexafi_return_url, hidden if empty
+      const returnBtn5 = screen5.querySelector('.nexafi-btn-return');
+      const returnAction5 = returnBtn5 ? returnBtn5.closest('.nexafi-form-action') : null;
+      if (returnBtn5) {
+        if (config.return_url) {
+          returnBtn5.href = config.return_url;
+          if (returnAction5) returnAction5.style.display = 'block';
+          returnBtn5.style.display = 'inline-flex';
+        } else {
+          if (returnAction5) returnAction5.style.display = 'none';
+          returnBtn5.style.display = 'none';
+        }
       }
     }
 

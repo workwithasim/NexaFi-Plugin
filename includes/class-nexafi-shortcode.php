@@ -75,7 +75,7 @@ class NexaFi_Shortcode {
         wp_enqueue_script( 'nexafi-frontend-js' );
 
         $privacy_url = ! empty( $atts['privacy_url'] ) ? esc_url( $atts['privacy_url'] ) : esc_url( get_option( 'nexafi_privacy_policy_url', home_url( '/privacy-policy/' ) ) );
-        $return_url  = ! empty( $atts['return_url'] ) ? esc_url( $atts['return_url'] ) : esc_url( get_option( 'nexafi_return_url', home_url( '/' ) ) );
+        $return_url  = ! empty( $atts['return_url'] ) ? esc_url( $atts['return_url'] ) : esc_url( get_option( 'nexafi_return_url', '' ) );
 
         $start_screen = in_array( (string) $atts['start_screen'], array( '2', '3' ), true ) ? (int) $atts['start_screen'] : 2;
 
@@ -542,11 +542,11 @@ class NexaFi_Shortcode {
                             </div>
                         </div>
 
-                        <!-- Screen 4 Action: See Your Next Steps > -->
+                        <!-- Screen 4 Action: See Your Next Steps → -->
                         <div class="nexafi-form-action">
                             <button type="button" class="nexafi-btn nexafi-btn-primary nexafi-btn-accept" data-target-screen="5" disabled>
                                 <span class="nexafi-btn-label"><?php esc_html_e( 'See Your Next Steps', 'nexafi-plugin' ); ?></span>
-                                <span class="nexafi-btn-arrow" aria-hidden="true">&gt;</span>
+                                <span class="nexafi-btn-arrow" aria-hidden="true">&rarr;</span>
                             </button>
                         </div>
 
@@ -592,7 +592,7 @@ class NexaFi_Shortcode {
                                 <span class="nexafi-btn-label">Contact Your Representative</span>
                                 <span class="nexafi-btn-arrow" aria-hidden="true">&rarr;</span>
                             </a>
-                            <a href="<?php echo esc_url( $return_url ); ?>" class="nexafi-btn nexafi-btn-secondary nexafi-btn-return-home" style="display: flex; text-decoration: none; justify-content: center; align-items: center;">
+                            <a href="<?php echo esc_url( $return_url ); ?>" class="nexafi-btn nexafi-btn-secondary nexafi-btn-return-home" style="<?php echo empty( $return_url ) ? 'display: none;' : 'display: flex;'; ?> text-decoration: none; justify-content: center; align-items: center;">
                                 <span class="nexafi-btn-label">Back to Website</span>
                             </a>
                         </div>
@@ -699,9 +699,10 @@ class NexaFi_Shortcode {
                     </div>
 
                     <!-- Return Action Button -->
-                    <div class="nexafi-form-action">
+                    <div class="nexafi-form-action"<?php echo empty( $return_url ) ? ' style="display: none;"' : ''; ?>>
                         <a href="<?php echo esc_url( $return_url ); ?>" class="nexafi-btn nexafi-btn-primary nexafi-btn-return">
-                            <span>Return to GDG Smiles</span>
+                            <span class="nexafi-btn-label"><?php esc_html_e( 'Return to GDG Smiles', 'nexafi-plugin' ); ?></span>
+                            <span class="nexafi-btn-arrow" aria-hidden="true">&rarr;</span>
                         </a>
                     </div>
 

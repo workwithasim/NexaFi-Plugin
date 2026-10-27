@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.15
+Stable tag: 2.4.16
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,13 @@ NexaFi Financing Application & Contact Form provides an advanced multi-step fina
 Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
+
+= 2.4.16 =
+* Button arrow consistency: updated "See Your Next Steps" button on Screen 4 to use &rarr; in an aria-hidden span matching all other form action buttons while preserving consent gating and navigation.
+* Screen 5 return button text: updated final action button to "Return to GDG Smiles &rarr;" with an aria-hidden arrow, keeping existing blue pill styling, size, placement, and tagline card branding.
+* Return URL handling: defaulted nexafi_return_url to empty instead of home_url('/'), hiding return buttons when empty, added HTTPS URL validation on save, and added admin notice prompting to configure the homepage URL.
+* IP-hash transient rate limiting: added rate limiting to nexafi_lookup_rep (max 20 req/min) and nexafi_submit_application (max 5 submissions/10 min) keyed by SHA-256 IP hash without storing raw IPs.
+* Settings pre-launch checklist: added overview checklist box on the NexaFi settings page showing done/not done status for return URL, active representative, terms verified, decision mode, disclosure text, and plan fee.
 
 = 2.4.15 =
 * Pending screen headline & styling fix: replaced "YOU'RE APPROVED!" and amber warning icon on pending / unverified screens with "Your Application Has Been Received" and a calm blue info icon; strictly reserved approval headlines and "Congratulations" wording for verified approvals (result === 'approved' AND terms_verified === true) across Screen 4, Screen 5, and applicant emails.

@@ -67,10 +67,57 @@ class NexaFi_Ajax {
     }
 
     /**
+     * Check rate limit using transient counters keyed by IP hash
+     *
+     * @param string $action         Action identifier
+     * @param int    $max_requests   Maximum allowed requests in the time window
+     * @param int    $window_seconds Window duration in seconds
+     * @param string $error_message  User-friendly error message when exceeded
+     */
+    private function check_rate_limit( $action, $max_requests, $window_seconds, $error_message ) {
+        $raw_ip  = ! empty( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '127.0.0.1';
+        $ip_hash = hash( 'sha256', 'nexafi_rl_salt_' . $raw_ip );
+        $transient_key = 'nxf_rl_' . substr( $action, 0, 10 ) . '_' . substr( $ip_hash, 0, 20 );
+
+        $data = get_transient( $transient_key );
+        $now  = time();
+
+        if ( false === $data || ! is_array( $data ) || empty( $data['reset'] ) || $now >= $data['reset'] ) {
+            set_transient(
+                $transient_key,
+                array(
+                    'count' => 1,
+                    'reset' => $now + $window_seconds,
+                ),
+                $window_seconds
+            );
+            return;
+        }
+
+        if ( intval( $data['count'] ) >= $max_requests ) {
+            wp_send_json_error( array(
+                'message' => $error_message,
+            ) );
+        }
+
+        $remaining_ttl = max( 1, $data['reset'] - $now );
+        $data['count'] = intval( $data['count'] ) + 1;
+        set_transient( $transient_key, $data, $remaining_ttl );
+    }
+
+    /**
      * Live GDG Representative lookup
      */
     public function lookup_representative() {
         check_ajax_referer( 'nexafi_financing_nonce', 'security' );
+
+        // Rate limit: max 20 requests per minute
+        $this->check_rate_limit(
+            'lookup_rep',
+            20,
+            60,
+            __( 'Too many representative lookups. Please wait a moment before trying again.', 'nexafi-plugin' )
+        );
 
         $rep_id = isset( $_POST['rep_id'] ) ? sanitize_text_field( wp_unslash( $_POST['rep_id'] ) ) : '';
 
@@ -121,6 +168,14 @@ class NexaFi_Ajax {
                 'nonce_expired' => true,
             ), 403 );
         }
+
+        // Rate limit: max 5 submissions per 10 minutes
+        $this->check_rate_limit(
+            'submit_app',
+            5,
+            600,
+            __( 'Too many application submissions. Please wait a few minutes before trying again.', 'nexafi-plugin' )
+        );
 
         $db = NexaFi_DB::get_instance();
 
