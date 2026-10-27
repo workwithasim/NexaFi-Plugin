@@ -93,7 +93,7 @@ class NexaFi_Ajax {
             }
 
             wp_send_json_error( array(
-                'message' => __( 'Representative ID not found. Please verify with your GDG representative.', 'nexafi-plugin' ),
+                'message' => __( 'Representative ID not found.', 'nexafi-plugin' ),
             ) );
         }
 
@@ -179,14 +179,26 @@ class NexaFi_Ajax {
         if ( empty( $dob ) ) {
             $errors['dob'] = __( 'Date of birth is required.', 'nexafi-plugin' );
         } elseif ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $dob ) && ! preg_match( '/^\d{2}\/\d{2}\/\d{4}$/', $dob ) ) {
-            $errors['dob'] = __( 'Please enter a valid date of birth.', 'nexafi-plugin' );
+            $errors['dob'] = __( 'You must be at least 18 years old to apply.', 'nexafi-plugin' );
         } else {
             // Standardize dob to YYYY-MM-DD
             $time = strtotime( $dob );
             if ( ! $time ) {
-                $errors['dob'] = __( 'Invalid date of birth format.', 'nexafi-plugin' );
+                $errors['dob'] = __( 'You must be at least 18 years old to apply.', 'nexafi-plugin' );
             } else {
                 $dob = gmdate( 'Y-m-d', $time );
+                // Age check: reject if in future, under 18, or older than 120
+                $dob_dt   = date_create( $dob );
+                $today_dt = date_create( 'today' );
+                if ( ! $dob_dt || ! $today_dt || $dob_dt > $today_dt ) {
+                    $errors['dob'] = __( 'You must be at least 18 years old to apply.', 'nexafi-plugin' );
+                } else {
+                    $diff = date_diff( $dob_dt, $today_dt );
+                    $age  = $diff->y;
+                    if ( $age < 18 || $age > 120 ) {
+                        $errors['dob'] = __( 'You must be at least 18 years old to apply.', 'nexafi-plugin' );
+                    }
+                }
             }
         }
 
@@ -242,14 +254,21 @@ class NexaFi_Ajax {
         }
 
         // Quote Validation
+        $min_quote = floatval( get_option( 'nexafi_min_quote', 0.0 ) );
         $max_quote = floatval( get_option( 'nexafi_max_quote', 50000.0 ) );
         if ( $treatment_quote <= 0 ) {
             $errors['treatment_quote'] = __( 'Please enter a valid treatment quote greater than $0.', 'nexafi-plugin' );
+        } elseif ( $min_quote > 0 && $treatment_quote < $min_quote ) {
+            $errors['treatment_quote'] = sprintf(
+                /* translators: %s: minimum treatment quote amount in currency format */
+                __( 'Treatment quote must be at least %s.', 'nexafi-plugin' ),
+                NexaFi_Calculator::format_currency( $min_quote, true )
+            );
         } elseif ( $max_quote > 0 && $treatment_quote > $max_quote ) {
             $errors['treatment_quote'] = sprintf(
                 /* translators: %s: maximum allowed treatment quote amount in currency format */
                 __( 'Treatment quote cannot exceed %s.', 'nexafi-plugin' ),
-                NexaFi_Calculator::format_currency( $max_quote )
+                NexaFi_Calculator::format_currency( $max_quote, true )
             );
         }
 
@@ -263,7 +282,7 @@ class NexaFi_Ajax {
                 $rep = $db->get_representative_by_id_str( $rep_id_input );
             }
             if ( ! $rep ) {
-                $errors['rep_id'] = __( 'Representative ID not found. Please verify with your GDG representative.', 'nexafi-plugin' );
+                $errors['rep_id'] = __( 'Representative ID not found.', 'nexafi-plugin' );
             }
         }
 
@@ -483,17 +502,35 @@ class NexaFi_Ajax {
             __( 'Please contact your GDG representative directly or speak with our front desk.', 'nexafi-plugin' )
         );
 
+        $terms_verified    = (bool) ( $calc['terms_verified'] ?? false );
+        $is_final_approved = ( 'approved' === $app->eligibility_result && $terms_verified );
+        $pending_body      = __( 'Your application has been received. Your GDG Smiles representative will confirm verified financing terms with you before proceeding.', 'nexafi-plugin' );
+
+        if ( $is_final_approved ) {
+            $resp_headline = $eval['headline'];
+            $resp_subtitle = $eval['subtitle'] ?? '';
+            $resp_message  = $eval['message'] ?? '';
+        } elseif ( 'ineligible' === $app->eligibility_result ) {
+            $resp_headline = __( 'We’re Unable to Offer In-House Financing Right Now', 'nexafi-plugin' );
+            $resp_subtitle = $eval['subtitle'] ?? '';
+            $resp_message  = $eval['message'] ?? ( $eval['reason'] ?? '' );
+        } else {
+            $resp_headline = __( 'Your Application Has Been Received', 'nexafi-plugin' );
+            $resp_subtitle = $pending_body;
+            $resp_message  = $pending_body;
+        }
+
         return array(
             'app_id'                     => intval( $app->id ),
             'reference_number'           => esc_html( $app->reference_number ),
             'applicant_name'             => esc_html( $app->first_name . ' ' . $app->last_name ),
             'eligibility_result'         => $app->eligibility_result,
             'decision_mode'              => $app->decision_mode,
-            'terms_verified'             => (bool) ( $calc['terms_verified'] ?? false ),
+            'terms_verified'             => $terms_verified,
             'terms_token'                => $terms_token,
-            'headline'                   => $eval['headline'],
-            'subtitle'                   => $eval['subtitle'] ?? '',
-            'message'                    => $eval['message'] ?? '',
+            'headline'                   => $resp_headline,
+            'subtitle'                   => $resp_subtitle,
+            'message'                    => $resp_message,
             'requires_contact'           => ! empty( $eval['requires_contact'] ),
             'fallback_contact_text'      => esc_html( $fallback_contact_text ),
             'representative'             => $rep_data,
@@ -840,16 +877,17 @@ class NexaFi_Ajax {
 
         $to = sanitize_email( $app->email );
 
-        $is_approved    = ( 'approved' === $app->eligibility_result );
-        $applicant_name = trim( $app->first_name . ' ' . $app->last_name );
-        $rep_name       = $rep ? $rep->name : ( ! empty( $app->rep_id_str ) ? $app->rep_id_str : 'Assigned Representative' );
-        $rep_id         = $rep ? $rep->rep_id : $app->rep_id_str;
-        $rep_phone      = $rep ? $rep->phone : '';
-        $rep_email      = $rep ? $rep->email : '';
+        $terms_verified_val = (bool) get_option( 'nexafi_terms_verified', false );
+        $is_final_approved  = ( 'approved' === $app->eligibility_result && $terms_verified_val );
+        $applicant_name     = trim( $app->first_name . ' ' . $app->last_name );
+        $rep_name           = $rep ? $rep->name : ( ! empty( $app->rep_id_str ) ? $app->rep_id_str : 'Assigned Representative' );
+        $rep_id             = $rep ? $rep->rep_id : $app->rep_id_str;
+        $rep_phone          = $rep ? $rep->phone : '';
+        $rep_email          = $rep ? $rep->email : '';
 
         /* translators: %s: application reference number */
         $subject = sprintf(
-            $is_approved
+            $is_final_approved
                 /* translators: %s: application reference number */
                 ? __( 'Your NexaFi Financing Application & Approval Details [%s]', 'nexafi-plugin' )
                 /* translators: %s: application reference number */
@@ -896,11 +934,15 @@ class NexaFi_Ajax {
             }
         }
 
-        $status_bg    = $is_approved ? '#16a34a' : '#d97706';
-        $status_title = $is_approved ? __( "YOU'RE APPROVED!", 'nexafi-plugin' ) : __( 'APPLICATION RECEIVED', 'nexafi-plugin' );
-        $status_desc  = $is_approved
+        $status_bg    = $is_final_approved ? '#16a34a' : ( ( 'ineligible' === $app->eligibility_result ) ? '#dc2626' : '#2563eb' );
+        $status_title = $is_final_approved
+            ? __( "YOU'RE APPROVED!", 'nexafi-plugin' )
+            : ( ( 'ineligible' === $app->eligibility_result ) ? __( 'APPLICATION INELIGIBLE', 'nexafi-plugin' ) : __( 'APPLICATION RECEIVED', 'nexafi-plugin' ) );
+        $status_desc  = $is_final_approved
             ? __( 'Congratulations! Your GDG Smiles in-house financing has been approved.', 'nexafi-plugin' )
-            : __( 'Your application has been received and is being processed by our team.', 'nexafi-plugin' );
+            : ( ( 'ineligible' === $app->eligibility_result )
+                ? __( 'Unfortunately, you don’t currently meet the requirements for our in-house financing program.', 'nexafi-plugin' )
+                : __( 'Your application has been received. Your GDG Smiles representative will confirm verified financing terms with you before proceeding.', 'nexafi-plugin' ) );
 
         // Clean percent strings (e.g. 70 instead of 70.00)
         $upfront_pct_str  = rtrim( rtrim( (string) $app->upfront_pct, '0' ), '.' );
@@ -932,7 +974,7 @@ class NexaFi_Ajax {
 
                     <!-- Status Hero Banner -->
                     <tr>
-                        <td style="padding: 24px 30px; text-align: center; border-bottom: 1px solid #e2e8f0; background-color: <?php echo $is_approved ? '#f0fdf4' : '#fffbeb'; ?>;">
+                        <td style="padding: 24px 30px; text-align: center; border-bottom: 1px solid #e2e8f0; background-color: <?php echo $is_final_approved ? '#f0fdf4' : ( ( 'ineligible' === $app->eligibility_result ) ? '#fef2f2' : '#f0f9ff' ); ?>;">
                             <span style="display: inline-block; background-color: <?php echo esc_attr( $status_bg ); ?>; color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px;">
                                 <?php echo esc_html( $status_title ); ?>
                             </span>

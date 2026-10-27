@@ -83,8 +83,9 @@ class NexaFi_Eligibility {
             );
         }
 
-        // 5. Declarations are satisfied. Return approved decision ONLY if final_authorized mode is active
-        if ( 'final_authorized' === $decision_mode ) {
+        // 5. Declarations are satisfied. Return approved decision ONLY if final_authorized mode is active AND terms_verified is true
+        $terms_verified = isset( $data['terms_verified'] ) ? (bool) $data['terms_verified'] : (bool) get_option( 'nexafi_terms_verified', false );
+        if ( 'final_authorized' === $decision_mode && $terms_verified ) {
             return array(
                 'is_eligible'        => true,
                 'result'             => 'approved',
@@ -98,20 +99,17 @@ class NexaFi_Eligibility {
             );
         }
 
-        $prelim_msg = get_option(
-            'nexafi_preliminary_message',
-            __( 'Your self-reported declarations satisfy initial financing eligibility. A GDG representative will review your treatment plan to finalize your financing.', 'nexafi-plugin' )
-        );
+        $pending_body = __( 'Your application has been received. Your GDG Smiles representative will confirm verified financing terms with you before proceeding.', 'nexafi-plugin' );
 
         return array(
             'is_eligible'        => true,
             'result'             => 'preliminary',
-            'reason'             => __( 'Declarations satisfy initial criteria. Pending written authorization and representative review.', 'nexafi-plugin' ),
-            'decision_mode'      => 'preliminary_only',
+            'reason'             => $pending_body,
+            'decision_mode'      => $decision_mode,
             'rule_version'       => $rule_version,
-            'headline'           => __( 'Preliminary Financing Eligibility', 'nexafi-plugin' ),
-            'subtitle'           => __( 'Your self-reported declarations satisfy initial financing requirements.', 'nexafi-plugin' ),
-            'message'            => $prelim_msg,
+            'headline'           => __( 'Your Application Has Been Received', 'nexafi-plugin' ),
+            'subtitle'           => $pending_body,
+            'message'            => $pending_body,
             'requires_contact'   => true,
         );
     }

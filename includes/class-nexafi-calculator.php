@@ -183,6 +183,7 @@ class NexaFi_Calculator {
             'financed_pct'       => floatval( get_option( 'nexafi_financed_pct', self::DEFAULT_FINANCED_PCT ) ),
             'charge_pct'         => floatval( get_option( 'nexafi_charge_pct', self::DEFAULT_CHARGE_PCT ) ),
             'repayment_term'     => intval( get_option( 'nexafi_repayment_term', self::DEFAULT_REPAYMENT_TERM ) ),
+            'min_quote'          => floatval( get_option( 'nexafi_min_quote', 0.0 ) ),
             'max_quote'          => floatval( get_option( 'nexafi_max_quote', 50000.0 ) ),
             'charge_basis'       => get_option( 'nexafi_charge_basis', self::DEFAULT_CHARGE_BASIS ),
             'plan_fee'           => floatval( get_option( 'nexafi_plan_fee', self::DEFAULT_PLAN_FEE ) ),

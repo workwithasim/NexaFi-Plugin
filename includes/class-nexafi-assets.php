@@ -84,6 +84,7 @@ class NexaFi_Assets {
                 'home_url'         => home_url( '/' ),
                 'return_url'       => esc_url( get_option( 'nexafi_return_url', home_url( '/' ) ) ),
                 'form_url'        => esc_url( $form_page_url ),
+                'min_quote'       => floatval( get_option( 'nexafi_min_quote', 0.0 ) ),
                 'max_quote'       => floatval( get_option( 'nexafi_max_quote', 50000.0 ) ),
                 'i18n'            => array(
                     'verifying_rep'   => __( 'Verifying representative...', 'nexafi-plugin' ),
@@ -94,7 +95,7 @@ class NexaFi_Assets {
                     'network_error'   => __( 'Unable to connect to the server. Please check your internet connection.', 'nexafi-plugin' ),
                     'consent_req'     => __( 'You must authorize information review to submit.', 'nexafi-plugin' ),
                     'required_field'  => __( 'This field is required.', 'nexafi-plugin' ),
-                    'rep_not_found'   => __( 'Representative ID not found. Please verify with your GDG representative.', 'nexafi-plugin' ),
+                    'rep_not_found'   => __( 'Representative ID not found.', 'nexafi-plugin' ),
                 ),
             )
         );

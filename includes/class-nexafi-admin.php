@@ -46,6 +46,9 @@ class NexaFi_Admin {
         add_action( 'wp_ajax_nexafi_admin_update_status', array( $this, 'ajax_update_app_status' ) );
         add_action( 'wp_ajax_nexafi_admin_toggle_rep', array( $this, 'ajax_toggle_rep' ) );
         add_action( 'wp_ajax_nexafi_admin_delete_email_log', array( $this, 'ajax_delete_email_log' ) );
+
+        // Active representative notice
+        add_action( 'admin_notices', array( $this, 'maybe_render_active_rep_notice' ) );
     }
 
     /**
@@ -141,6 +144,25 @@ class NexaFi_Admin {
                 'confirm_policy_text' => __( 'WARNING: Enabling Final Approval wording confirms written authorization has been obtained from GDG and the financing provider. Are you sure you wish to enable final approval mode?', 'nexafi-plugin' ),
             ),
         ) );
+    }
+
+    /**
+     * Show admin notice on NexaFi pages if no active representative exists
+     */
+    public function maybe_render_active_rep_notice() {
+        $screen = get_current_screen();
+        if ( ! $screen || false === strpos( $screen->id, 'nexafi' ) ) {
+            return;
+        }
+
+        $db = NexaFi_DB::get_instance();
+        if ( ! $db->has_active_representative() ) {
+            ?>
+            <div class="notice notice-warning is-dismissible">
+                <p><?php esc_html_e( 'Add at least one active GDG representative before going live.', 'nexafi-plugin' ); ?></p>
+            </div>
+            <?php
+        }
     }
 
     /**
@@ -352,7 +374,8 @@ class NexaFi_Admin {
         $financed_pct        = floatval( $_POST['nexafi_financed_pct'] ?? 30.0 );
         $charge_pct          = floatval( $_POST['nexafi_charge_pct'] ?? 15.0 );
         $repayment_term      = intval( $_POST['nexafi_repayment_term'] ?? 12 );
-        $max_quote          = floatval( $_POST['nexafi_max_quote'] ?? 50000.0 );
+        $min_quote           = max( 0.0, floatval( $_POST['nexafi_min_quote'] ?? 0.0 ) );
+        $max_quote           = floatval( $_POST['nexafi_max_quote'] ?? 50000.0 );
         $charge_basis        = sanitize_text_field( wp_unslash( $_POST['nexafi_charge_basis'] ?? 'financed_amount' ) );
         $plan_fee            = max( 0.0, floatval( $_POST['nexafi_plan_fee'] ?? 0.0 ) );
         $plan_fee_treatment  = sanitize_text_field( wp_unslash( $_POST['nexafi_plan_fee_treatment'] ?? 'financed' ) );
@@ -370,6 +393,7 @@ class NexaFi_Admin {
         update_option( 'nexafi_financed_pct', $financed_pct );
         update_option( 'nexafi_charge_pct', $charge_pct );
         update_option( 'nexafi_repayment_term', $repayment_term );
+        update_option( 'nexafi_min_quote', $min_quote );
         update_option( 'nexafi_max_quote', $max_quote );
         update_option( 'nexafi_charge_basis', $charge_basis );
         update_option( 'nexafi_plan_fee', $plan_fee );
@@ -1299,6 +1323,7 @@ class NexaFi_Admin {
         $financed_pct        = floatval( get_option( 'nexafi_financed_pct', 30.0 ) );
         $charge_pct          = floatval( get_option( 'nexafi_charge_pct', 15.0 ) );
         $repayment_term      = intval( get_option( 'nexafi_repayment_term', 12 ) );
+        $min_quote           = floatval( get_option( 'nexafi_min_quote', 0.0 ) );
         $max_quote           = floatval( get_option( 'nexafi_max_quote', 50000.0 ) );
         $charge_basis        = get_option( 'nexafi_charge_basis', 'financed_amount' );
         $plan_fee            = floatval( get_option( 'nexafi_plan_fee', 0.00 ) );
@@ -1434,6 +1459,13 @@ class NexaFi_Admin {
                             <td>
                                 <input type="number" min="1" max="120" name="nexafi_repayment_term" id="nexafi_repayment_term" value="<?php echo esc_attr( $repayment_term ); ?>" class="small-text" required /> months
                                 <p class="description">Default: 12 months.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="nexafi_min_quote">Minimum Allowed Quote ($)</label></th>
+                            <td>
+                                $ <input type="number" step="50" min="0" name="nexafi_min_quote" id="nexafi_min_quote" value="<?php echo esc_attr( $min_quote > 0 ? $min_quote : 0 ); ?>" class="regular-text" />
+                                <p class="description">Minimum treatment quote allowed on the application (Default: $0 = no minimum).</p>
                             </td>
                         </tr>
                         <tr>

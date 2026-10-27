@@ -170,10 +170,13 @@ class NexaFi_Shortcode {
                             <div class="nexafi-field-group">
                                 <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-dob">Date of Birth <span class="nexafi-req">*</span></label>
                                 <div class="nexafi-input-icon-wrap">
-                                    <input type="date" id="<?php echo esc_attr( $instance_id ); ?>-dob" name="dob" class="nexafi-input" required autocomplete="bday" max="<?php echo esc_attr( gmdate( 'Y-m-d' ) ); ?>" />
+                                    <input type="date" id="<?php echo esc_attr( $instance_id ); ?>-dob" name="dob" class="nexafi-input" required autocomplete="bday" max="<?php echo esc_attr( gmdate( 'Y-m-d', strtotime( '-18 years' ) ) ); ?>" />
                                     <span class="nexafi-input-icon" aria-hidden="true">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                     </span>
+                                </div>
+                                <div class="nexafi-field-error nexafi-dob-error" style="display: none; color: #dc2626; font-size: 12px; margin-top: 4px; font-weight: 500;">
+                                    <?php esc_html_e( 'You must be at least 18 years old to apply.', 'nexafi-plugin' ); ?>
                                 </div>
                             </div>
 
@@ -549,18 +552,18 @@ class NexaFi_Shortcode {
 
                     </div>
 
-                    <!-- OUTCOME B: NOT ELIGIBLE UNDER DECLARATION RULE CONTAINER -->
+                    <!-- OUTCOME B: PENDING VERIFICATION / NOT ELIGIBLE CONTAINER -->
                     <div class="nexafi-decision-outcome nexafi-outcome-ineligible" style="display: none;">
                         <div class="nexafi-info-badge-wrap">
-                            <div class="nexafi-badge-circle nexafi-badge-amber">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            <div class="nexafi-badge-circle nexafi-badge-blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                             </div>
                         </div>
 
                         <div class="nexafi-decision-title-group">
-                            <h2 class="nexafi-ineligible-heading">We’re Unable to Offer In-House Financing Right Now</h2>
+                            <h2 class="nexafi-ineligible-heading"><?php esc_html_e( 'Your Application Has Been Received', 'nexafi-plugin' ); ?></h2>
                             <p class="nexafi-ineligible-reason">
-                                Unfortunately, you don’t currently meet the requirements for our in-house financing program. Don’t worry! Your GDG Smiles representative can help you explore other available payment options.
+                                <?php esc_html_e( 'Your application has been received. Your GDG Smiles representative will confirm verified financing terms with you before proceeding.', 'nexafi-plugin' ); ?>
                             </p>
                         </div>
 

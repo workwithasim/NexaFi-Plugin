@@ -1649,6 +1649,21 @@ input[type="date"].nexafi-input {
   margin: 0;
 }
 
+.nexafi-outcome-pending .nexafi-ineligible-heading {
+  color: #0b275b;
+}
+
+.nexafi-outcome-pending .nexafi-ineligible-reason {
+  color: #475569;
+}
+
+.nexafi-dob-error {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
 .nexafi-ineligible-msg-box {
   background: #fefce8;
   border: 1px solid #fef08a;

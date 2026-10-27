@@ -31,6 +31,8 @@
       ajax_url: '/wp-admin/admin-ajax.php',
       nonce: '',
       default_rep_id: '',
+      min_quote: 0,
+      max_quote: 50000,
       home_url: '/',
       i18n: {},
     };
@@ -131,6 +133,24 @@
         clearFormProgress();
       }
     });
+
+    // Date of Birth: enforce max date = today minus 18 years
+    const dobInputField = wrapper.querySelector('input[name="dob"]');
+    if (dobInputField) {
+      const todayDate = new Date();
+      const maxYear = todayDate.getFullYear() - 18;
+      const mm = String(todayDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(todayDate.getDate()).padStart(2, '0');
+      dobInputField.max = `${maxYear}-${mm}-${dd}`;
+
+      const clearDobError = function () {
+        const dobErr = wrapper.querySelector('.nexafi-dob-error');
+        if (dobErr) dobErr.style.display = 'none';
+        dobInputField.classList.remove('nexafi-input-invalid');
+      };
+      dobInputField.addEventListener('input', clearDobError);
+      dobInputField.addEventListener('change', clearDobError);
+    }
 
     // -----------------------------------------------------------------------
     // Phone Auto-Formatting (XXX) XXX-XXXX (§1.2)
@@ -327,6 +347,40 @@
         }
       });
 
+      // Validate Date of Birth (at least 18 years old, not future, not older than 120)
+      const dobInput = formStep2.querySelector('input[name="dob"]');
+      const dobError = formStep2.querySelector('.nexafi-dob-error');
+      if (dobError) dobError.style.display = 'none';
+
+      if (dobInput && !dobInput.disabled) {
+        const dobVal = dobInput.value.trim();
+        if (!dobVal) {
+          dobInput.classList.add('nexafi-input-invalid');
+          isValid = false;
+          if (!firstInvalid) firstInvalid = dobInput;
+        } else {
+          const dobDate = new Date(dobVal + 'T00:00:00');
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          let age = today.getFullYear() - dobDate.getFullYear();
+          const m = today.getMonth() - dobDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+            age--;
+          }
+
+          if (isNaN(dobDate.getTime()) || dobDate > today || age < 18 || age > 120) {
+            dobInput.classList.add('nexafi-input-invalid');
+            if (dobError) {
+              dobError.textContent = 'You must be at least 18 years old to apply.';
+              dobError.style.display = 'block';
+            }
+            isValid = false;
+            if (!firstInvalid) firstInvalid = dobInput;
+          }
+        }
+      }
+
       // Validate Phone 10 digits
       if (phoneInput && !phoneInput.disabled) {
         let pDigits = phoneInput.value.replace(/\D/g, '');
@@ -437,7 +491,7 @@
             hideRepPreview();
             repInput.classList.add('nexafi-input-invalid');
             if (repStatusText) {
-              repStatusText.textContent = res.data && res.data.message ? res.data.message : 'Representative ID not found or inactive.';
+              repStatusText.textContent = res.data && res.data.message ? res.data.message : 'Representative ID not found.';
             }
           }
         })
@@ -497,6 +551,16 @@
         const numQuote = parseFloat(rawQuote);
         if (isNaN(numQuote) || numQuote <= 0) {
           showAlert(alertBox3, 'Please enter a valid treatment quote greater than $0.');
+          if (quoteInput) {
+            quoteInput.classList.add('nexafi-input-invalid');
+            quoteInput.focus();
+          }
+          return;
+        }
+
+        const minQuote = parseFloat(config.min_quote || 0);
+        if (minQuote > 0 && numQuote < minQuote) {
+          showAlert(alertBox3, 'Treatment quote must be at least $' + minQuote.toLocaleString('en-US') + '.');
           if (quoteInput) {
             quoteInput.classList.add('nexafi-input-invalid');
             quoteInput.focus();
@@ -714,6 +778,24 @@
         if (outcomeIneligible) {
           outcomeIneligible.style.display = 'block';
 
+          const isTrulyIneligible = (result === 'ineligible');
+          const badgeCircle = outcomeIneligible.querySelector('.nexafi-badge-circle');
+
+          if (badgeCircle) {
+            if (isTrulyIneligible) {
+              badgeCircle.className = 'nexafi-badge-circle nexafi-badge-amber';
+              badgeCircle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+              outcomeIneligible.classList.remove('nexafi-outcome-pending');
+              outcomeIneligible.classList.add('nexafi-outcome-rejected');
+            } else {
+              // Calm info icon for pending application received state
+              badgeCircle.className = 'nexafi-badge-circle nexafi-badge-blue';
+              badgeCircle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+              outcomeIneligible.classList.remove('nexafi-outcome-rejected');
+              outcomeIneligible.classList.add('nexafi-outcome-pending');
+            }
+          }
+
           const chosenRepName = (rep && rep.name) ? rep.name : (submittedRep ? ('Representative ' + submittedRep) : '—');
           const chosenRepId = (rep && rep.rep_id) ? rep.rep_id : (submittedRep ? submittedRep : '—');
 
@@ -730,16 +812,26 @@
             repAvatar.src = rep.photo_url;
           }
 
-          const ineligHeadline = (data && data.headline) ? data.headline : 'We’re Unable to Offer In-House Financing Right Now';
+          const fallbackHeading = isTrulyIneligible
+            ? 'We’re Unable to Offer In-House Financing Right Now'
+            : 'Your Application Has Been Received';
+          const defaultReason = isTrulyIneligible
+            ? 'Unfortunately, you don’t currently meet the requirements for our in-house financing program. Don’t worry! Your GDG Smiles representative can help you explore other available payment options.'
+            : 'Your application has been received. Your GDG Smiles representative will confirm verified financing terms with you before proceeding.';
+
+          let ineligHeadline = (data && data.headline) ? data.headline : fallbackHeading;
+          if (ineligHeadline.toUpperCase().includes('APPROVED') || ineligHeadline.includes('Congratulations')) {
+            ineligHeadline = fallbackHeading;
+          }
           setValText(outcomeIneligible, '.nexafi-ineligible-heading', ineligHeadline);
 
-          const defaultIneligReason = (result === 'approved' && !termsVerified)
-            ? 'Your application has been received. Your GDG Smiles representative will confirm verified financing terms with you before proceeding.'
-            : 'Unfortunately, you don’t currently meet the requirements for our in-house financing program. Don’t worry! Your GDG Smiles representative can help you explore other available payment options.';
-          const cleanReason = (data && data.reason) ? data.reason : defaultIneligReason;
+          let cleanReason = (data && data.reason) ? data.reason : defaultReason;
+          if (cleanReason.toUpperCase().includes('APPROVED') || cleanReason.includes('Congratulations') || cleanReason.includes('criteria satisfied')) {
+            cleanReason = defaultReason;
+          }
           setValText(outcomeIneligible, '.nexafi-ineligible-reason', cleanReason);
 
-          if (data && data.message) {
+          if (data && data.message && isTrulyIneligible) {
             setValText(outcomeIneligible, '.nexafi-ineligible-detail-text', data.message);
           }
 

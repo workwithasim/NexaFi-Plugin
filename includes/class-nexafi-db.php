@@ -205,38 +205,14 @@ class NexaFi_DB {
         // Clean up any legacy or rogue unique index names (one-time migration).
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
         $wpdb->query( 'ALTER TABLE `' . esc_sql( $this->tbl_applications ) . '` DROP INDEX `reference_key`' );
-
-        // Seed default representative GDG1027 if none exists
-        $this->seed_default_representative();
     }
 
     /**
-     * Seed initial GDG representative (GDG1027 - Caleb Johnson)
+     * Seed initial GDG representative (deprecated - no sample representatives seeded on fresh installs)
      */
     public function seed_default_representative() {
-        global $wpdb;
-        $rep_count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-            $wpdb->prepare( 'SELECT COUNT(*) FROM `' . esc_sql( $this->tbl_representatives ) . '`' )
-        );
-
-        if ( intval( $rep_count ) === 0 ) {
-            $default_photo = plugins_url( 'assets/images/rep-caleb.png', dirname( __FILE__ ) );
-            $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-                $this->tbl_representatives,
-                array(
-                    'rep_id'     => 'GDG1027',
-                    'name'       => 'Caleb Johnson',
-                    'email'      => 'caleb.johnson@gdgsmiles.com',
-                    'phone'      => '(555) 382-9471',
-                    'photo_url'  => $default_photo,
-                    'notes'      => 'Primary GDG Representative for In-House Financing',
-                    'is_active'  => 1,
-                    'created_at' => current_time( 'mysql' ),
-                    'updated_at' => current_time( 'mysql' ),
-                ),
-                array( '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
-            );
-        }
+        // No sample representatives are seeded on fresh installs.
+        return;
     }
 
     /**
@@ -570,13 +546,21 @@ class NexaFi_DB {
             return $rep;
         }
 
-        // Fallback to any representative if none are active
+        return null;
+    }
+
+    /**
+     * Check if at least one active GDG representative exists in database
+     *
+     * @return bool
+     */
+    public function has_active_representative() {
+        global $wpdb;
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-        return $wpdb->get_row(
-            $wpdb->prepare(
-                'SELECT id, rep_id, name, email, phone, photo_url, is_active FROM `' . esc_sql( $this->tbl_representatives ) . '` ORDER BY id ASC LIMIT 1'
-            )
+        $count = $wpdb->get_var(
+            'SELECT COUNT(*) FROM `' . esc_sql( $this->tbl_representatives ) . '` WHERE is_active = 1'
         );
+        return ( intval( $count ) > 0 );
     }
 
     /**

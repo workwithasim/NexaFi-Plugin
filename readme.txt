@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.14
+Stable tag: 2.4.15
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,12 @@ NexaFi Financing Application & Contact Form provides an advanced multi-step fina
 Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
+
+= 2.4.15 =
+* Pending screen headline & styling fix: replaced "YOU'RE APPROVED!" and amber warning icon on pending / unverified screens with "Your Application Has Been Received" and a calm blue info icon; strictly reserved approval headlines and "Congratulations" wording for verified approvals (result === 'approved' AND terms_verified === true) across Screen 4, Screen 5, and applicant emails.
+* Age verification enforcement: added server-side and client-side validation requiring applicants to be at least 18 years old and under 120 years old, setting date of birth input max to today minus 18 years, failing safely without logging sensitive data.
+* Minimum quote setting: added nexafi_min_quote admin setting (default $0 = no minimum) next to max quote, enforced in submit_application and Screen 3 validation with "Treatment quote must be at least $X."
+* Representative seeding & validation: discontinued sample representative seeding on fresh installs, ensured shortcode renders cleanly when no active representative exists, updated representative lookup failure message to "Representative ID not found.", and added admin notice warning when no active representative exists.
 
 = 2.4.14 =
 * Fixed upfront plan fee calculation: Required Down Payment includes plan fee without reducing Amount Financed; Financing Charge and Total Installment Payments exclude the upfront fee.
