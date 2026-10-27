@@ -41,6 +41,10 @@ class NexaFi_Ajax {
         add_action( 'wp_ajax_nexafi_lookup_rep', array( $this, 'lookup_representative' ) );
         add_action( 'wp_ajax_nopriv_nexafi_lookup_rep', array( $this, 'lookup_representative' ) );
 
+        // Nonce Refresh for cached form pages
+        add_action( 'wp_ajax_nexafi_get_nonce', array( $this, 'get_nonce' ) );
+        add_action( 'wp_ajax_nopriv_nexafi_get_nonce', array( $this, 'get_nonce' ) );
+
         // Application Submission
         add_action( 'wp_ajax_nexafi_submit_application', array( $this, 'submit_application' ) );
         add_action( 'wp_ajax_nopriv_nexafi_submit_application', array( $this, 'submit_application' ) );
@@ -51,6 +55,15 @@ class NexaFi_Ajax {
 
         // Admin Resend Email
         add_action( 'wp_ajax_nexafi_admin_resend_email', array( $this, 'admin_resend_email' ) );
+    }
+
+    /**
+     * Return fresh nonce for cached pages
+     */
+    public function get_nonce() {
+        wp_send_json_success( array(
+            'nonce' => wp_create_nonce( 'nexafi_financing_nonce' ),
+        ) );
     }
 
     /**
@@ -101,11 +114,11 @@ class NexaFi_Ajax {
      * Process Application Submission
      */
     public function submit_application() {
-        // 1. Nonce check with fallback for public cached form pages
-        $has_valid_nonce = check_ajax_referer( 'nexafi_financing_nonce', 'security', false );
-        if ( ! $has_valid_nonce && empty( $_POST['email'] ) && empty( $_POST['first_name'] ) ) {
+        // 1. Strict nonce check (CSRF Protection)
+        if ( ! check_ajax_referer( 'nexafi_financing_nonce', 'security', false ) ) {
             wp_send_json_error( array(
-                'message' => __( 'Security verification expired. Please refresh the page and try again.', 'nexafi-plugin' ),
+                'message'       => __( 'Security verification expired. Please refresh the page and try again.', 'nexafi-plugin' ),
+                'nonce_expired' => true,
             ), 403 );
         }
 
@@ -177,9 +190,17 @@ class NexaFi_Ajax {
             }
         }
 
-        if ( empty( $phone ) ) {
-            $errors['phone'] = __( 'Phone number is required.', 'nexafi-plugin' );
+        // Phone Validation (10 digits required)
+        $phone_digits = preg_replace( '/\D/', '', $phone );
+        if ( strlen( $phone_digits ) === 11 && '1' === substr( $phone_digits, 0, 1 ) ) {
+            $phone_digits = substr( $phone_digits, 1 );
         }
+        if ( strlen( $phone_digits ) !== 10 ) {
+            $errors['phone'] = __( 'Please enter a valid 10-digit phone number.', 'nexafi-plugin' );
+        } else {
+            $phone = sprintf( '(%s) %s-%s', substr( $phone_digits, 0, 3 ), substr( $phone_digits, 3, 3 ), substr( $phone_digits, 6, 4 ) );
+        }
+
         if ( empty( $email ) || ! is_email( $email ) ) {
             $errors['email'] = __( 'Please enter a valid email address.', 'nexafi-plugin' );
         }
@@ -195,6 +216,8 @@ class NexaFi_Ajax {
         }
         if ( empty( $zip_code ) ) {
             $errors['zip_code'] = __( 'ZIP code is required.', 'nexafi-plugin' );
+        } elseif ( ! preg_match( '/^\d{5}(-\d{4})?$/', $zip_code ) ) {
+            $errors['zip_code'] = __( 'Please enter a valid 5-digit US ZIP code.', 'nexafi-plugin' );
         }
 
         if ( empty( $employment_status ) ) {
@@ -244,8 +267,12 @@ class NexaFi_Ajax {
             }
         }
 
-        // Consent Checkbox (default confirmed on submission)
-        $consent = 1;
+        // Consent Checkbox (explicit verification required)
+        $consent_checked = ! empty( $_POST['consent'] ) && in_array( (string) $_POST['consent'], array( '1', 'true', 'on' ), true );
+        if ( ! $consent_checked ) {
+            $errors['consent'] = __( 'You must authorize information review to submit your application.', 'nexafi-plugin' );
+        }
+        $consent = $consent_checked ? 1 : 0;
 
         if ( ! empty( $errors ) ) {
             wp_send_json_error( array(
@@ -274,6 +301,10 @@ class NexaFi_Ajax {
             $ref_number = 'NEXA-' . wp_date( 'Ymd' ) . '-' . wp_rand( 1000, 9999 );
         }
 
+        // 32-character random secret for hardening terms acceptance authorization
+        $terms_secret     = wp_generate_password( 32, false, false );
+        $terms_token_hash = hash( 'sha256', $terms_secret );
+
         $record_data = array(
             'reference_number'           => $ref_number,
             'first_name'                 => $first_name,
@@ -295,7 +326,7 @@ class NexaFi_Ajax {
             'treatment_quote'            => $treatment_quote,
             'rep_record_id'              => $rep ? intval( $rep->id ) : null,
             'rep_id_str'                 => $rep ? $rep->rep_id : $rep_id_input,
-            'consent_status'             => 1,
+            'consent_status'             => $consent,
             'consent_timestamp'          => current_time( 'mysql' ),
             'eligibility_result'         => $eval['result'],
             'eligibility_reason'         => $eval['reason'],
@@ -304,6 +335,9 @@ class NexaFi_Ajax {
             'financed_pct'               => $calc['financed_pct'],
             'charge_pct'                 => $calc['charge_pct'],
             'repayment_term'             => $calc['repayment_term'],
+            'charge_basis'               => $calc['charge_basis'],
+            'plan_fee'                   => $calc['plan_fee'],
+            'calc_version'               => '1.0',
             'upfront_amount'             => $calc['upfront_amount'],
             'financed_amount'            => $calc['financed_amount'],
             'charge_amount'              => $calc['charge_amount'],
@@ -311,6 +345,7 @@ class NexaFi_Ajax {
             'monthly_payment'            => $calc['monthly_payment'],
             'application_status'         => ( 'approved' === $eval['result'] ) ? 'approved' : 'ineligible',
             'terms_accepted'             => 0,
+            'terms_token_hash'           => $terms_token_hash,
             'rule_version'               => $eval['rule_version'],
             'submission_token'           => $submission_token,
             'ip_address'                 => $ip_address,
@@ -339,34 +374,42 @@ class NexaFi_Ajax {
         $this->maybe_send_applicant_notification( $saved_app, $rep );
 
         // 8. Return formatted response for Screens 4 & 5
-        wp_send_json_success( $this->format_application_response( $saved_app, $rep, $eval, $calc ) );
+        wp_send_json_success( $this->format_application_response( $saved_app, $rep, $eval, $calc, $terms_secret ) );
     }
 
     /**
-     * Mark terms accepted by applicant
+     * Mark terms accepted by applicant (Hardened with 32-char token verification)
      */
     public function accept_terms() {
         check_ajax_referer( 'nexafi_financing_nonce', 'security' );
 
-        $app_id    = isset( $_POST['app_id'] ) ? intval( $_POST['app_id'] ) : 0;
-        $reference = isset( $_POST['reference'] ) ? sanitize_text_field( wp_unslash( $_POST['reference'] ) ) : '';
+        $app_id        = isset( $_POST['app_id'] ) ? intval( $_POST['app_id'] ) : 0;
+        $terms_token   = isset( $_POST['terms_token'] ) ? sanitize_text_field( wp_unslash( $_POST['terms_token'] ) ) : '';
+        $terms_version = isset( $_POST['terms_version'] ) ? sanitize_text_field( wp_unslash( $_POST['terms_version'] ) ) : '1.0';
 
-        if ( ! $app_id || empty( $reference ) ) {
+        if ( ! $app_id || empty( $terms_token ) ) {
             wp_send_json_error( array(
                 'message' => __( 'Missing application parameters.', 'nexafi-plugin' ),
-            ) );
+            ), 400 );
         }
 
         $db  = NexaFi_DB::get_instance();
         $app = $db->get_application( $app_id );
 
-        if ( ! $app || $app->reference_number !== $reference ) {
+        if ( ! $app || empty( $app->terms_token_hash ) ) {
             wp_send_json_error( array(
                 'message' => __( 'Invalid application record.', 'nexafi-plugin' ),
-            ) );
+            ), 404 );
         }
 
-        $success = $db->mark_terms_accepted( $app_id );
+        if ( ! hash_equals( $app->terms_token_hash, hash( 'sha256', $terms_token ) ) ) {
+            wp_send_json_error( array(
+                'message' => __( 'Authorization verification failed.', 'nexafi-plugin' ),
+            ), 403 );
+        }
+
+        $ip_address = ! empty( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+        $success    = $db->mark_terms_accepted( $app_id, $terms_version, $ip_address );
 
         if ( $success ) {
             wp_send_json_success( array(
@@ -383,7 +426,7 @@ class NexaFi_Ajax {
     /**
      * Format application record into client-ready response payload
      */
-    private function format_application_response( $app, $rep = null, $eval = null, $calc = null ) {
+    private function format_application_response( $app, $rep = null, $eval = null, $calc = null, $terms_token = '' ) {
         if ( ! $eval ) {
             $eval = array(
                 'result'           => $app->eligibility_result,
@@ -401,6 +444,8 @@ class NexaFi_Ajax {
                 'financed_pct'   => $app->financed_pct,
                 'charge_pct'     => $app->charge_pct,
                 'repayment_term' => $app->repayment_term,
+                'charge_basis'   => ! empty( $app->charge_basis ) ? $app->charge_basis : 'financed_amount',
+                'plan_fee'       => ! empty( $app->plan_fee ) ? $app->plan_fee : 0.00,
             ) );
         }
 
@@ -421,8 +466,8 @@ class NexaFi_Ajax {
             }
         }
 
-        $rep_name_val = ( $rep && ! empty( $rep->name ) ) ? $rep->name : ( ! empty( $app->rep_id_str ) ? $app->rep_id_str : 'kalijo' );
-        $rep_id_val   = ( $rep && ! empty( $rep->rep_id ) ) ? $rep->rep_id : ( ! empty( $app->rep_id_str ) ? $app->rep_id_str : 'GDG1122' );
+        $rep_name_val = ( $rep && ! empty( $rep->name ) ) ? $rep->name : ( ! empty( $app->rep_id_str ) ? $app->rep_id_str : '' );
+        $rep_id_val   = ( $rep && ! empty( $rep->rep_id ) ) ? $rep->rep_id : ( ! empty( $app->rep_id_str ) ? $app->rep_id_str : '' );
 
         $default_avatar = plugins_url( 'assets/images/rep-caleb.png', dirname( __FILE__ ) );
         $rep_data = array(
@@ -439,22 +484,31 @@ class NexaFi_Ajax {
         );
 
         return array(
-            'app_id'                 => intval( $app->id ),
-            'reference_number'       => esc_html( $app->reference_number ),
-            'applicant_name'         => esc_html( $app->first_name . ' ' . $app->last_name ),
-            'eligibility_result'     => $app->eligibility_result,
-            'decision_mode'          => $app->decision_mode,
-            'headline'               => $eval['headline'],
-            'subtitle'               => $eval['subtitle'] ?? '',
-            'message'                => $eval['message'] ?? '',
-            'requires_contact'       => ! empty( $eval['requires_contact'] ),
-            'fallback_contact_text'  => esc_html( $fallback_contact_text ),
-            'representative'         => $rep_data,
-            'calculation'            => $calc,
-            'submission_date'        => $display_date,
-            'submission_time'        => $display_time,
-            'application_status'     => esc_html( $app->application_status ),
-            'terms_accepted'         => (bool) $app->terms_accepted,
+            'app_id'                     => intval( $app->id ),
+            'reference_number'           => esc_html( $app->reference_number ),
+            'applicant_name'             => esc_html( $app->first_name . ' ' . $app->last_name ),
+            'eligibility_result'         => $app->eligibility_result,
+            'decision_mode'              => $app->decision_mode,
+            'terms_verified'             => (bool) ( $calc['terms_verified'] ?? false ),
+            'terms_token'                => $terms_token,
+            'headline'                   => $eval['headline'],
+            'subtitle'                   => $eval['subtitle'] ?? '',
+            'message'                    => $eval['message'] ?? '',
+            'requires_contact'           => ! empty( $eval['requires_contact'] ),
+            'fallback_contact_text'      => esc_html( $fallback_contact_text ),
+            'representative'             => $rep_data,
+            'calculation'                => $calc,
+            'submission_date'            => $display_date,
+            'submission_time'            => $display_time,
+            'application_status'         => esc_html( $app->application_status ),
+            'terms_accepted'             => (bool) $app->terms_accepted,
+            'disclosure_text'            => get_option( 'nexafi_disclosure_text', __( 'Financing disclosures pending verification.', 'nexafi-plugin' ) ),
+            'provider_disclosure'        => get_option( 'nexafi_provider_disclosure', '' ),
+            'booking_deposit'            => floatval( $calc['booking_deposit'] ?? 0.00 ),
+            'remaining_down_payment'     => floatval( $calc['remaining_down_payment'] ?? 0.00 ),
+            'formatted_booking_deposit'  => $calc['formatted_booking_deposit'] ?? '',
+            'formatted_remaining_down'   => $calc['formatted_remaining_down'] ?? '',
+            'booking_deposit_note'       => get_option( 'nexafi_booking_deposit_note', __( 'Any booking deposit you pay is credited toward your Required Down Payment. It does not replace it.', 'nexafi-plugin' ) ),
         );
     }
 
@@ -661,36 +715,38 @@ class NexaFi_Ajax {
                             <h3 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">
                                 Financing Breakdown
                             </h3>
-                            <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 22px; font-size: 13px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+                            <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 16px; font-size: 13px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
                                 <tr>
-                                    <td style="padding: 6px 0; color: #475569;">Total Treatment Quote:</td>
+                                    <td style="padding: 6px 0; color: #475569;">Total Treatment Price:</td>
                                     <td align="right" style="padding: 6px 0; color: #0f172a; font-weight: 700; font-size: 15px;"><?php echo esc_html( $quote_fmt ); ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 6px 0; color: #475569;">Upfront Contribution (<?php echo esc_html( $upfront_pct_str ); ?>%):</td>
+                                    <td style="padding: 6px 0; color: #475569;">Required Down Payment:</td>
                                     <td align="right" style="padding: 6px 0; color: #0f172a; font-weight: 600;"><?php echo esc_html( $upfront_fmt ); ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 6px 0; color: #475569;">Financed Amount (<?php echo esc_html( $financed_pct_str ); ?>%):</td>
+                                    <td style="padding: 6px 0; color: #475569;">Amount Financed:</td>
                                     <td align="right" style="padding: 6px 0; color: #0f172a; font-weight: 600;"><?php echo esc_html( $financed_fmt ); ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 6px 0; color: #475569;">Financing Charge (<?php echo esc_html( $charge_pct_str ); ?>%):</td>
+                                    <td style="padding: 6px 0; color: #475569;">Financing Charge:</td>
                                     <td align="right" style="padding: 6px 0; color: #0f172a;"><?php echo esc_html( $charge_fmt ); ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 6px 0; color: #475569;">Repayment Term:</td>
-                                    <td align="right" style="padding: 6px 0; color: #0f172a;"><?php echo intval( $app->repayment_term ); ?> <?php esc_html_e( 'Months', 'nexafi-plugin' ); ?></td>
+                                    <td style="padding: 6px 0; color: #475569;">Total Installment Payments:</td>
+                                    <td align="right" style="padding: 6px 0; color: #0f172a; font-weight: 600;"><?php echo esc_html( $total_rep_fmt ); ?></td>
                                 </tr>
                                 <tr style="border-top: 1px solid #cbd5e1;">
-                                    <td style="padding: 8px 0 4px 0; color: #0f172a; font-weight: 700;">Monthly Installment:</td>
+                                    <td style="padding: 8px 0 4px 0; color: #0f172a; font-weight: 700;">Your Monthly Payment:</td>
                                     <td align="right" style="padding: 8px 0 4px 0; color: #16a34a; font-weight: 700; font-size: 16px;"><?php echo esc_html( $monthly_fmt ); ?> / mo</td>
                                 </tr>
-                                <tr>
-                                    <td style="padding: 2px 0 0 0; color: #64748b; font-size: 11.5px;">Total Scheduled Repayment:</td>
-                                    <td align="right" style="padding: 2px 0 0 0; color: #64748b; font-size: 11.5px;"><?php echo esc_html( $total_rep_fmt ); ?></td>
-                                </tr>
                             </table>
+
+                            <!-- Calculation Details for Admin Reference -->
+                            <div style="font-size: 11.5px; color: #64748b; margin-bottom: 22px; line-height: 1.5; padding: 6px 10px; background: #f1f5f9; border-radius: 4px;">
+                                <strong>Internal Calculation Details:</strong>
+                                Down Payment: <?php echo esc_html( $upfront_pct_str ); ?>% | Financed: <?php echo esc_html( $financed_pct_str ); ?>% | Charge: <?php echo esc_html( $charge_pct_str ); ?>% | Basis: <?php echo esc_html( ! empty( $app->charge_basis ) ? $app->charge_basis : 'financed_amount' ); ?> | Term: <?php echo intval( $app->repayment_term ); ?> months
+                            </div>
 
                             <!-- Section 4: Assigned Representative -->
                             <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 22px;">
@@ -917,49 +973,49 @@ class NexaFi_Ajax {
                             </h3>
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size: 14px;">
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b;"><?php esc_html_e( 'Total Treatment Quote', 'nexafi-plugin' ); ?></td>
+                                    <td style="padding: 7px 0; color: #64748b;"><?php esc_html_e( 'Total Treatment Price', 'nexafi-plugin' ); ?></td>
                                     <td align="right" style="padding: 7px 0; font-weight: 700; color: #0f172a;"><?php echo esc_html( $quote_fmt ); ?></td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;">
-                                        <?php
-                                        /* translators: %s: upfront percentage value */
-                                        printf( esc_html__( 'Upfront Contribution (%s%%)', 'nexafi-plugin' ), esc_html( $upfront_pct_str ) );
-                                        ?>
+                                        <?php esc_html_e( 'Required Down Payment', 'nexafi-plugin' ); ?>
                                     </td>
                                     <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $upfront_fmt ); ?></td>
                                 </tr>
+                                <?php
+                                $booking_deposit_val = floatval( get_option( 'nexafi_booking_deposit', 0.00 ) );
+                                $terms_verified_val  = (bool) get_option( 'nexafi_terms_verified', false );
+                                if ( $booking_deposit_val > 0 && $terms_verified_val ) :
+                                    $rem_down = max( 0.0, floatval( $app->upfront_amount ) - $booking_deposit_val );
+                                ?>
+                                <tr>
+                                    <td style="padding: 5px 0 5px 12px; color: #64748b; font-size: 12.5px;"><?php esc_html_e( 'Booking deposit credited', 'nexafi-plugin' ); ?></td>
+                                    <td align="right" style="padding: 5px 0; color: #0f172a; font-size: 12.5px;"><?php echo esc_html( NexaFi_Calculator::format_currency( $booking_deposit_val, true ) ); ?></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 5px 0 5px 12px; color: #64748b; font-size: 12.5px;"><?php esc_html_e( 'Remaining down payment', 'nexafi-plugin' ); ?></td>
+                                    <td align="right" style="padding: 5px 0; color: #0f172a; font-size: 12.5px; font-weight: 600;"><?php echo esc_html( NexaFi_Calculator::format_currency( $rem_down, true ) ); ?></td>
+                                </tr>
+                                <?php endif; ?>
                                 <tr>
                                     <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;">
-                                        <?php
-                                        /* translators: %s: financed percentage value */
-                                        printf( esc_html__( 'Financed Amount (%s%%)', 'nexafi-plugin' ), esc_html( $financed_pct_str ) );
-                                        ?>
+                                        <?php esc_html_e( 'Amount Financed', 'nexafi-plugin' ); ?>
                                     </td>
                                     <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $financed_fmt ); ?></td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;">
-                                        <?php
-                                        /* translators: %s: financing charge percentage value */
-                                        printf( esc_html__( 'Financing Charge (%s%%)', 'nexafi-plugin' ), esc_html( $charge_pct_str ) );
-                                        ?>
+                                        <?php esc_html_e( 'Financing Charge', 'nexafi-plugin' ); ?>
                                     </td>
-                                    <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $charge_fmt ); ?></td>
+                                    <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo $terms_verified_val ? esc_html( $charge_fmt ) : esc_html__( '— (Pending verification)', 'nexafi-plugin' ); ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Repayment Term', 'nexafi-plugin' ); ?></td>
-                                    <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;">
-                                        <?php echo esc_html( $app->repayment_term ); ?> <?php esc_html_e( 'Months', 'nexafi-plugin' ); ?>
-                                    </td>
+                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Total Installment Payments', 'nexafi-plugin' ); ?></td>
+                                    <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo $terms_verified_val ? esc_html( $total_rep_fmt ) : '—'; ?></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 10px 0; color: #0f172a; font-weight: 700; border-top: 2px solid #e2e8f0; font-size: 15px;"><?php esc_html_e( 'Monthly Payment', 'nexafi-plugin' ); ?></td>
-                                    <td align="right" style="padding: 10px 0; font-weight: 800; color: #16a34a; border-top: 2px solid #e2e8f0; font-size: 17px;"><?php echo esc_html( $monthly_fmt ); ?> <span style="font-size: 12px; color: #64748b; font-weight: normal;">/ mo</span></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 7px 0; color: #64748b; border-top: 1px solid #f1f5f9;"><?php esc_html_e( 'Total of Monthly Payments', 'nexafi-plugin' ); ?></td>
-                                    <td align="right" style="padding: 7px 0; font-weight: 600; color: #0f172a; border-top: 1px solid #f1f5f9;"><?php echo esc_html( $total_rep_fmt ); ?></td>
+                                    <td style="padding: 10px 0; color: #0f172a; font-weight: 700; border-top: 2px solid #e2e8f0; font-size: 15px;"><?php esc_html_e( 'Your Monthly Payment', 'nexafi-plugin' ); ?></td>
+                                    <td align="right" style="padding: 10px 0; font-weight: 800; color: #16a34a; border-top: 2px solid #e2e8f0; font-size: 17px;"><?php echo $terms_verified_val ? ( esc_html( $monthly_fmt ) . ' <span style="font-size: 12px; color: #64748b; font-weight: normal;">/ mo</span>' ) : '—'; ?></td>
                                 </tr>
                             </table>
                         </td>
@@ -1029,11 +1085,33 @@ class NexaFi_Ajax {
                                         <?php esc_html_e( 'Next Steps:', 'nexafi-plugin' ); ?>
                                     </div>
                                     <ol style="margin: 0; padding-left: 18px; font-size: 13px; color: #475569; line-height: 1.6;">
-                                        <li><?php esc_html_e( 'Your GDG representative will contact you shortly to finalize your setup.', 'nexafi-plugin' ); ?></li>
-                                        <li><?php esc_html_e( 'Complete your payment arrangements.', 'nexafi-plugin' ); ?></li>
-                                        <li><?php esc_html_e( 'Lock in your appointment and get one step closer to your new smile!', 'nexafi-plugin' ); ?></li>
+                                        <li><strong><?php esc_html_e( 'Connect With Your GDG Representative', 'nexafi-plugin' ); ?></strong> &mdash; <?php esc_html_e( 'Your GDG Smiles representative will help finalize your financing arrangements and answer any remaining questions.', 'nexafi-plugin' ); ?></li>
+                                        <li><strong><?php esc_html_e( 'Secure Your Promotional Pricing', 'nexafi-plugin' ); ?></strong> &mdash; <?php esc_html_e( 'Complete your required booking deposit to lock in your promotional pricing for up to 3 months! Your deposit is applied toward your treatment balance.', 'nexafi-plugin' ); ?></li>
+                                        <li><strong><?php esc_html_e( 'Schedule Your Smile Transformation', 'nexafi-plugin' ); ?></strong> &mdash; <?php esc_html_e( 'Once your booking requirements and payment arrangements are completed, your representative will help reserve your treatment dates.', 'nexafi-plugin' ); ?></li>
                                     </ol>
+                                    <?php
+                                    $deposit_note = get_option(
+                                        'nexafi_booking_deposit_note',
+                                        __( 'Any booking deposit you pay is credited toward your Required Down Payment. It does not replace it.', 'nexafi-plugin' )
+                                    );
+                                    if ( ! empty( $deposit_note ) ) :
+                                    ?>
+                                        <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748b; font-style: italic; line-height: 1.5;">
+                                            <?php echo esc_html( $deposit_note ); ?>
+                                        </p>
+                                    <?php endif; ?>
+                                    <?php
+                                    $provider_disc = get_option( 'nexafi_provider_disclosure', '' );
+                                    if ( ! empty( $provider_disc ) ) :
+                                    ?>
+                                        <p style="margin: 8px 0 0 0; font-size: 11.5px; color: #94a3b8; line-height: 1.4;">
+                                            <?php echo esc_html( $provider_disc ); ?>
+                                        </p>
+                                    <?php endif; ?>
                                 </div>
+                            </div>
+                        </td>
+                    </tr>
                             </div>
                         </td>
                     </tr>

@@ -96,6 +96,9 @@ class NexaFi_DB {
             financed_pct decimal(5,2) NOT NULL DEFAULT '30.00',
             charge_pct decimal(5,2) NOT NULL DEFAULT '15.00',
             repayment_term int(10) unsigned NOT NULL DEFAULT '12',
+            charge_basis varchar(50) NOT NULL DEFAULT 'financed_amount',
+            plan_fee decimal(12,2) NOT NULL DEFAULT '0.00',
+            calc_version varchar(50) NOT NULL DEFAULT '1.0',
             upfront_amount decimal(12,2) NOT NULL DEFAULT '0.00',
             financed_amount decimal(12,2) NOT NULL DEFAULT '0.00',
             charge_amount decimal(12,2) NOT NULL DEFAULT '0.00',
@@ -104,6 +107,9 @@ class NexaFi_DB {
             application_status varchar(50) NOT NULL DEFAULT 'approved',
             terms_accepted tinyint(1) NOT NULL DEFAULT '0',
             terms_accepted_timestamp datetime DEFAULT NULL,
+            terms_token_hash varchar(64) DEFAULT '',
+            terms_version varchar(50) DEFAULT '',
+            terms_ip_address varchar(45) DEFAULT '',
             rule_version varchar(50) NOT NULL DEFAULT '1.0',
             submission_token varchar(64) DEFAULT '',
             ip_address varchar(45) DEFAULT '',
@@ -325,6 +331,9 @@ class NexaFi_DB {
             'financed_pct'               => '%f',
             'charge_pct'                 => '%f',
             'repayment_term'             => '%d',
+            'charge_basis'               => '%s',
+            'plan_fee'                   => '%f',
+            'calc_version'               => '%s',
             'upfront_amount'             => '%f',
             'financed_amount'            => '%f',
             'charge_amount'              => '%f',
@@ -333,6 +342,9 @@ class NexaFi_DB {
             'application_status'         => '%s',
             'terms_accepted'             => '%d',
             'terms_accepted_timestamp'   => '%s',
+            'terms_token_hash'           => '%s',
+            'terms_version'              => '%s',
+            'terms_ip_address'           => '%s',
             'rule_version'               => '%s',
             'submission_token'           => '%s',
             'ip_address'                 => '%s',
@@ -409,7 +421,7 @@ class NexaFi_DB {
      * @param int $id
      * @return bool
      */
-    public function mark_terms_accepted( $id ) {
+    public function mark_terms_accepted( $id, $terms_version = '1.0', $ip_address = '' ) {
         global $wpdb;
         $id  = intval( $id );
         $now = current_time( 'mysql' );
@@ -421,16 +433,28 @@ class NexaFi_DB {
 
         $new_status = ( 'approved' === $old->eligibility_result ) ? 'accepted' : $old->application_status;
 
+        $update_data = array(
+            'terms_accepted'           => 1,
+            'terms_accepted_timestamp' => $now,
+            'application_status'       => $new_status,
+            'updated_at'               => $now,
+        );
+        $update_format = array( '%d', '%s', '%s', '%s' );
+
+        if ( ! empty( $terms_version ) ) {
+            $update_data['terms_version'] = sanitize_text_field( $terms_version );
+            $update_format[] = '%s';
+        }
+        if ( ! empty( $ip_address ) ) {
+            $update_data['terms_ip_address'] = sanitize_text_field( $ip_address );
+            $update_format[] = '%s';
+        }
+
         $updated = $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $this->tbl_applications,
-            array(
-                'terms_accepted'           => 1,
-                'terms_accepted_timestamp' => $now,
-                'application_status'       => $new_status,
-                'updated_at'               => $now,
-            ),
+            $update_data,
             array( 'id' => $id ),
-            array( '%d', '%s', '%s', '%s' ),
+            $update_format,
             array( '%d' )
         );
 

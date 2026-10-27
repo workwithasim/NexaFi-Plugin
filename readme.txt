@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.12
+Stable tag: 2.4.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,15 @@ NexaFi Financing Application & Contact Form provides an advanced multi-step fina
 Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
+
+= 2.4.13 =
+* Form UX improvements: added autocomplete="bday" to DOB, enforced inputmode="numeric" on currency fields, full state names on mobile with full-width native select, and 16px font-size to prevent iOS Safari auto-zoom.
+* Navigation fixes: preserved and restored representative ID on session resume, single session submission token to eliminate duplicate applications, and sessionStorage clearance on pagehide.
+* Redesigned Screen 4 approval breakdown with exact labels and order, prominent Required Down Payment featured card, and fail-closed gate requiring verified terms.
+* Precise integer-cents financing calculator supporting charge basis selection (financed amount vs treatment price), configurable plan fee, booking deposit credit calculation, and remainder cents reconciliation.
+* Hardened consent and terms acceptance: explicit acknowledgment checkbox, per-application 32-char token secret hashing, and strict CSRF protection with nonce refresh.
+* Screen 5 "What's Next?" steps updated with booking deposit credit non-promotional notice.
+* Removed patient-facing third-party provider branding and added configurable provider disclosures.
 
 = 2.4.12 =
 * Removed Declarations & Consent details from email notifications across all eligibility outcomes.

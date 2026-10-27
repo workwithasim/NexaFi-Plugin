@@ -35,13 +35,26 @@
       i18n: {},
     };
 
+    // Cached page nonce refresh
+    if (!config.nonce && config.ajax_url) {
+      fetch(config.ajax_url + '?action=nexafi_get_nonce')
+        .then(function (res) { return res.json(); })
+        .then(function (res) {
+          if (res.success && res.data && res.data.nonce) {
+            config.nonce = res.data.nonce;
+          }
+        })
+        .catch(function () {});
+    }
+
     let currentScreen = parseInt(wrapper.getAttribute('data-start-screen') || '2', 10);
     if (isNaN(currentScreen) || currentScreen < 2) {
       currentScreen = 2;
     }
-    let applicationData = {};
+    let applicationData = null;
     let submissionToken = generateSubmissionToken();
     let isSubmitting = false;
+    let submittedRep = '';
 
     // Cache Screen Elements
     const screens = {
@@ -53,6 +66,131 @@
 
     // Show initial screen
     goToScreen(currentScreen);
+
+    // -----------------------------------------------------------------------
+    // Form Progress Persistence (sessionStorage - §1.5)
+    // -----------------------------------------------------------------------
+    const STORAGE_KEY = 'nexafi_form_progress_' + (wrapper.id || 'default');
+
+    function saveFormProgress() {
+      try {
+        const formData = {};
+        const allInputs = wrapper.querySelectorAll('input, select, textarea');
+        allInputs.forEach(function (inp) {
+          if (!inp.name || inp.type === 'hidden' || inp.name === 'nexafi_hp' || inp.name === 'submission_token') return;
+          if (inp.type === 'checkbox') {
+            formData[inp.name] = inp.checked ? 1 : 0;
+          } else {
+            formData[inp.name] = inp.value;
+          }
+        });
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      } catch (err) {}
+    }
+
+    function restoreFormProgress() {
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (!saved || typeof saved !== 'object') return;
+        for (const name in saved) {
+          const inp = wrapper.querySelector('[name="' + CSS.escape(name) + '"]');
+          if (!inp) continue;
+          if (inp.type === 'checkbox') {
+            inp.checked = (saved[name] === 1 || saved[name] === true || saved[name] === '1');
+          } else {
+            if (saved[name] !== undefined && saved[name] !== null && saved[name] !== '') {
+              inp.value = saved[name];
+            }
+          }
+        }
+        // Trigger Rep ID lookup if restored from session (§1.5)
+        const restoredRepInput = wrapper.querySelector('input[name="rep_id"]');
+        if (restoredRepInput && restoredRepInput.value && restoredRepInput.value.trim()) {
+          if (typeof performRepLookup === 'function') {
+            performRepLookup(restoredRepInput.value.trim());
+          }
+        }
+      } catch (err) {}
+    }
+
+    function clearFormProgress() {
+      try {
+        sessionStorage.removeItem(STORAGE_KEY);
+      } catch (err) {}
+    }
+
+    restoreFormProgress();
+    wrapper.addEventListener('input', saveFormProgress);
+    wrapper.addEventListener('change', saveFormProgress);
+
+    // Clear progress on pagehide after submission (§1.5)
+    window.addEventListener('pagehide', function () {
+      if (applicationData && applicationData.app_id) {
+        clearFormProgress();
+      }
+    });
+
+    // -----------------------------------------------------------------------
+    // Phone Auto-Formatting (XXX) XXX-XXXX (§1.2)
+    // -----------------------------------------------------------------------
+    const phoneInput = wrapper.querySelector('input[name="phone"]');
+    if (phoneInput) {
+      function formatPhoneValue(val) {
+        let digits = val.replace(/\D/g, '');
+        if (digits.length === 11 && digits.charAt(0) === '1') {
+          digits = digits.substring(1);
+        }
+        digits = digits.substring(0, 10);
+        if (digits.length === 0) return '';
+        if (digits.length <= 3) return '(' + digits;
+        if (digits.length <= 6) return '(' + digits.substring(0, 3) + ') ' + digits.substring(3);
+        return '(' + digits.substring(0, 3) + ') ' + digits.substring(3, 6) + '-' + digits.substring(6, 10);
+      }
+
+      phoneInput.addEventListener('input', function () {
+        phoneInput.value = formatPhoneValue(phoneInput.value);
+      });
+
+      phoneInput.addEventListener('paste', function () {
+        setTimeout(function () {
+          phoneInput.value = formatPhoneValue(phoneInput.value);
+        }, 10);
+      });
+
+      if (phoneInput.value) {
+        phoneInput.value = formatPhoneValue(phoneInput.value);
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // ZIP Code Digit-Only Live Filter (§1.3)
+    // -----------------------------------------------------------------------
+    const zipCodeInput = wrapper.querySelector('input[name="zip_code"]');
+    if (zipCodeInput) {
+      function sanitizeZip(val) {
+        let digits = val.replace(/[^\d-]/g, '');
+        let parts = digits.split('-');
+        if (parts.length > 2) {
+          digits = parts[0] + '-' + parts.slice(1).join('');
+        }
+        if (digits.length > 10) {
+          digits = digits.substring(0, 10);
+        }
+        return digits;
+      }
+
+      zipCodeInput.addEventListener('input', function () {
+        zipCodeInput.value = sanitizeZip(zipCodeInput.value);
+      });
+
+      zipCodeInput.addEventListener('paste', function () {
+        setTimeout(function () {
+          zipCodeInput.value = sanitizeZip(zipCodeInput.value);
+        }, 10);
+      });
+    }
 
     // -----------------------------------------------------------------------
     // Top Navigation Back Buttons
@@ -189,6 +327,30 @@
         }
       });
 
+      // Validate Phone 10 digits
+      if (phoneInput && !phoneInput.disabled) {
+        let pDigits = phoneInput.value.replace(/\D/g, '');
+        if (pDigits.length === 11 && pDigits.charAt(0) === '1') {
+          pDigits = pDigits.substring(1);
+        }
+        if (pDigits.length !== 10) {
+          phoneInput.classList.add('nexafi-input-invalid');
+          isValid = false;
+          if (!firstInvalid) firstInvalid = phoneInput;
+        }
+      }
+
+      // Validate ZIP Code (5 digits or 5+4)
+      if (zipCodeInput && !zipCodeInput.disabled) {
+        const cleanZip = zipCodeInput.value.trim();
+        const zipRegex = /^\d{5}(-\d{4})?$/;
+        if (!zipRegex.test(cleanZip)) {
+          zipCodeInput.classList.add('nexafi-input-invalid');
+          isValid = false;
+          if (!firstInvalid) firstInvalid = zipCodeInput;
+        }
+      }
+
       if (!isValid) {
         showAlert(alertBox2, 'Please complete all required fields correctly before continuing.');
         if (firstInvalid) {
@@ -224,10 +386,15 @@
 
     if (repInput) {
       repInput.placeholder = 'GDG ID';
-      repInput.value = '';
-      hideRepPreview();
       if (repStatusText) repStatusText.textContent = '';
       repInput.classList.remove('nexafi-input-invalid');
+
+      // Preserve restored Rep ID (§1.5)
+      if (repInput.value && repInput.value.trim()) {
+        performRepLookup(repInput.value.trim());
+      } else {
+        hideRepPreview();
+      }
 
       repInput.addEventListener('input', function () {
         clearTimeout(repLookupTimeout);
@@ -318,6 +485,13 @@
 
         hideAlert(alertBox3);
 
+        // Check if application was already submitted in this session (§1.5 duplicate guard)
+        if (applicationData && applicationData.app_id) {
+          showAlert(alertBox3, 'You have already submitted an application (Reference: ' + (applicationData.reference_number || '') + '). Proceeding to review your financing terms.');
+          goToScreen(4);
+          return;
+        }
+
         // 1. Validate Quote
         const rawQuote = quoteInput ? quoteInput.value.replace(/[^\d.]/g, '') : '';
         const numQuote = parseFloat(rawQuote);
@@ -341,7 +515,7 @@
         }
 
         // 2. Validate Representative (Strictly Required & Must Be Valid)
-        const submittedRep = repInput ? repInput.value.trim() : '';
+        submittedRep = repInput ? repInput.value.trim() : '';
         if (!submittedRep) {
           showAlert(alertBox3, 'Representative ID is required. Please enter your GDG Representative ID.');
           if (repInput) {
@@ -373,8 +547,7 @@
           return;
         }
 
-        // Assemble Full Application Payload with fresh token
-        const freshToken = generateSubmissionToken();
+        // Assemble Full Application Payload reusing single session token (§1.5)
         const formData = new FormData(formStep2);
         formData.append('action', 'nexafi_submit_application');
         formData.append('security', config.nonce);
@@ -386,7 +559,7 @@
         const hasDebitInput = formStep2.querySelector('input[name="has_debit_card_declaration"]');
         formData.set('has_id_declaration', (hasIdInput && hasIdInput.checked) ? '1' : '0');
         formData.set('has_debit_card_declaration', (hasDebitInput && hasDebitInput.checked) ? '1' : '0');
-        formData.append('submission_token', freshToken);
+        formData.append('submission_token', submissionToken);
 
         // Lock button & show spinner
         setSubmitLoading(true);
@@ -405,6 +578,8 @@
               applicationData = res.data;
               populateDecisionScreen(res.data);
               populateConfirmationScreen(res.data);
+              clearFormProgress();
+              if (btnSubmit) btnSubmit.disabled = true;
               goToScreen(4);
             } else {
               let errMsg = res.data && res.data.message ? res.data.message : 'An error occurred processing your application.';
@@ -454,89 +629,80 @@
     }
 
     // -----------------------------------------------------------------------
-    // SCREEN 4: Decision Rendering & Review & Accept Action
+    // SCREEN 4: Decision Rendering & Fail-Closed Logic (§2c, §3.4, §4)
     // -----------------------------------------------------------------------
     function populateDecisionScreen(data) {
       const screen4 = screens[4];
       if (!screen4) return;
 
       const outcomeApproved = screen4.querySelector('.nexafi-outcome-approved');
-      const outcomePrelim = screen4.querySelector('.nexafi-outcome-preliminary');
       const outcomeIneligible = screen4.querySelector('.nexafi-outcome-ineligible');
 
       // Hide all outcomes initially
       if (outcomeApproved) outcomeApproved.style.display = 'none';
-      if (outcomePrelim) outcomePrelim.style.display = 'none';
       if (outcomeIneligible) outcomeIneligible.style.display = 'none';
 
       const calc = (data && data.calculation) ? data.calculation : {};
       const rep = (data && data.representative) ? data.representative : {};
-      const result = (data && data.eligibility_result ? data.eligibility_result : 'approved').toString().toLowerCase();
+      const result = (data && data.eligibility_result) ? data.eligibility_result.toString().toLowerCase() : '';
+      const termsVerified = (data && data.terms_verified === true);
 
-      // Read user entered quote from input if not supplied in response calculation
-      const rawQuoteInput = quoteInput ? quoteInput.value.replace(/[^\d.]/g, '') : '';
-      const userQuote = parseFloat(rawQuoteInput) || 10000;
-
-      // Financing terms (70% upfront, 30% financed, 15% charge, 12 months)
-      const upfrontPct = (calc.upfront_pct !== undefined && calc.upfront_pct !== null) ? parseFloat(calc.upfront_pct) : 70;
-      const financedPct = (calc.financed_pct !== undefined && calc.financed_pct !== null) ? parseFloat(calc.financed_pct) : 30;
-      const chargePct = (calc.charge_pct !== undefined && calc.charge_pct !== null) ? parseFloat(calc.charge_pct) : 15;
-      const term = (calc.repayment_term !== undefined && calc.repayment_term !== null) ? parseInt(calc.repayment_term, 10) : 12;
-
-      const qAmt = (calc.treatment_quote !== undefined && calc.treatment_quote !== null) ? parseFloat(calc.treatment_quote) : userQuote;
-      const upAmt = (calc.upfront_amount !== undefined && calc.upfront_amount !== null) ? parseFloat(calc.upfront_amount) : Math.round(qAmt * (upfrontPct / 100));
-      const finAmt = (calc.financed_amount !== undefined && calc.financed_amount !== null) ? parseFloat(calc.financed_amount) : Math.round(qAmt * (financedPct / 100));
-      const chgAmt = (calc.charge_amount !== undefined && calc.charge_amount !== null) ? parseFloat(calc.charge_amount) : Math.round(finAmt * (chargePct / 100));
-      const totRepay = (calc.total_repayment !== undefined && calc.total_repayment !== null) ? parseFloat(calc.total_repayment) : (finAmt + chgAmt);
-      const monAmt = (calc.monthly_payment !== undefined && calc.monthly_payment !== null) ? parseFloat(calc.monthly_payment) : Math.round((totRepay / term) * 100) / 100;
-
-      // Currency strings formatted cleanly without unnecessary decimal zeros
-      const fmtQuote = calc.formatted_quote || ('$' + Math.round(qAmt).toLocaleString('en-US'));
-      const fmtUpfront = calc.formatted_upfront || ('$' + Math.round(upAmt).toLocaleString('en-US'));
-      const fmtFinanced = calc.formatted_financed || ('$' + Math.round(finAmt).toLocaleString('en-US'));
-      const fmtCharge = calc.formatted_charge || ('$' + Math.round(chgAmt).toLocaleString('en-US'));
-      const fmtTotal = calc.formatted_repayment || ('$' + Math.round(totRepay).toLocaleString('en-US'));
-      const fmtMonthly = calc.formatted_monthly || ('$' + monAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-
-      if (result !== 'ineligible') {
+      // §2c Fail-Closed: Show approved view ONLY when result === 'approved' AND terms_verified === true
+      if (result === 'approved' && termsVerified) {
         if (outcomeApproved) {
           outcomeApproved.style.display = 'block';
-          if (outcomePrelim) outcomePrelim.style.display = 'none';
-          if (outcomeIneligible) outcomeIneligible.style.display = 'none';
 
-          // Populate dynamic figures calculated from requirement
-          setValText(outcomeApproved, '.nexafi-val-financed', fmtFinanced);
-          setValText(outcomeApproved, '.nexafi-val-quote', fmtQuote);
-          setValText(outcomeApproved, '.nexafi-val-upfront-pct', upfrontPct + '%');
-          setValText(outcomeApproved, '.nexafi-val-upfront', fmtUpfront);
-          setValText(outcomeApproved, '.nexafi-val-financed-pct', financedPct + '%');
-          setValText(outcomeApproved, '.nexafi-val-financed-sub', fmtFinanced);
-          setValText(outcomeApproved, '.nexafi-val-charge-pct', chargePct + '%');
-          setValText(outcomeApproved, '.nexafi-val-charge', fmtCharge);
-          setValText(outcomeApproved, '.nexafi-val-term', term.toString());
-          setValText(outcomeApproved, '.nexafi-val-total-repayment', fmtTotal);
-          setValText(outcomeApproved, '.nexafi-val-monthly', fmtMonthly);
-          setValText(outcomeApproved, '.nexafi-val-term-sub', term.toString());
-          setValText(outcomeApproved, '.nexafi-val-charge-sub', chargePct + '%');
-        } else if (outcomePrelim) {
-          outcomePrelim.style.display = 'block';
-          setValText(outcomePrelim, '.nexafi-val-quote', fmtQuote);
-          setValText(outcomePrelim, '.nexafi-val-upfront-pct', upfrontPct + '%');
-          setValText(outcomePrelim, '.nexafi-val-upfront', fmtUpfront);
-          setValText(outcomePrelim, '.nexafi-val-financed-pct', financedPct + '%');
-          setValText(outcomePrelim, '.nexafi-val-financed-sub', fmtFinanced);
-          setValText(outcomePrelim, '.nexafi-val-monthly', fmtMonthly);
-          setValText(outcomePrelim, '.nexafi-val-term', term.toString());
+          // Visual Priority: 1. Approved Financing Amount, 2. Required Down Payment, 3. Your Monthly Payment
+          setValText(outcomeApproved, '.nexafi-val-financed', calc.formatted_financed || '—');
+          setValText(outcomeApproved, '.nexafi-val-down-payment', calc.formatted_upfront || '—');
+          setValText(outcomeApproved, '.nexafi-val-monthly', calc.formatted_monthly || '—');
+
+          // Deposit breakdown if booking deposit is configured (§5)
+          const depositBreakdown = outcomeApproved.querySelector('.nexafi-deposit-credit-breakdown');
+          if (depositBreakdown) {
+            if (calc.booking_deposit && parseFloat(calc.booking_deposit) > 0) {
+              depositBreakdown.style.display = 'block';
+              setValText(depositBreakdown, '.nexafi-val-deposit-credited', calc.formatted_booking_deposit || '—');
+              setValText(depositBreakdown, '.nexafi-val-deposit-remaining', calc.formatted_remaining_down_payment || '—');
+            } else {
+              depositBreakdown.style.display = 'none';
+            }
+          }
+
+          // Plan Details List: Total Treatment Price, Required Down Payment, Amount Financed, Financing Charge, Total Installment Payments, Your Monthly Payment (§2a)
+          setValText(outcomeApproved, '.nexafi-val-quote', calc.formatted_quote || '—');
+          setValText(outcomeApproved, '.nexafi-val-down-payment-table', calc.formatted_upfront || '—');
+          setValText(outcomeApproved, '.nexafi-val-upfront', calc.formatted_upfront || '—');
+          setValText(outcomeApproved, '.nexafi-val-financed-sub', calc.formatted_financed || '—');
+          setValText(outcomeApproved, '.nexafi-val-charge', calc.formatted_charge || '—');
+          setValText(outcomeApproved, '.nexafi-val-total-repayment', calc.formatted_repayment || '—');
+          setValText(outcomeApproved, '.nexafi-val-monthly-table', calc.formatted_monthly || '—');
+
+          // Financing Disclosures (§4)
+          if (data.disclosure_text) {
+            setValText(outcomeApproved, '.nexafi-val-disclosures', data.disclosure_text);
+          }
+          if (data.provider_disclosure) {
+            setValText(outcomeApproved, '.nexafi-provider-disclosure-text', data.provider_disclosure);
+          }
+
+          // Acknowledgment Checkbox: See Your Next Steps > button disabled until checked (§4.1)
+          const ackCheckbox = outcomeApproved.querySelector('.nexafi-terms-checkbox');
+          const btnAccept = outcomeApproved.querySelector('.nexafi-btn-accept');
+          if (ackCheckbox && btnAccept) {
+            btnAccept.disabled = !ackCheckbox.checked;
+            ackCheckbox.addEventListener('change', function () {
+              btnAccept.disabled = !ackCheckbox.checked;
+            });
+          }
         }
       } else {
-        // Outcome B: Ineligible under declaration rule
+        // §2c Fail-Closed Outcome: Ineligible, unverified terms, or preliminary authorization required
         if (outcomeIneligible) {
           outcomeIneligible.style.display = 'block';
-          if (outcomeApproved) outcomeApproved.style.display = 'none';
-          if (outcomePrelim) outcomePrelim.style.display = 'none';
 
-          const chosenRepName = (rep && rep.name) ? rep.name : (submittedRep ? ('Representative ' + submittedRep) : (config.default_rep_name || 'Caleb Johnson'));
-          const chosenRepId = (rep && rep.rep_id) ? rep.rep_id : (submittedRep ? submittedRep : (config.default_rep_id || 'GDG1027'));
+          const chosenRepName = (rep && rep.name) ? rep.name : (submittedRep ? ('Representative ' + submittedRep) : '—');
+          const chosenRepId = (rep && rep.rep_id) ? rep.rep_id : (submittedRep ? submittedRep : '—');
 
           setValText(outcomeIneligible, '.nexafi-val-rep-name', chosenRepName);
           setValText(outcomeIneligible, '.nexafi-val-rep-id', chosenRepId);
@@ -554,7 +720,9 @@
           const ineligHeadline = (data && data.headline) ? data.headline : 'We’re Unable to Offer In-House Financing Right Now';
           setValText(outcomeIneligible, '.nexafi-ineligible-heading', ineligHeadline);
 
-          const defaultIneligReason = 'Unfortunately, you don’t currently meet the requirements for our in-house financing program. Don’t worry! Your GDG Smiles representative can help you explore other available payment options.';
+          const defaultIneligReason = (result === 'approved' && !termsVerified)
+            ? 'Your application has been received. Your GDG Smiles representative will confirm verified financing terms with you before proceeding.'
+            : 'Unfortunately, you don’t currently meet the requirements for our in-house financing program. Don’t worry! Your GDG Smiles representative can help you explore other available payment options.';
           const cleanReason = (data && data.reason) ? data.reason : defaultIneligReason;
           setValText(outcomeIneligible, '.nexafi-ineligible-reason', cleanReason);
 
@@ -584,7 +752,7 @@
             }
             if (contactBtn) contactBtn.href = 'mailto:' + rep.email;
           } else {
-            if (fallback) fallback.textContent = data.fallback_contact_text || 'Please speak with your representative directly.';
+            if (fallback) fallback.textContent = (data && data.fallback_contact_text) ? data.fallback_contact_text : 'Please speak with your representative directly.';
             if (contactBtn) contactBtn.href = '#';
           }
 
@@ -596,28 +764,29 @@
       }
     }
 
-    // Action button on Screen 4: Proceed to Screen 5
-    const btnAccept = wrapper.querySelectorAll('.nexafi-btn-accept, .nexafi-decision-outcome button[data-target-screen="5"]');
-    btnAccept.forEach(function (btn) {
+    // Action button on Screen 4: Proceed to Screen 5 with explicit acceptance (§4)
+    const btnAcceptList = wrapper.querySelectorAll('.nexafi-btn-accept');
+    btnAcceptList.forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.preventDefault();
-        // Record terms acceptance asynchronously if approved
-        if (applicationData && applicationData.app_id && applicationData.eligibility_result === 'approved') {
-          const termsBox = wrapper.querySelector('.nexafi-terms-checkbox');
-          if (termsBox && termsBox.checked) {
-            sendTermsAcceptance(applicationData.app_id, applicationData.reference_number);
-          }
+        const termsBox = wrapper.querySelector('.nexafi-terms-checkbox');
+        if (termsBox && !termsBox.checked) {
+          return;
+        }
+        if (applicationData && applicationData.app_id && termsBox && termsBox.checked) {
+          sendTermsAcceptance(applicationData.app_id, applicationData.terms_token);
         }
         goToScreen(5);
       });
     });
 
-    function sendTermsAcceptance(appId, refNum) {
+    function sendTermsAcceptance(appId, termsToken) {
       const formData = new FormData();
       formData.append('action', 'nexafi_accept_terms');
       formData.append('security', config.nonce);
       formData.append('app_id', appId);
-      formData.append('reference', refNum);
+      formData.append('terms_token', termsToken || '');
+      formData.append('terms_version', (applicationData && applicationData.terms_version) ? applicationData.terms_version : '1.0');
 
       fetch(config.ajax_url, {
         method: 'POST',
@@ -626,7 +795,7 @@
     }
 
     // -----------------------------------------------------------------------
-    // SCREEN 5: Confirmation Rendering
+    // SCREEN 5: Confirmation Rendering (§2c, §5)
     // -----------------------------------------------------------------------
     function populateConfirmationScreen(data) {
       const screen5 = screens[5];
@@ -643,22 +812,28 @@
       const stepsEligible = screen5.querySelector('.nexafi-steps-eligible');
       const stepsIneligible = screen5.querySelector('.nexafi-steps-ineligible');
 
-      if (refNumEl) refNumEl.textContent = data.reference_number || 'NEXA-20250826-1047';
-      if (dateEl) dateEl.textContent = data.submission_date || 'Today';
+      // Strictly real data only - no hardcoded fallbacks
+      if (refNumEl) refNumEl.textContent = data.reference_number || '—';
+      if (dateEl) dateEl.textContent = data.submission_date || '—';
       if (timeEl) timeEl.textContent = data.submission_time || '';
 
-      const repName = (data.representative && data.representative.name) ? data.representative.name : (config.default_rep_name || 'kalijo');
-      const repCode = (data.representative && data.representative.rep_id) ? data.representative.rep_id : (config.default_rep_id || 'GDG1122');
-      if (repEl) repEl.textContent = repName + (repCode ? ' (' + repCode + ')' : '');
+      const repName = (data.representative && data.representative.name) ? data.representative.name : '';
+      const repCode = (data.representative && data.representative.rep_id) ? data.representative.rep_id : '';
+      if (repEl) {
+        repEl.textContent = repName ? (repName + (repCode ? ' (' + repCode + ')' : '')) : '—';
+      }
 
-      if (data.eligibility_result === 'approved') {
+      const isApproved = (data && data.eligibility_result === 'approved');
+      const termsVerified = (data && data.terms_verified === true);
+
+      if (isApproved && termsVerified) {
         if (titleEl) titleEl.textContent = "You're All Set!";
         if (subtitleEl) subtitleEl.textContent = 'Your financing application has been completed and approved.';
         if (statusEl) {
           statusEl.textContent = 'Approved';
           statusEl.className = 'nexafi-badge-status nexafi-ref-status';
         }
-        if (stepsEligible) stepsEligible.style.display = 'flex';
+        if (stepsEligible) stepsEligible.style.display = 'block';
         if (stepsIneligible) stepsIneligible.style.display = 'none';
       } else {
         if (titleEl) titleEl.textContent = 'Application Received';
@@ -670,7 +845,7 @@
           statusEl.style.color = '#92400e';
         }
         if (stepsEligible) stepsEligible.style.display = 'none';
-        if (stepsIneligible) stepsIneligible.style.display = 'flex';
+        if (stepsIneligible) stepsIneligible.style.display = 'block';
       }
     }
 
@@ -683,15 +858,41 @@
       Object.keys(screens).forEach(function (num) {
         if (screens[num]) {
           screens[num].classList.remove('nexafi-active');
+          screens[num].style.display = 'none';
         }
       });
 
       screens[screenNumber].classList.add('nexafi-active');
+      screens[screenNumber].style.display = 'block';
       currentScreen = screenNumber;
+
+      if (window.history && window.history.pushState) {
+        try {
+          const state = { nexafi_screen: screenNumber };
+          if (!window.history.state || window.history.state.nexafi_screen !== screenNumber) {
+            window.history.pushState(state, '', window.location.href);
+          }
+        } catch (e) {}
+      }
 
       // Smooth scroll to top of card
       wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    window.addEventListener('popstate', function (e) {
+      if (e.state && e.state.nexafi_screen && screens[e.state.nexafi_screen]) {
+        Object.keys(screens).forEach(function (num) {
+          if (screens[num]) {
+            screens[num].classList.remove('nexafi-active');
+            screens[num].style.display = 'none';
+          }
+        });
+        screens[e.state.nexafi_screen].classList.add('nexafi-active');
+        screens[e.state.nexafi_screen].style.display = 'block';
+        currentScreen = e.state.nexafi_screen;
+        restoreFormProgress();
+      }
+    });
 
     // -----------------------------------------------------------------------
     // Utility Helpers

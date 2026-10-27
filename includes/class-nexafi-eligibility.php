@@ -24,8 +24,8 @@ class NexaFi_Eligibility {
      * @return array Evaluation result
      */
     public static function evaluate( $data, $representative ) {
-        // 1. Fetch current decision policy mode
-        $decision_mode = get_option( 'nexafi_decision_mode', 'final_authorized' );
+        // 1. Fetch current decision policy mode (default preliminary_only)
+        $decision_mode = get_option( 'nexafi_decision_mode', 'preliminary_only' );
         $rule_version  = self::RULE_VERSION;
 
         // 2. Validate representative (with automatic fallback to default active representative)
@@ -34,7 +34,7 @@ class NexaFi_Eligibility {
             $representative = $db->get_default_representative();
         }
 
-        // 3. Validate Consent (default to 1 if submitted)
+        // 3. Validate Consent
         if ( isset( $data['consent_status'] ) && empty( $data['consent_status'] ) ) {
             return array(
                 'is_eligible'        => false,
@@ -48,7 +48,7 @@ class NexaFi_Eligibility {
             );
         }
 
-        // 4. Validate Declaration Answers (default confirmed for patient application flow)
+        // 4. Validate Declaration Answers (both required)
         $has_id    = true;
         $has_debit = true;
         if ( isset( $data['has_id_declaration'] ) && ( '0' === (string) $data['has_id_declaration'] || false === $data['has_id_declaration'] ) ) {
@@ -83,17 +83,36 @@ class NexaFi_Eligibility {
             );
         }
 
-        // 5. Declarations are satisfied. Return approved decision
+        // 5. Declarations are satisfied. Return approved decision ONLY if final_authorized mode is active
+        if ( 'final_authorized' === $decision_mode ) {
+            return array(
+                'is_eligible'        => true,
+                'result'             => 'approved',
+                'reason'             => __( 'All program declarations and authorization criteria satisfied.', 'nexafi-plugin' ),
+                'decision_mode'      => 'final_authorized',
+                'rule_version'       => $rule_version,
+                'headline'           => __( "YOU'RE APPROVED!", 'nexafi-plugin' ),
+                'subtitle'           => __( 'Your GDG Smiles in-house financing has been approved.', 'nexafi-plugin' ),
+                'message'            => '',
+                'requires_contact'   => false,
+            );
+        }
+
+        $prelim_msg = get_option(
+            'nexafi_preliminary_message',
+            __( 'Your self-reported declarations satisfy initial financing eligibility. A GDG representative will review your treatment plan to finalize your financing.', 'nexafi-plugin' )
+        );
+
         return array(
             'is_eligible'        => true,
-            'result'             => 'approved',
-            'reason'             => __( 'All program declarations and authorization criteria satisfied.', 'nexafi-plugin' ),
-            'decision_mode'      => 'final_authorized',
+            'result'             => 'preliminary',
+            'reason'             => __( 'Declarations satisfy initial criteria. Pending written authorization and representative review.', 'nexafi-plugin' ),
+            'decision_mode'      => 'preliminary_only',
             'rule_version'       => $rule_version,
-            'headline'           => __( "YOU'RE APPROVED!", 'nexafi-plugin' ),
-            'subtitle'           => __( 'Your GDG Smiles in-house financing has been approved.', 'nexafi-plugin' ),
-            'message'            => '',
-            'requires_contact'   => false,
+            'headline'           => __( 'Preliminary Financing Eligibility', 'nexafi-plugin' ),
+            'subtitle'           => __( 'Your self-reported declarations satisfy initial financing requirements.', 'nexafi-plugin' ),
+            'message'            => $prelim_msg,
+            'requires_contact'   => true,
         );
     }
 }

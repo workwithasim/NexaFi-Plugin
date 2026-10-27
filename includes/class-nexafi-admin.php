@@ -138,7 +138,7 @@ class NexaFi_Admin {
             'nonce'    => wp_create_nonce( 'nexafi_admin_action_nonce' ),
             'i18n'     => array(
                 'confirm_delete'      => __( 'Are you sure you want to delete this record? This action cannot be undone.', 'nexafi-plugin' ),
-                'confirm_policy_text' => __( 'WARNING: Enabling Final Approval wording confirms written authorization has been obtained from GDG & iCare. Are you sure you wish to enable final approval mode?', 'nexafi-plugin' ),
+                'confirm_policy_text' => __( 'WARNING: Enabling Final Approval wording confirms written authorization has been obtained from GDG and the financing provider. Are you sure you wish to enable final approval mode?', 'nexafi-plugin' ),
             ),
         ) );
     }
@@ -274,16 +274,16 @@ class NexaFi_Admin {
             'Monthly Income',
             'State ID Declared',
             'Debit Card Declared',
-            'Treatment Quote',
+            'Total Treatment Price',
             'Representative ID',
             'Eligibility Result',
             'Eligibility Reason',
             'Decision Mode',
-            'Upfront Amount',
-            'Financed Amount',
+            'Required Down Payment',
+            'Amount Financed',
             'Financing Charge',
-            'Total Repayment',
-            'Monthly Payment',
+            'Total Installment Payments',
+            'Your Monthly Payment',
             'Term (Months)',
             'Status',
             'Terms Accepted',
@@ -348,14 +348,19 @@ class NexaFi_Admin {
     private function process_save_settings() {
         check_admin_referer( 'nexafi_save_settings_action', 'nexafi_settings_nonce' );
 
-        $upfront_pct    = floatval( $_POST['nexafi_upfront_pct'] ?? 70.0 );
-        $financed_pct   = floatval( $_POST['nexafi_financed_pct'] ?? 30.0 );
-        $charge_pct     = floatval( $_POST['nexafi_charge_pct'] ?? 15.0 );
-        $repayment_term = intval( $_POST['nexafi_repayment_term'] ?? 12 );
-        $max_quote      = floatval( $_POST['nexafi_max_quote'] ?? 50000.0 );
+        $upfront_pct         = floatval( $_POST['nexafi_upfront_pct'] ?? 70.0 );
+        $financed_pct        = floatval( $_POST['nexafi_financed_pct'] ?? 30.0 );
+        $charge_pct          = floatval( $_POST['nexafi_charge_pct'] ?? 15.0 );
+        $repayment_term      = intval( $_POST['nexafi_repayment_term'] ?? 12 );
+        $max_quote          = floatval( $_POST['nexafi_max_quote'] ?? 50000.0 );
+        $charge_basis        = sanitize_text_field( wp_unslash( $_POST['nexafi_charge_basis'] ?? 'financed_amount' ) );
+        $plan_fee            = max( 0.0, floatval( $_POST['nexafi_plan_fee'] ?? 0.0 ) );
+        $plan_fee_treatment  = sanitize_text_field( wp_unslash( $_POST['nexafi_plan_fee_treatment'] ?? 'financed' ) );
+        $terms_verified      = ! empty( $_POST['nexafi_terms_verified'] ) ? 1 : 0;
+        $booking_deposit     = max( 0.0, floatval( $_POST['nexafi_booking_deposit'] ?? 0.0 ) );
 
-        // Validate percentage balance
-        $val_res = NexaFi_Calculator::validate_settings( $upfront_pct, $financed_pct, $charge_pct, $repayment_term );
+        // Validate percentage balance and financing options
+        $val_res = NexaFi_Calculator::validate_settings( $upfront_pct, $financed_pct, $charge_pct, $repayment_term, $charge_basis, $plan_fee, $plan_fee_treatment );
         if ( is_wp_error( $val_res ) ) {
             wp_safe_redirect( add_query_arg( array( 'page' => 'nexafi-settings', 'error' => urlencode( $val_res->get_error_message() ) ), admin_url( 'admin.php' ) ) );
             exit;
@@ -366,22 +371,31 @@ class NexaFi_Admin {
         update_option( 'nexafi_charge_pct', $charge_pct );
         update_option( 'nexafi_repayment_term', $repayment_term );
         update_option( 'nexafi_max_quote', $max_quote );
+        update_option( 'nexafi_charge_basis', $charge_basis );
+        update_option( 'nexafi_plan_fee', $plan_fee );
+        update_option( 'nexafi_plan_fee_treatment', $plan_fee_treatment );
+        update_option( 'nexafi_terms_verified', $terms_verified );
+        update_option( 'nexafi_booking_deposit', $booking_deposit );
+        update_option( 'nexafi_booking_deposit_note', sanitize_textarea_field( wp_unslash( $_POST['nexafi_booking_deposit_note'] ?? '' ) ) );
 
-        // Automated Decision Policy: Always Final Authorized (Rule-based)
-        $new_mode = 'final_authorized';
-        $old_mode = get_option( 'nexafi_decision_mode', 'final_authorized' );
+        // Decision Policy Mode (preliminary_only vs final_authorized)
+        $posted_mode = sanitize_text_field( wp_unslash( $_POST['nexafi_decision_mode'] ?? 'preliminary_only' ) );
+        $new_mode    = ( 'final_authorized' === $posted_mode ) ? 'final_authorized' : 'preliminary_only';
+        $old_mode    = get_option( 'nexafi_decision_mode', 'preliminary_only' );
         if ( $old_mode !== $new_mode ) {
             update_option( 'nexafi_decision_mode', $new_mode );
             $db = NexaFi_DB::get_instance();
             $db->log_audit( 'settings', 'nexafi_decision_mode', 'policy_mode_change', $old_mode, $new_mode );
         }
 
-        // Messages & URLs
+        // Messages & URLs & Disclosures
         update_option( 'nexafi_ineligibility_message', sanitize_textarea_field( wp_unslash( $_POST['nexafi_ineligibility_message'] ?? '' ) ) );
         update_option( 'nexafi_preliminary_message', sanitize_textarea_field( wp_unslash( $_POST['nexafi_preliminary_message'] ?? '' ) ) );
         update_option( 'nexafi_privacy_policy_url', esc_url_raw( wp_unslash( $_POST['nexafi_privacy_policy_url'] ?? '' ) ) );
         update_option( 'nexafi_return_url', esc_url_raw( wp_unslash( $_POST['nexafi_return_url'] ?? '' ) ) );
         update_option( 'nexafi_contact_fallback_text', sanitize_text_field( wp_unslash( $_POST['nexafi_contact_fallback_text'] ?? '' ) ) );
+        update_option( 'nexafi_disclosure_text', sanitize_textarea_field( wp_unslash( $_POST['nexafi_disclosure_text'] ?? '' ) ) );
+        update_option( 'nexafi_provider_disclosure', sanitize_textarea_field( wp_unslash( $_POST['nexafi_provider_disclosure'] ?? '' ) ) );
 
         // Email Notification Settings
         $admin_email_enabled = ! empty( $_POST['nexafi_admin_email_enabled'] ) ? '1' : '0';
@@ -1281,12 +1295,26 @@ class NexaFi_Admin {
      * RENDER PAGE 4: Settings & Policies
      */
     public function render_settings_page() {
-        $upfront_pct    = floatval( get_option( 'nexafi_upfront_pct', 70.0 ) );
-        $financed_pct   = floatval( get_option( 'nexafi_financed_pct', 30.0 ) );
-        $charge_pct     = floatval( get_option( 'nexafi_charge_pct', 15.0 ) );
-        $repayment_term = intval( get_option( 'nexafi_repayment_term', 12 ) );
-        $max_quote      = floatval( get_option( 'nexafi_max_quote', 50000.0 ) );
-        $decision_mode  = get_option( 'nexafi_decision_mode', 'preliminary_only' );
+        $upfront_pct         = floatval( get_option( 'nexafi_upfront_pct', 70.0 ) );
+        $financed_pct        = floatval( get_option( 'nexafi_financed_pct', 30.0 ) );
+        $charge_pct          = floatval( get_option( 'nexafi_charge_pct', 15.0 ) );
+        $repayment_term      = intval( get_option( 'nexafi_repayment_term', 12 ) );
+        $max_quote           = floatval( get_option( 'nexafi_max_quote', 50000.0 ) );
+        $charge_basis        = get_option( 'nexafi_charge_basis', 'financed_amount' );
+        $plan_fee            = floatval( get_option( 'nexafi_plan_fee', 0.00 ) );
+        $plan_fee_treatment  = get_option( 'nexafi_plan_fee_treatment', 'financed' );
+        $terms_verified      = (bool) get_option( 'nexafi_terms_verified', false );
+        $booking_deposit     = floatval( get_option( 'nexafi_booking_deposit', 0.00 ) );
+        $booking_deposit_note = get_option(
+            'nexafi_booking_deposit_note',
+            __( 'Any booking deposit you pay is credited toward your Required Down Payment. It does not replace it.', 'nexafi-plugin' )
+        );
+        $disclosure_text     = get_option(
+            'nexafi_disclosure_text',
+            __( 'Financing disclosures pending verification.', 'nexafi-plugin' )
+        );
+        $provider_disclosure = get_option( 'nexafi_provider_disclosure', '' );
+        $decision_mode       = get_option( 'nexafi_decision_mode', 'preliminary_only' );
 
         $ineligibility_msg = get_option(
             'nexafi_ineligibility_message',
@@ -1345,7 +1373,7 @@ class NexaFi_Admin {
                             <th scope="row"><label for="nexafi_upfront_pct">Upfront Contribution (%)</label></th>
                             <td>
                                 <input type="number" step="0.1" min="0" max="100" name="nexafi_upfront_pct" id="nexafi_upfront_pct" value="<?php echo esc_attr( $upfront_pct ); ?>" class="small-text" required /> %
-                                <p class="description">Default: 70%. Patient pays this upfront at the clinic.</p>
+                                <p class="description">Default: 70%. Patient pays this upfront at the clinic as the Required Down Payment.</p>
                             </td>
                         </tr>
                         <tr>
@@ -1359,7 +1387,44 @@ class NexaFi_Admin {
                             <th scope="row"><label for="nexafi_charge_pct">One-Time Financing Charge (%)</label></th>
                             <td>
                                 <input type="number" step="0.1" min="0" max="100" name="nexafi_charge_pct" id="nexafi_charge_pct" value="<?php echo esc_attr( $charge_pct ); ?>" class="small-text" required /> %
-                                <p class="description">Default: 15% of the financed balance. Not an APR.</p>
+                                <p class="description">Default: 15%. Applied to either the financed balance or the total treatment price per setting below.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="nexafi_charge_basis">Financing Charge Basis</label></th>
+                            <td>
+                                <select name="nexafi_charge_basis" id="nexafi_charge_basis">
+                                    <option value="financed_amount" <?php selected( 'financed_amount', $charge_basis ); ?>>Financed Amount (Default - 15% of 30% financed balance)</option>
+                                    <option value="treatment_price" <?php selected( 'treatment_price', $charge_basis ); ?>>Total Treatment Price (15% of entire treatment price)</option>
+                                </select>
+                                <p class="description">Select whether the 15% financing charge is calculated against the financed amount ($3,000 on $10k) or total treatment price ($10,000).</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="nexafi_plan_fee">Plan / Administrative Fee ($)</label></th>
+                            <td>
+                                $ <input type="number" step="0.01" min="0" name="nexafi_plan_fee" id="nexafi_plan_fee" value="<?php echo esc_attr( number_format( $plan_fee, 2, '.', '' ) ); ?>" class="small-text" />
+                                <p class="description">Optional administrative or plan setup fee (e.g. $35.00). Default: $0.00.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="nexafi_plan_fee_treatment">Plan Fee Treatment</label></th>
+                            <td>
+                                <select name="nexafi_plan_fee_treatment" id="nexafi_plan_fee_treatment">
+                                    <option value="financed" <?php selected( 'financed', $plan_fee_treatment ); ?>>Financed (Added into installment balance)</option>
+                                    <option value="upfront" <?php selected( 'upfront', $plan_fee_treatment ); ?>>Upfront (Collected at clinic with down payment)</option>
+                                </select>
+                                <p class="description">Controls whether the plan fee is financed over the installment term or due upfront at booking.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="nexafi_terms_verified">Financing Terms Verification Gate</label></th>
+                            <td>
+                                <label for="nexafi_terms_verified" style="font-weight: 600; cursor: pointer;">
+                                    <input type="checkbox" name="nexafi_terms_verified" id="nexafi_terms_verified" value="1" <?php checked( true, $terms_verified ); ?> style="margin-top: -2px;" />
+                                    <?php esc_html_e( 'Financing terms verified by GDG/legal', 'nexafi-plugin' ); ?>
+                                </label>
+                                <p class="description">When unchecked (default off), unverified calculation figures (Financing Charge, Total Installment Payments, Monthly Payment) are displayed as neutral placeholders ("— / Your representative will confirm") on patient-facing screens and emails until verified.</p>
                             </td>
                         </tr>
                         <tr>
@@ -1376,32 +1441,75 @@ class NexaFi_Admin {
                                 <p class="description">Maximum treatment quote allowed on the application (Default: $50,000).</p>
                             </td>
                         </tr>
+                        <tr>
+                            <th scope="row"><label for="nexafi_booking_deposit">Standard Booking Deposit ($)</label></th>
+                            <td>
+                                $ <input type="number" step="1" min="0" name="nexafi_booking_deposit" id="nexafi_booking_deposit" value="<?php echo esc_attr( $booking_deposit > 0 ? $booking_deposit : '' ); ?>" placeholder="e.g. 300" class="regular-text" />
+                                <p class="description">Optional standard booking deposit amount (e.g. $300) credited toward the Required Down Payment. Leave blank if none.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="nexafi_booking_deposit_note">Booking Deposit Clarification Note</label></th>
+                            <td>
+                                <textarea name="nexafi_booking_deposit_note" id="nexafi_booking_deposit_note" rows="2" class="large-text"><?php echo esc_textarea( $booking_deposit_note ); ?></textarea>
+                                <p class="description">Non-promotional clarification note displayed under next steps ("Any booking deposit you pay is credited toward your Required Down Payment. It does not replace it.").</p>
+                            </td>
+                        </tr>
                     </table>
                 </div>
 
                 <!-- SECTION 2: Automated Approval Policy -->
                 <div class="nexafi-settings-box nexafi-policy-box">
                     <h2>2. Automated Decision &amp; Approval Policy</h2>
-                    <p class="description">NexaFi operates as a fully automated, rule-based in-house financing application with zero manual management review.</p>
+                    <p class="description">Configure whether automated qualifying decisions emit final approval or preliminary eligibility pending representative authorization.</p>
 
-                    <div style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 14px 18px; border-radius: 6px; margin-top: 14px;">
-                        <strong style="color: #065f46; font-size: 14px;">&#10003; Automated Rule-Based Decisioning Active</strong>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">Decision Policy Mode</th>
+                            <td>
+                                <fieldset>
+                                    <label style="display: block; margin-bottom: 12px; cursor: pointer;">
+                                        <input type="radio" name="nexafi_decision_mode" value="preliminary_only" <?php checked( 'preliminary_only', $decision_mode ); ?> />
+                                        <strong>Preliminary Eligibility Mode (Default / Safe Safeguard)</strong>
+                                        <p class="description" style="margin-left: 24px; margin-top: 2px;">Applicants meeting criteria receive an initial eligibility notification. Final approval requires representative follow-up and written authorization.</p>
+                                    </label>
+                                    <label style="display: block; margin-bottom: 12px; cursor: pointer;">
+                                        <input type="radio" name="nexafi_decision_mode" value="final_authorized" <?php checked( 'final_authorized', $decision_mode ); ?> />
+                                        <strong>Final Approval Mode (Authorized)</strong>
+                                        <p class="description" style="margin-left: 24px; margin-top: 2px;">Qualifying applicants receive immediate final approval ("YOU'RE APPROVED! / You're All Set"). Requires verified written authorization.</p>
+                                    </label>
+                                </fieldset>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div id="nexafi-authorization-confirm-box" style="display: <?php echo ( 'final_authorized' === $decision_mode ) ? 'block' : 'none'; ?>; background: #f0fdf4; border-left: 4px solid #10b981; padding: 14px 18px; border-radius: 6px; margin-top: 14px;">
+                        <strong style="color: #065f46; font-size: 14px;">&#10003; Final Approval Automated Decisioning Active</strong>
                         <p style="margin: 8px 0 0 0; color: #1e293b; font-size: 13px; line-height: 1.6;">
-                            Applications are evaluated immediately by the rule engine:
-                            <br />&bull; Active GDG Representative ID verified
-                            <br />&bull; Valid government ID and active traditional debit card declarations checked
-                            <br />&bull; Standard financing formula applied: <strong>70% upfront, 30% approved financing, 15% financing charge, 12 monthly payments</strong>.
-                            <br />Qualifying applicants instantly receive the final <strong>"YOU'RE APPROVED!"</strong> screen with zero manual management intervention or waiting period.
+                            Written authorization confirmed for automated final approvals. Qualifying applications that satisfy all declarations and terms verification will emit final approved confirmation.
                         </p>
                     </div>
-                    <input type="hidden" name="nexafi_decision_mode" value="final_authorized" />
                 </div>
 
                 <!-- SECTION 3: Content & URLs -->
                 <div class="nexafi-settings-box">
-                    <h2>3. Patient Messages &amp; Navigation URLs</h2>
+                    <h2>3. Patient Messages, Disclosures &amp; Navigation URLs</h2>
 
                     <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="nexafi_disclosure_text">Financing Disclosure Text</label></th>
+                            <td>
+                                <textarea name="nexafi_disclosure_text" id="nexafi_disclosure_text" rows="3" class="large-text"><?php echo esc_textarea( $disclosure_text ); ?></textarea>
+                                <p class="description">Configurable financing terms disclosure displayed on Screen 4 above the patient acknowledgment checkbox.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="nexafi_provider_disclosure">Financing Provider Disclosure</label></th>
+                            <td>
+                                <textarea name="nexafi_provider_disclosure" id="nexafi_provider_disclosure" rows="2" class="large-text"><?php echo esc_textarea( $provider_disclosure ); ?></textarea>
+                                <p class="description">Legally required creditor/servicer identification rendered in the disclosure block and applicant email (empty by default).</p>
+                            </td>
+                        </tr>
                         <tr>
                             <th scope="row"><label for="nexafi_ineligibility_message">Ineligibility Message</label></th>
                             <td>
@@ -1544,12 +1652,21 @@ class NexaFi_Admin {
             <div class="nexafi-detail-col">
                 <h3>Treatment &amp; Financing Breakdown</h3>
                 <table class="widefat fixed striped">
-                    <tr><td><strong>Total Treatment Quote:</strong></td><td><strong><?php echo esc_html( NexaFi_Calculator::format_currency( $app->treatment_quote ) ); ?></strong></td></tr>
-                    <tr><td><strong>Upfront Contribution (<?php echo esc_html( $app->upfront_pct ); ?>%):</strong></td><td><?php echo esc_html( NexaFi_Calculator::format_currency( $app->upfront_amount ) ); ?></td></tr>
-                    <tr><td><strong>Financed Balance (<?php echo esc_html( $app->financed_pct ); ?>%):</strong></td><td><?php echo esc_html( NexaFi_Calculator::format_currency( $app->financed_amount ) ); ?></td></tr>
-                    <tr><td><strong>Financing Charge (<?php echo esc_html( $app->charge_pct ); ?>%):</strong></td><td><?php echo esc_html( NexaFi_Calculator::format_currency( $app->charge_amount ) ); ?></td></tr>
-                    <tr><td><strong>Total Repayment:</strong></td><td><strong><?php echo esc_html( NexaFi_Calculator::format_currency( $app->total_repayment ) ); ?></strong></td></tr>
-                    <tr><td><strong>Monthly Payment (<?php echo esc_html( $app->repayment_term ); ?> mos):</strong></td><td><strong style="color: #10b981; font-size: 15px;"><?php echo esc_html( NexaFi_Calculator::format_currency( $app->monthly_payment ) ); ?>/mo</strong></td></tr>
+                    <tr><td><strong>Total Treatment Price:</strong></td><td><strong><?php echo esc_html( NexaFi_Calculator::format_currency( $app->treatment_quote ) ); ?></strong></td></tr>
+                    <tr><td><strong>Required Down Payment:</strong></td><td><?php echo esc_html( NexaFi_Calculator::format_currency( $app->upfront_amount ) ); ?></td></tr>
+                    <tr><td><strong>Amount Financed:</strong></td><td><?php echo esc_html( NexaFi_Calculator::format_currency( $app->financed_amount ) ); ?></td></tr>
+                    <tr><td><strong>Financing Charge:</strong></td><td><?php echo esc_html( NexaFi_Calculator::format_currency( $app->charge_amount ) ); ?></td></tr>
+                    <tr><td><strong>Total Installment Payments:</strong></td><td><strong><?php echo esc_html( NexaFi_Calculator::format_currency( $app->total_repayment ) ); ?></strong></td></tr>
+                    <tr><td><strong>Your Monthly Payment:</strong></td><td><strong style="color: #10b981; font-size: 15px;"><?php echo esc_html( NexaFi_Calculator::format_currency( $app->monthly_payment ) ); ?>/mo</strong></td></tr>
+                </table>
+
+                <h3 style="margin-top: 15px;">Internal Calculation Details</h3>
+                <table class="widefat fixed striped">
+                    <tr><td><strong>Down / Financed Split:</strong></td><td><?php echo esc_html( $app->upfront_pct ); ?>% upfront / <?php echo esc_html( $app->financed_pct ); ?>% financed</td></tr>
+                    <tr><td><strong>Charge Percentage:</strong></td><td><?php echo esc_html( $app->charge_pct ); ?>%</td></tr>
+                    <tr><td><strong>Charge Basis:</strong></td><td><?php echo esc_html( ! empty( $app->charge_basis ) ? $app->charge_basis : 'financed_amount' ); ?></td></tr>
+                    <tr><td><strong>Plan Fee:</strong></td><td><?php echo esc_html( NexaFi_Calculator::format_currency( ! empty( $app->plan_fee ) ? $app->plan_fee : 0 ) ); ?></td></tr>
+                    <tr><td><strong>Repayment Term:</strong></td><td><?php echo esc_html( $app->repayment_term ); ?> months</td></tr>
                 </table>
 
                 <h3 style="margin-top: 15px;">Decision &amp; Policy Metadata</h3>

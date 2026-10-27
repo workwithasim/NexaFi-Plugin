@@ -77,7 +77,11 @@ class NexaFi_Shortcode {
         $privacy_url = ! empty( $atts['privacy_url'] ) ? esc_url( $atts['privacy_url'] ) : esc_url( get_option( 'nexafi_privacy_policy_url', home_url( '/privacy-policy/' ) ) );
         $return_url  = ! empty( $atts['return_url'] ) ? esc_url( $atts['return_url'] ) : esc_url( get_option( 'nexafi_return_url', home_url( '/' ) ) );
 
-        $start_screen = in_array( (string) $atts['start_screen'], array( '2', '3', '4', '5' ), true ) ? (int) $atts['start_screen'] : 2;
+        $start_screen = in_array( (string) $atts['start_screen'], array( '2', '3' ), true ) ? (int) $atts['start_screen'] : 2;
+
+        $disclosure_text      = get_option( 'nexafi_disclosure_text', 'Financing disclosures pending verification.' );
+        $provider_disclosure  = get_option( 'nexafi_provider_disclosure', '' );
+        $booking_deposit_note = get_option( 'nexafi_booking_deposit_note', 'Any booking deposit you pay is credited toward your Required Down Payment. It does not replace it.' );
 
         // SVG Logo representations
         $logo_dark_html  = $this->get_logo_svg( 'dark' );
@@ -169,7 +173,7 @@ class NexaFi_Shortcode {
                             <div class="nexafi-field-group">
                                 <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-dob">Date of Birth <span class="nexafi-req">*</span></label>
                                 <div class="nexafi-input-icon-wrap">
-                                    <input type="date" id="<?php echo esc_attr( $instance_id ); ?>-dob" name="dob" class="nexafi-input" required max="<?php echo esc_attr( gmdate( 'Y-m-d' ) ); ?>" />
+                                    <input type="date" id="<?php echo esc_attr( $instance_id ); ?>-dob" name="dob" class="nexafi-input" required autocomplete="bday" max="<?php echo esc_attr( gmdate( 'Y-m-d' ) ); ?>" />
                                     <span class="nexafi-input-icon" aria-hidden="true">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                     </span>
@@ -179,12 +183,12 @@ class NexaFi_Shortcode {
                             <div class="nexafi-grid nexafi-grid-contact">
                                 <div class="nexafi-field-group">
                                     <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-phone">Phone Number <span class="nexafi-req">*</span></label>
-                                    <input type="tel" id="<?php echo esc_attr( $instance_id ); ?>-phone" name="phone" class="nexafi-input" placeholder="(555) 123-4567" required autocomplete="tel" />
+                                    <input type="tel" id="<?php echo esc_attr( $instance_id ); ?>-phone" name="phone" class="nexafi-input" placeholder="(555) 123-4567" required autocomplete="tel" inputmode="tel" />
                                 </div>
 
                                 <div class="nexafi-field-group">
                                     <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-email">Email Address <span class="nexafi-req">*</span></label>
-                                    <input type="email" id="<?php echo esc_attr( $instance_id ); ?>-email" name="email" class="nexafi-input" placeholder="jennifer@gmail.com" required autocomplete="email" />
+                                    <input type="email" id="<?php echo esc_attr( $instance_id ); ?>-email" name="email" class="nexafi-input" placeholder="jennifer@gmail.com" required autocomplete="email" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false" />
                                 </div>
                             </div>
                         </div>
@@ -193,7 +197,7 @@ class NexaFi_Shortcode {
                         <div class="nexafi-form-section">
                             <div class="nexafi-field-group">
                                 <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-address">Home Address <span class="nexafi-req">*</span></label>
-                                <input type="text" id="<?php echo esc_attr( $instance_id ); ?>-address" name="home_address" class="nexafi-input" placeholder="1234 Main St" required autocomplete="street-address" />
+                                <input type="text" id="<?php echo esc_attr( $instance_id ); ?>-address" name="home_address" class="nexafi-input" placeholder="1234 Main St" required autocomplete="address-line1" />
                             </div>
 
                             <div class="nexafi-grid nexafi-grid-3">
@@ -204,13 +208,13 @@ class NexaFi_Shortcode {
                                 <div class="nexafi-field-group">
                                     <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-state">State <span class="nexafi-req">*</span></label>
                                     <select id="<?php echo esc_attr( $instance_id ); ?>-state" name="state" class="nexafi-select" required autocomplete="address-level1">
-                                        <option value="">Select State</option>
+                                        <option value=""><?php esc_html_e( 'Select state', 'nexafi-plugin' ); ?></option>
                                         <?php echo $this->get_us_states_options( '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                     </select>
                                 </div>
                                 <div class="nexafi-field-group">
                                     <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-zip">ZIP Code <span class="nexafi-req">*</span></label>
-                                    <input type="text" id="<?php echo esc_attr( $instance_id ); ?>-zip" name="zip_code" class="nexafi-input" placeholder="33301" maxlength="10" required autocomplete="postal-code" />
+                                    <input type="text" id="<?php echo esc_attr( $instance_id ); ?>-zip" name="zip_code" class="nexafi-input" placeholder="33301" maxlength="10" required autocomplete="postal-code" inputmode="numeric" pattern="[0-9]*" />
                                 </div>
                             </div>
                         </div>
@@ -219,7 +223,7 @@ class NexaFi_Shortcode {
                         <div class="nexafi-form-section">
                             <div class="nexafi-field-group">
                                 <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-emp-status">Employment Status <span class="nexafi-req">*</span></label>
-                                <select id="<?php echo esc_attr( $instance_id ); ?>-emp-status" name="employment_status" class="nexafi-select nexafi-emp-toggle" required>
+                                <select id="<?php echo esc_attr( $instance_id ); ?>-emp-status" name="employment_status" class="nexafi-select nexafi-emp-toggle" required autocomplete="off">
                                     <option value="">Select Employment Status</option>
                                     <option value="Employed">Employed</option>
                                     <option value="Self-Employed">Self-Employed</option>
@@ -245,7 +249,7 @@ class NexaFi_Shortcode {
                             <div class="nexafi-grid nexafi-grid-2">
                                 <div class="nexafi-field-group nexafi-time-at-job-field">
                                     <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-timejob">Time at Job <span class="nexafi-req nexafi-emp-req">*</span></label>
-                                    <select id="<?php echo esc_attr( $instance_id ); ?>-timejob" name="time_at_job" class="nexafi-select" required>
+                                    <select id="<?php echo esc_attr( $instance_id ); ?>-timejob" name="time_at_job" class="nexafi-select" required autocomplete="off">
                                         <option value="">Select Time at Job</option>
                                         <option value="Less than 1 year">Less than 1 year</option>
                                         <option value="1-2 years">1-2 years</option>
@@ -257,7 +261,7 @@ class NexaFi_Shortcode {
                                     <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-income">Monthly Income <span class="nexafi-req">*</span></label>
                                     <div class="nexafi-input-currency-wrap">
                                         <span class="nexafi-currency-symbol">$</span>
-                                        <input type="text" id="<?php echo esc_attr( $instance_id ); ?>-income" name="monthly_income" class="nexafi-input nexafi-currency-input" placeholder="4,500" required />
+                                        <input type="text" id="<?php echo esc_attr( $instance_id ); ?>-income" name="monthly_income" class="nexafi-input nexafi-currency-input" placeholder="4,500" required inputmode="numeric" />
                                     </div>
                                 </div>
                             </div>
@@ -266,7 +270,7 @@ class NexaFi_Shortcode {
                         <!-- SECTION D: Two Required Eligibility Declarations -->
                         <div class="nexafi-form-section nexafi-declarations-box">
                             <label class="nexafi-checkbox-card">
-                                <input type="checkbox" name="has_id_declaration" class="nexafi-checkbox" value="1" checked />
+                                <input type="checkbox" name="has_id_declaration" class="nexafi-checkbox" value="1" />
                                 <span class="nexafi-checkbox-indicator"></span>
                                 <span class="nexafi-checkbox-label">
                                     I have a valid, unexpired driver's license or state ID.
@@ -274,7 +278,7 @@ class NexaFi_Shortcode {
                             </label>
 
                             <label class="nexafi-checkbox-card">
-                                <input type="checkbox" name="has_debit_card_declaration" class="nexafi-checkbox" value="1" checked />
+                                <input type="checkbox" name="has_debit_card_declaration" class="nexafi-checkbox" value="1" />
                                 <span class="nexafi-checkbox-indicator"></span>
                                 <span class="nexafi-checkbox-label">
                                     I have an active debit card from a traditional bank or credit union (not a prepaid or internet-only bank).
@@ -342,7 +346,7 @@ class NexaFi_Shortcode {
                                 <label class="nexafi-label" for="<?php echo esc_attr( $instance_id ); ?>-quote">Total Treatment Quote <span class="nexafi-req">*</span></label>
                                 <div class="nexafi-input-currency-wrap nexafi-quote-wrap">
                                     <span class="nexafi-currency-symbol">$</span>
-                                    <input type="text" id="<?php echo esc_attr( $instance_id ); ?>-quote" name="treatment_quote" class="nexafi-input nexafi-currency-input nexafi-quote-input" placeholder="10,000" required />
+                                    <input type="text" id="<?php echo esc_attr( $instance_id ); ?>-quote" name="treatment_quote" class="nexafi-input nexafi-currency-input nexafi-quote-input" placeholder="10,000" required inputmode="numeric" />
                                 </div>
                             </div>
 
@@ -381,7 +385,7 @@ class NexaFi_Shortcode {
                                 <input type="checkbox" name="consent" class="nexafi-checkbox" value="1" required />
                                 <span class="nexafi-checkbox-indicator"></span>
                                 <span class="nexafi-checkbox-label">
-                                    I confirm that all information provided is accurate and authorize GDG and iCare to review my information for financing purposes.
+                                    <?php esc_html_e( 'I confirm that all information provided is accurate and authorize GDG Smiles and its financing partners to review my information for financing purposes.', 'nexafi-plugin' ); ?>
                                 </span>
                             </label>
 
@@ -443,43 +447,27 @@ class NexaFi_Shortcode {
 
                         <!-- Approved Financing Amount Highlight Card -->
                         <div class="nexafi-amount-featured-card">
-                            <div class="nexafi-featured-label">Approved Financing Amount</div>
-                            <div class="nexafi-featured-val nexafi-val-financed">$3,000</div>
+                            <div class="nexafi-featured-label"><?php esc_html_e( 'Approved Financing Amount', 'nexafi-plugin' ); ?></div>
+                            <div class="nexafi-featured-val nexafi-val-financed">&mdash;</div>
                         </div>
 
-                        <!-- Payment Breakdown List (Clean list matching image) -->
-                        <div class="nexafi-breakdown-wrap">
-                            <div class="nexafi-breakdown-title">Your Payment Breakdown</div>
-                            <div class="nexafi-breakdown-table">
-                                <div class="nexafi-breakdown-row">
-                                    <span class="nexafi-row-label">Total Treatment Quote</span>
-                                    <span class="nexafi-row-val nexafi-val-quote">$10,000</span>
-                                </div>
-                                <div class="nexafi-breakdown-row">
-                                    <span class="nexafi-row-label">Upfront Contribution (<span class="nexafi-val-upfront-pct">70%</span>)</span>
-                                    <span class="nexafi-row-val nexafi-val-upfront">$7,000</span>
-                                </div>
-                                <div class="nexafi-breakdown-row">
-                                    <span class="nexafi-row-label">Financed Amount (<span class="nexafi-val-financed-pct">30%</span>)</span>
-                                    <span class="nexafi-row-val nexafi-val-financed-sub">$3,000</span>
-                                </div>
-                                <div class="nexafi-breakdown-row">
-                                    <span class="nexafi-row-label">Financing Charge (<span class="nexafi-val-charge-pct">15%</span>)</span>
-                                    <span class="nexafi-row-val nexafi-val-charge">$450</span>
-                                </div>
-                                <div class="nexafi-breakdown-row nexafi-row-total">
-                                    <span class="nexafi-row-label">Total of <span class="nexafi-val-term">12</span> Monthly Payments</span>
-                                    <span class="nexafi-row-val nexafi-val-total-repayment">$3,450</span>
-                                </div>
+                        <!-- Required Down Payment Featured Box (Section 2b: prominent card directly under approved amount) -->
+                        <div class="nexafi-downpayment-featured-box">
+                            <div class="nexafi-downpayment-label"><?php esc_html_e( 'Required Down Payment', 'nexafi-plugin' ); ?></div>
+                            <div class="nexafi-downpayment-val nexafi-val-down-payment">&mdash;</div>
+                            <div class="nexafi-downpayment-sub"><?php esc_html_e( 'Due to begin your treatment plan.', 'nexafi-plugin' ); ?></div>
+                            <div class="nexafi-deposit-credit-breakdown" style="display: none;">
+                                <div class="nexafi-deposit-credit-line"><?php esc_html_e( 'Booking deposit credited:', 'nexafi-plugin' ); ?> <span class="nexafi-val-deposit-credited">&mdash;</span></div>
+                                <div class="nexafi-deposit-remaining-line"><?php esc_html_e( 'Remaining down payment:', 'nexafi-plugin' ); ?> <span class="nexafi-val-deposit-remaining">&mdash;</span></div>
                             </div>
                         </div>
 
                         <!-- Monthly Payment Highlight Box -->
                         <div class="nexafi-monthly-featured-box">
-                            <div class="nexafi-monthly-label">Your Monthly Payment</div>
-                            <div class="nexafi-monthly-val nexafi-val-monthly">$287.50</div>
+                            <div class="nexafi-monthly-label"><?php esc_html_e( 'Your Monthly Payment', 'nexafi-plugin' ); ?></div>
+                            <div class="nexafi-monthly-val nexafi-val-monthly">&mdash;</div>
                             <div class="nexafi-monthly-sub">
-                                <span class="nexafi-val-term-sub">12</span> months (includes <span class="nexafi-val-charge-sub">15%</span> financing charge)
+                                <?php esc_html_e( '12 monthly payments', 'nexafi-plugin' ); ?>
                             </div>
                         </div>
 
@@ -495,74 +483,72 @@ class NexaFi_Shortcode {
                                 </svg>
                             </div>
                             <div class="nexafi-motivation-text">
-                                <div class="nexafi-motivation-heading">Your new smile is within reach!</div>
-                                <div class="nexafi-motivation-desc">None of our competitors say yes like this. GDG Smiles makes it possible.</div>
+                                <div class="nexafi-motivation-heading"><?php esc_html_e( 'Your new smile is within reach!', 'nexafi-plugin' ); ?></div>
+                                <div class="nexafi-motivation-desc"><?php esc_html_e( 'Other financing options may have said no. GDG Smiles is giving you another opportunity to move forward!', 'nexafi-plugin' ); ?></div>
                             </div>
                         </div>
 
-                        <!-- Background terms confirmation preservation (zero visual clutter) -->
-                        <input type="checkbox" name="accept_financing_terms" class="nexafi-terms-checkbox" value="1" checked style="display:none !important;" />
-
-                        <!-- Screen 4 Action: Review & Accept -->
-                        <div class="nexafi-form-action">
-                            <button type="button" class="nexafi-btn nexafi-btn-primary nexafi-btn-accept" data-target-screen="5">
-                                <span class="nexafi-btn-label">Review &amp; Accept</span>
-                                <span class="nexafi-btn-arrow" aria-hidden="true">&rarr;</span>
-                            </button>
-                        </div>
-
-                    </div>
-
-                    <!-- OUTCOME A2: PRELIMINARY ESTIMATE CONTAINER (Safe default before written authorization) -->
-                    <div class="nexafi-decision-outcome nexafi-outcome-preliminary" style="display: none;">
-                        <div class="nexafi-celebration-badge-wrap">
-                            <div class="nexafi-confetti-particle-box" aria-hidden="true">
-                                <span class="nexafi-confetti c1"></span><span class="nexafi-confetti c2"></span>
-                                <span class="nexafi-confetti c3"></span><span class="nexafi-confetti c4"></span>
-                                <span class="nexafi-confetti c5"></span><span class="nexafi-confetti c6"></span>
-                                <span class="nexafi-confetti c7 dot"></span><span class="nexafi-confetti c8"></span>
-                                <span class="nexafi-confetti c9 dot"></span><span class="nexafi-confetti c10"></span>
-                            </div>
-                            <div class="nexafi-check-circle">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                        </div>
-
-                        <div class="nexafi-decision-title-group">
-                            <span class="nexafi-congrats-text">Congratulations!</span>
-                            <h2 class="nexafi-approved-heading">YOU'RE APPROVED!</h2>
-                            <p class="nexafi-approved-subtext">Your GDG Smiles in-house financing has been approved.</p>
-                        </div>
-
-                        <!-- Preliminary Payment Breakdown -->
-                        <div class="nexafi-breakdown-wrap">
-                            <div class="nexafi-breakdown-title">Your Payment Breakdown</div>
+                        <!-- Compact Plan Details List (Section 2a labels in exact order) -->
+                        <div class="nexafi-breakdown-wrap nexafi-plan-details-wrap">
+                            <div class="nexafi-breakdown-title"><?php esc_html_e( 'Plan Details', 'nexafi-plugin' ); ?></div>
                             <div class="nexafi-breakdown-table">
                                 <div class="nexafi-breakdown-row">
-                                    <span class="nexafi-row-label">Total Treatment Quote</span>
-                                    <span class="nexafi-row-val nexafi-val-quote">$10,000</span>
+                                    <span class="nexafi-row-label"><?php esc_html_e( 'Total Treatment Price', 'nexafi-plugin' ); ?></span>
+                                    <span class="nexafi-row-val nexafi-val-quote">&mdash;</span>
                                 </div>
                                 <div class="nexafi-breakdown-row">
-                                    <span class="nexafi-row-label">Estimated Upfront (<span class="nexafi-val-upfront-pct">70%</span>)</span>
-                                    <span class="nexafi-row-val nexafi-val-upfront">$7,000</span>
+                                    <span class="nexafi-row-label"><?php esc_html_e( 'Required Down Payment', 'nexafi-plugin' ); ?></span>
+                                    <span class="nexafi-row-val nexafi-val-down-payment-table nexafi-val-upfront">&mdash;</span>
                                 </div>
                                 <div class="nexafi-breakdown-row">
-                                    <span class="nexafi-row-label">Estimated Financed Amount (<span class="nexafi-val-financed-pct">30%</span>)</span>
-                                    <span class="nexafi-row-val nexafi-val-financed-sub">$3,000</span>
+                                    <span class="nexafi-row-label"><?php esc_html_e( 'Amount Financed', 'nexafi-plugin' ); ?></span>
+                                    <span class="nexafi-row-val nexafi-val-financed-sub">&mdash;</span>
                                 </div>
                                 <div class="nexafi-breakdown-row">
-                                    <span class="nexafi-row-label">Estimated Monthly Payment (<span class="nexafi-val-term">12</span> mos)</span>
-                                    <span class="nexafi-row-val nexafi-val-monthly">$287.50</span>
+                                    <span class="nexafi-row-label"><?php esc_html_e( 'Financing Charge', 'nexafi-plugin' ); ?></span>
+                                    <span class="nexafi-row-val nexafi-val-charge">&mdash;</span>
+                                </div>
+                                <div class="nexafi-breakdown-row nexafi-row-total">
+                                    <span class="nexafi-row-label"><?php esc_html_e( 'Total Installment Payments', 'nexafi-plugin' ); ?></span>
+                                    <span class="nexafi-row-val nexafi-val-total-repayment">&mdash;</span>
+                                </div>
+                                <div class="nexafi-breakdown-row">
+                                    <span class="nexafi-row-label"><?php esc_html_e( 'Your Monthly Payment', 'nexafi-plugin' ); ?></span>
+                                    <span class="nexafi-row-val nexafi-val-monthly-table">&mdash;</span>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Section 4: Financing Disclosures & Acknowledgment -->
+                        <div class="nexafi-disclosures-block">
+                            <div class="nexafi-disclosures-title"><?php esc_html_e( 'Financing Disclosures', 'nexafi-plugin' ); ?></div>
+                            <div class="nexafi-disclosures-text nexafi-val-disclosures">
+                                <?php echo esc_html( $disclosure_text ); ?>
+                            </div>
+                            <?php if ( ! empty( $provider_disclosure ) ) : ?>
+                                <div class="nexafi-provider-disclosure-text">
+                                    <?php echo esc_html( $provider_disclosure ); ?>
+                                </div>
+                            <?php endif; ?>
+                            <div class="nexafi-disclosure-checkbox-wrap">
+                                <label class="nexafi-checkbox-card nexafi-ack-card">
+                                    <input type="checkbox" name="accept_financing_terms" class="nexafi-terms-checkbox" value="1" />
+                                    <span class="nexafi-checkbox-indicator"></span>
+                                    <span class="nexafi-checkbox-label">
+                                        <?php esc_html_e( 'I have reviewed the financing terms above.', 'nexafi-plugin' ); ?>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Screen 4 Action: See Your Next Steps > -->
                         <div class="nexafi-form-action">
-                            <button type="button" class="nexafi-btn nexafi-btn-primary nexafi-btn-accept" data-target-screen="5">
-                                <span class="nexafi-btn-label">Review &amp; Accept</span>
-                                <span class="nexafi-btn-arrow" aria-hidden="true">&rarr;</span>
+                            <button type="button" class="nexafi-btn nexafi-btn-primary nexafi-btn-accept" data-target-screen="5" disabled>
+                                <span class="nexafi-btn-label"><?php esc_html_e( 'See Your Next Steps', 'nexafi-plugin' ); ?></span>
+                                <span class="nexafi-btn-arrow" aria-hidden="true">&gt;</span>
                             </button>
                         </div>
+
                     </div>
 
                     <!-- OUTCOME B: NOT ELIGIBLE UNDER DECLARATION RULE CONTAINER -->
@@ -590,8 +576,8 @@ class NexaFi_Shortcode {
                         <div class="nexafi-rep-contact-box">
                             <div class="nexafi-rep-contact-title">Contact Your Assigned GDG Representative:</div>
                             <div class="nexafi-rep-contact-info">
-                                <div class="nexafi-rep-contact-name nexafi-val-rep-name"><?php echo esc_html( $default_rep_name ); ?></div>
-                                <div class="nexafi-rep-contact-id">ID: <span class="nexafi-val-rep-id"><?php echo esc_html( $default_rep_id ); ?></span></div>
+                                <div class="nexafi-rep-contact-name nexafi-val-rep-name">&mdash;</div>
+                                <div class="nexafi-rep-contact-id">ID: <span class="nexafi-val-rep-id">&mdash;</span></div>
                                 <div class="nexafi-rep-contact-channels">
                                     <span class="nexafi-rep-phone-line" style="display:none;">📞 <a href="#" class="nexafi-val-rep-phone"></a></span>
                                     <span class="nexafi-rep-email-line" style="display:none;">✉️ <a href="#" class="nexafi-val-rep-email"></a></span>
@@ -671,15 +657,15 @@ class NexaFi_Shortcode {
                         <ol class="nexafi-steps-list nexafi-steps-eligible">
                             <li class="nexafi-step-item">
                                 <span class="nexafi-step-num">1</span>
-                                <span class="nexafi-step-desc">Your GDG representative will contact you shortly to finalize your iCare setup.</span>
+                                <span class="nexafi-step-desc"><strong><?php esc_html_e( 'Connect With Your GDG Representative', 'nexafi-plugin' ); ?></strong> &mdash; <?php esc_html_e( 'Your GDG Smiles representative will help finalize your financing arrangements and answer any remaining questions.', 'nexafi-plugin' ); ?></span>
                             </li>
                             <li class="nexafi-step-item">
                                 <span class="nexafi-step-num">2</span>
-                                <span class="nexafi-step-desc">Complete your payment arrangements.</span>
+                                <span class="nexafi-step-desc"><strong><?php esc_html_e( 'Secure Your Promotional Pricing', 'nexafi-plugin' ); ?></strong> &mdash; <?php esc_html_e( 'Complete your required booking deposit to lock in your promotional pricing for up to 3 months! Your deposit is applied toward your treatment balance.', 'nexafi-plugin' ); ?></span>
                             </li>
                             <li class="nexafi-step-item">
                                 <span class="nexafi-step-num">3</span>
-                                <span class="nexafi-step-desc">Lock in your appointment and get one step closer to your new smile!</span>
+                                <span class="nexafi-step-desc"><strong><?php esc_html_e( 'Schedule Your Smile Transformation', 'nexafi-plugin' ); ?></strong> &mdash; <?php esc_html_e( 'Once your booking requirements and payment arrangements are completed, your representative will help reserve your treatment dates.', 'nexafi-plugin' ); ?></span>
                             </li>
                         </ol>
 
@@ -698,6 +684,11 @@ class NexaFi_Shortcode {
                                 <span class="nexafi-step-desc">Follow the personalized guidance provided by your GDG team.</span>
                             </li>
                         </ol>
+
+                        <!-- Non-promotional booking deposit note -->
+                        <div class="nexafi-booking-deposit-note">
+                            <?php echo esc_html( $booking_deposit_note ); ?>
+                        </div>
                     </div>
 
                     <!-- Callout Tagline Card -->
@@ -744,7 +735,7 @@ class NexaFi_Shortcode {
         $out = '';
         foreach ( $states as $code => $name ) {
             $is_sel = ( $code === $selected ) ? ' selected' : '';
-            $out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $code ), $is_sel, esc_html( $name . ' (' . $code . ')' ) );
+            $out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $code ), $is_sel, esc_html( $name ) );
         }
         return $out;
     }

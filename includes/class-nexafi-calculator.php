@@ -4,6 +4,7 @@
  *
  * Handles precise financing calculations, rounding, currency formatting,
  * and financing plan breakdowns according to NexaFi / GDG Smiles rules.
+ * All internal arithmetic is performed in integer cents to eliminate floating-point drift.
  *
  * @package NexaFi_Financing
  */
@@ -17,20 +18,35 @@ class NexaFi_Calculator {
     /**
      * Default financing configuration
      */
-    const DEFAULT_UPFRONT_PCT = 70.0;
-    const DEFAULT_FINANCED_PCT = 30.0;
-    const DEFAULT_CHARGE_PCT = 15.0;
-    const DEFAULT_REPAYMENT_TERM = 12;
+    const DEFAULT_UPFRONT_PCT        = 70.0;
+    const DEFAULT_FINANCED_PCT       = 30.0;
+    const DEFAULT_CHARGE_PCT         = 15.0;
+    const DEFAULT_REPAYMENT_TERM     = 12;
+    const DEFAULT_CHARGE_BASIS       = 'financed_amount';
+    const DEFAULT_PLAN_FEE           = 0.00;
+    const DEFAULT_PLAN_FEE_TREATMENT = 'financed';
 
     /**
-     * Calculate financing terms for a given treatment quote
+     * Calculate financing terms for a given treatment quote using integer cents arithmetic.
      *
-     * Formula:
-     * - Upfront Payment = Treatment Quote × Upfront %
-     * - Financed Amount = Treatment Quote × Financed %
-     * - Financing Charge = Financed Amount × Charge %
-     * - Total Repayment = Financed Amount + Financing Charge
-     * - Monthly Payment = Total Repayment ÷ Repayment Term
+     * Formulas (performed in integer cents):
+     * - Down Payment (Cents) = round( Quote_Cents × ( Upfront_% ÷ 100 ) )
+     * - Financed Amount (Cents) = Quote_Cents - Down_Payment_Cents
+     * - Percentage Charge Base:
+     *     * If charge_basis === 'treatment_price': Base = Quote_Cents
+     *     * If charge_basis === 'financed_amount': Base = Financed_Amount_Cents
+     * - Percentage Charge (Cents) = round( Base × ( Charge_% ÷ 100 ) )
+     * - Plan Fee Treatment:
+     *     * If plan_fee_treatment === 'financed':
+     *         Charge Amount (Cents) = Percentage_Charge_Cents + Plan_Fee_Cents
+     *         Total Installment Payments (Cents) = Financed_Amount_Cents + Charge_Amount_Cents
+     *     * If plan_fee_treatment === 'upfront':
+     *         Charge Amount (Cents) = Percentage_Charge_Cents
+     *         Total Installment Payments (Cents) = Financed_Amount_Cents + Percentage_Charge_Cents
+     *         (Plan fee is credited to upfront payment requirements)
+     * - Monthly Payment (Cents) = round( Total_Installments_Cents ÷ Term )
+     * - Monthly Reconciliation: Remainder_Cents = Total_Installments_Cents - ( Monthly_Cents × Term )
+     *   Final Payment = ( Monthly_Cents + Remainder_Cents )
      *
      * @param float $quote Total treatment quote amount.
      * @param array $custom_settings Optional overrides for financing parameters.
@@ -44,41 +60,90 @@ class NexaFi_Calculator {
 
         $settings = wp_parse_args( $custom_settings, self::get_configured_settings() );
 
-        $upfront_pct    = floatval( $settings['upfront_pct'] );
-        $financed_pct   = floatval( $settings['financed_pct'] );
-        $charge_pct     = floatval( $settings['charge_pct'] );
-        $repayment_term = max( 1, intval( $settings['repayment_term'] ) );
+        $upfront_pct         = floatval( $settings['upfront_pct'] );
+        $financed_pct        = floatval( $settings['financed_pct'] );
+        $charge_pct          = floatval( $settings['charge_pct'] );
+        $repayment_term      = max( 1, intval( $settings['repayment_term'] ) );
+        $charge_basis        = in_array( $settings['charge_basis'], array( 'treatment_price', 'financed_amount' ), true ) ? $settings['charge_basis'] : self::DEFAULT_CHARGE_BASIS;
+        $plan_fee            = max( 0.0, floatval( $settings['plan_fee'] ) );
+        $plan_fee_treatment  = in_array( $settings['plan_fee_treatment'], array( 'financed', 'upfront' ), true ) ? $settings['plan_fee_treatment'] : self::DEFAULT_PLAN_FEE_TREATMENT;
+        $terms_verified      = ! empty( $settings['terms_verified'] );
+        $booking_deposit     = max( 0.0, floatval( $settings['booking_deposit'] ?? 0.0 ) );
 
         // Ensure percentage consistency
         if ( round( $upfront_pct + $financed_pct, 2 ) !== 100.0 ) {
             $financed_pct = 100.0 - $upfront_pct;
         }
 
-        // Exact decimal calculations with standard half-up rounding
-        $upfront_amount  = round( $quote * ( $upfront_pct / 100 ), 2 );
-        $financed_amount = round( $quote * ( $financed_pct / 100 ), 2 );
-        $charge_amount   = round( $financed_amount * ( $charge_pct / 100 ), 2 );
-        $total_repayment = round( $financed_amount + $charge_amount, 2 );
-        $monthly_payment = round( $total_repayment / $repayment_term, 2 );
+        // Integer cents conversion
+        $quote_cents = (int) round( $quote * 100 );
+
+        // Down payment & financed amount (split cents cleanly)
+        $down_payment_cents = (int) round( $quote_cents * ( $upfront_pct / 100 ) );
+        $financed_cents     = $quote_cents - $down_payment_cents;
+
+        // Base for percentage charge
+        $base_cents = ( 'treatment_price' === $charge_basis ) ? $quote_cents : $financed_cents;
+        $pct_charge_cents = (int) round( $base_cents * ( $charge_pct / 100 ) );
+
+        $plan_fee_cents = (int) round( $plan_fee * 100 );
+
+        if ( 'financed' === $plan_fee_treatment ) {
+            $charge_amount_cents      = $pct_charge_cents + $plan_fee_cents;
+            $total_installments_cents = $financed_cents + $charge_amount_cents;
+        } else {
+            $charge_amount_cents      = $pct_charge_cents;
+            $total_installments_cents = $financed_cents + $pct_charge_cents;
+        }
+
+        $monthly_cents          = (int) round( $total_installments_cents / $repayment_term );
+        $reconciled_total_cents = $monthly_cents * $repayment_term;
+        $remainder_cents        = $total_installments_cents - $reconciled_total_cents;
+        $final_payment_cents    = $monthly_cents + $remainder_cents;
+
+        // Booking deposit reconciliation
+        $booking_deposit_cents = (int) round( $booking_deposit * 100 );
+        $remaining_down_cents  = max( 0, $down_payment_cents - $booking_deposit_cents );
+
+        // Convert back to currency floats
+        $upfront_amount         = $down_payment_cents / 100;
+        $financed_amount        = $financed_cents / 100;
+        $charge_amount          = $charge_amount_cents / 100;
+        $total_installments     = $total_installments_cents / 100;
+        $monthly_payment        = $monthly_cents / 100;
+        $final_payment          = $final_payment_cents / 100;
+        $remaining_down_payment = $remaining_down_cents / 100;
 
         return array(
-            'treatment_quote'     => $quote,
-            'upfront_pct'         => $upfront_pct,
-            'financed_pct'        => $financed_pct,
-            'charge_pct'          => $charge_pct,
-            'repayment_term'      => $repayment_term,
-            'upfront_amount'      => $upfront_amount,
-            'financed_amount'     => $financed_amount,
-            'charge_amount'       => $charge_amount,
-            'total_repayment'     => $total_repayment,
-            'monthly_payment'     => $monthly_payment,
+            'treatment_quote'             => $quote,
+            'upfront_pct'                 => $upfront_pct,
+            'financed_pct'                => $financed_pct,
+            'charge_pct'                  => $charge_pct,
+            'repayment_term'              => $repayment_term,
+            'charge_basis'                => $charge_basis,
+            'plan_fee'                    => $plan_fee,
+            'plan_fee_treatment'          => $plan_fee_treatment,
+            'terms_verified'              => $terms_verified,
+            'booking_deposit'             => $booking_deposit,
+            'remaining_down_payment'      => $remaining_down_payment,
+            'upfront_amount'              => $upfront_amount,
+            'financed_amount'             => $financed_amount,
+            'charge_amount'               => $charge_amount,
+            'total_repayment'             => $total_installments, // Backward compatibility alias
+            'total_installments'          => $total_installments,
+            'monthly_payment'             => $monthly_payment,
+            'remainder_cents'             => $remainder_cents,
+            'final_payment'               => $final_payment,
             // Formatted strings matching reference design ($10,000, $3,000 etc.)
-            'formatted_quote'     => self::format_currency( $quote, true ),
-            'formatted_upfront'   => self::format_currency( $upfront_amount, true ),
-            'formatted_financed'  => self::format_currency( $financed_amount, true ),
-            'formatted_charge'    => self::format_currency( $charge_amount, true ),
-            'formatted_repayment' => self::format_currency( $total_repayment, true ),
-            'formatted_monthly'   => self::format_currency( $monthly_payment, false ),
+            'formatted_quote'             => self::format_currency( $quote, true ),
+            'formatted_upfront'           => self::format_currency( $upfront_amount, true ),
+            'formatted_financed'          => self::format_currency( $financed_amount, true ),
+            'formatted_charge'            => $terms_verified ? self::format_currency( $charge_amount, true ) : '—',
+            'formatted_repayment'         => $terms_verified ? self::format_currency( $total_installments, true ) : '—',
+            'formatted_total_installments'=> $terms_verified ? self::format_currency( $total_installments, true ) : '—',
+            'formatted_monthly'           => $terms_verified ? self::format_currency( $monthly_payment, false ) : '—',
+            'formatted_booking_deposit'   => ( $booking_deposit > 0 ) ? self::format_currency( $booking_deposit, true ) : '',
+            'formatted_remaining_down'    => self::format_currency( $remaining_down_payment, true ),
         );
     }
 
@@ -89,11 +154,16 @@ class NexaFi_Calculator {
      */
     public static function get_configured_settings() {
         return array(
-            'upfront_pct'    => floatval( get_option( 'nexafi_upfront_pct', self::DEFAULT_UPFRONT_PCT ) ),
-            'financed_pct'   => floatval( get_option( 'nexafi_financed_pct', self::DEFAULT_FINANCED_PCT ) ),
-            'charge_pct'     => floatval( get_option( 'nexafi_charge_pct', self::DEFAULT_CHARGE_PCT ) ),
-            'repayment_term' => intval( get_option( 'nexafi_repayment_term', self::DEFAULT_REPAYMENT_TERM ) ),
-            'max_quote'      => floatval( get_option( 'nexafi_max_quote', 50000.0 ) ),
+            'upfront_pct'        => floatval( get_option( 'nexafi_upfront_pct', self::DEFAULT_UPFRONT_PCT ) ),
+            'financed_pct'       => floatval( get_option( 'nexafi_financed_pct', self::DEFAULT_FINANCED_PCT ) ),
+            'charge_pct'         => floatval( get_option( 'nexafi_charge_pct', self::DEFAULT_CHARGE_PCT ) ),
+            'repayment_term'     => intval( get_option( 'nexafi_repayment_term', self::DEFAULT_REPAYMENT_TERM ) ),
+            'max_quote'          => floatval( get_option( 'nexafi_max_quote', 50000.0 ) ),
+            'charge_basis'       => get_option( 'nexafi_charge_basis', self::DEFAULT_CHARGE_BASIS ),
+            'plan_fee'           => floatval( get_option( 'nexafi_plan_fee', self::DEFAULT_PLAN_FEE ) ),
+            'plan_fee_treatment' => get_option( 'nexafi_plan_fee_treatment', self::DEFAULT_PLAN_FEE_TREATMENT ),
+            'terms_verified'     => (bool) get_option( 'nexafi_terms_verified', false ),
+            'booking_deposit'    => floatval( get_option( 'nexafi_booking_deposit', 0.00 ) ),
         );
     }
 
@@ -113,15 +183,18 @@ class NexaFi_Calculator {
     }
 
     /**
-     * Validate financing settings percentages
+     * Validate financing settings percentages and parameters
      *
-     * @param float $upfront_pct
-     * @param float $financed_pct
-     * @param float $charge_pct
-     * @param int   $repayment_term
+     * @param float  $upfront_pct
+     * @param float  $financed_pct
+     * @param float  $charge_pct
+     * @param int    $repayment_term
+     * @param string $charge_basis
+     * @param float  $plan_fee
+     * @param string $plan_fee_treatment
      * @return true|WP_Error
      */
-    public static function validate_settings( $upfront_pct, $financed_pct, $charge_pct, $repayment_term ) {
+    public static function validate_settings( $upfront_pct, $financed_pct, $charge_pct, $repayment_term, $charge_basis = 'financed_amount', $plan_fee = 0.0, $plan_fee_treatment = 'financed' ) {
         if ( $upfront_pct < 0 || $upfront_pct > 100 ) {
             return new WP_Error( 'invalid_upfront', __( 'Upfront contribution percentage must be between 0% and 100%.', 'nexafi-plugin' ) );
         }
@@ -137,6 +210,16 @@ class NexaFi_Calculator {
         if ( $repayment_term < 1 || $repayment_term > 120 ) {
             return new WP_Error( 'invalid_term', __( 'Repayment term must be between 1 and 120 months.', 'nexafi-plugin' ) );
         }
+        if ( ! in_array( $charge_basis, array( 'financed_amount', 'treatment_price' ), true ) ) {
+            return new WP_Error( 'invalid_charge_basis', __( 'Financing charge basis must be either financed_amount or treatment_price.', 'nexafi-plugin' ) );
+        }
+        if ( $plan_fee < 0 ) {
+            return new WP_Error( 'invalid_plan_fee', __( 'Plan fee cannot be negative.', 'nexafi-plugin' ) );
+        }
+        if ( ! in_array( $plan_fee_treatment, array( 'financed', 'upfront' ), true ) ) {
+            return new WP_Error( 'invalid_plan_fee_treatment', __( 'Plan fee treatment must be either financed or upfront.', 'nexafi-plugin' ) );
+        }
         return true;
     }
 }
+
