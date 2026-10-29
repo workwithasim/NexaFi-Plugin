@@ -27,15 +27,27 @@
    * Initialize a NexaFi financing application instance
    */
   function initNexaFiApp(wrapper) {
-    const config = window.nexafi_obj || {
+    const config = Object.assign({
       ajax_url: '/wp-admin/admin-ajax.php',
       nonce: '',
       default_rep_id: '',
       min_quote: 0,
       max_quote: 50000,
       home_url: '/',
+      return_url: '',
+      privacy_url: '',
       i18n: {},
-    };
+    }, window.nexafi_obj || {});
+
+    // Sync config with wrapper data attributes
+    const wrapperReturnUrl = wrapper.getAttribute('data-return-url');
+    if (wrapperReturnUrl !== null && wrapperReturnUrl !== '') {
+      config.return_url = wrapperReturnUrl;
+    }
+    const wrapperPrivacyUrl = wrapper.getAttribute('data-privacy-url');
+    if (wrapperPrivacyUrl !== null && wrapperPrivacyUrl !== '') {
+      config.privacy_url = wrapperPrivacyUrl;
+    }
 
     // Cached page nonce refresh
     if (!config.nonce && config.ajax_url) {
@@ -224,13 +236,13 @@
       });
     });
 
-    // Home-back buttons: navigate to home page (used when form starts directly at Screen 2)
+    // Home-back buttons: navigate to return URL or home page (used when form starts directly at Screen 2)
     const homeBackButtons = wrapper.querySelectorAll('.nexafi-nav-back-home');
     homeBackButtons.forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.preventDefault();
-        const homeUrl = wrapper.getAttribute('data-home-url') || config.home_url || '/';
-        window.location.href = homeUrl;
+        const returnUrl = wrapper.getAttribute('data-return-url') || config.return_url || wrapper.getAttribute('data-home-url') || config.home_url || '/';
+        window.location.href = returnUrl;
       });
     });
 
@@ -428,6 +440,19 @@
     const alertBox3 = wrapper.querySelector('.nexafi-screen-3 .nexafi-alert');
     const consentCheckbox = wrapper.querySelector('input[name="consent"]');
     const btnSubmit = wrapper.querySelector('.nexafi-btn-submit');
+
+    // Privacy policy link visibility on Screen 3
+    const privacyWrap = wrapper.querySelector('.nexafi-privacy-link-wrap');
+    const privacyLink = wrapper.querySelector('.nexafi-privacy-link');
+    const currentPrivacyUrl = config.privacy_url || wrapper.getAttribute('data-privacy-url') || '';
+    if (privacyWrap) {
+      if (currentPrivacyUrl) {
+        if (privacyLink) privacyLink.href = currentPrivacyUrl;
+        privacyWrap.style.display = '';
+      } else {
+        privacyWrap.style.display = 'none';
+      }
+    }
 
     // Live currency formatting for Treatment Quote
     if (quoteInput) {
@@ -867,8 +892,9 @@
 
           const returnBtn = outcomeIneligible.querySelector('.nexafi-btn-return-home');
           if (returnBtn) {
-            if (config.return_url) {
-              returnBtn.href = config.return_url;
+            const currentReturnUrl = (data && data.return_url) || config.return_url || wrapper.getAttribute('data-return-url') || '';
+            if (currentReturnUrl) {
+              returnBtn.href = currentReturnUrl;
               returnBtn.style.display = 'flex';
             } else {
               returnBtn.style.display = 'none';
@@ -966,8 +992,9 @@
       const returnBtn5 = screen5.querySelector('.nexafi-btn-return');
       const returnAction5 = returnBtn5 ? returnBtn5.closest('.nexafi-form-action') : null;
       if (returnBtn5) {
-        if (config.return_url) {
-          returnBtn5.href = config.return_url;
+        const currentReturnUrl = (data && data.return_url) || config.return_url || wrapper.getAttribute('data-return-url') || '';
+        if (currentReturnUrl) {
+          returnBtn5.href = currentReturnUrl;
           if (returnAction5) returnAction5.style.display = 'block';
           returnBtn5.style.display = 'inline-flex';
         } else {

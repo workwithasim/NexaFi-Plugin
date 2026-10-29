@@ -4,7 +4,7 @@ Tags: financing, contact form, patient financing, calculator, application
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.19
+Stable tag: 2.4.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,12 @@ NexaFi Financing Application & Contact Form provides an advanced multi-step fina
 Use the shortcode `[nexafi_financing_form]` on your desired page.
 
 == Changelog ==
+
+= 2.4.20 =
+* Fix Privacy Policy URL: hide View Privacy Policy link when the setting is empty, and dynamically open configured destination when present.
+* Fix Return URL: ensure Back to Website button redirects to configured Return to GDG Smiles URL across all outcome screens (Screen 4 ineligibility and Screen 5 confirmation).
+* Update backend helper text to accurately reflect Return to GDG Smiles URL usage on outcome screens.
+* Sanitize return_url input on save.
 
 = 2.4.19 =
 * Settings interface cleanup: removed the pre-launch checklist overview container from the NexaFi settings administration page.

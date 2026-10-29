@@ -74,7 +74,7 @@ class NexaFi_Shortcode {
         wp_enqueue_style( 'nexafi-frontend-css' );
         wp_enqueue_script( 'nexafi-frontend-js' );
 
-        $privacy_url = ! empty( $atts['privacy_url'] ) ? esc_url( $atts['privacy_url'] ) : esc_url( get_option( 'nexafi_privacy_policy_url', home_url( '/privacy-policy/' ) ) );
+        $privacy_url = ! empty( $atts['privacy_url'] ) ? esc_url( $atts['privacy_url'] ) : esc_url( get_option( 'nexafi_privacy_policy_url', '' ) );
         $return_url  = ! empty( $atts['return_url'] ) ? esc_url( $atts['return_url'] ) : esc_url( get_option( 'nexafi_return_url', '' ) );
 
         $start_screen = in_array( (string) $atts['start_screen'], array( '2', '3' ), true ) ? (int) $atts['start_screen'] : 2;
@@ -389,9 +389,9 @@ class NexaFi_Shortcode {
                                 </span>
                             </label>
 
-                            <div class="nexafi-privacy-link-wrap">
+                            <div class="nexafi-privacy-link-wrap"<?php echo empty( $privacy_url ) ? ' style="display: none;"' : ''; ?>>
                                 <a href="<?php echo esc_url( $privacy_url ); ?>" class="nexafi-link nexafi-privacy-link" target="_blank" rel="noopener noreferrer">
-                                    View Privacy Policy
+                                    <?php esc_html_e( 'View Privacy Policy', 'nexafi-plugin' ); ?>
                                 </a>
                             </div>
                         </div>
@@ -701,7 +701,7 @@ class NexaFi_Shortcode {
                     <!-- Return Action Button -->
                     <div class="nexafi-form-action"<?php echo empty( $return_url ) ? ' style="display: none;"' : ''; ?>>
                         <a href="<?php echo esc_url( $return_url ); ?>" class="nexafi-btn nexafi-btn-primary nexafi-btn-return">
-                            <span class="nexafi-btn-label"><?php esc_html_e( 'Return to GDG Smiles', 'nexafi-plugin' ); ?></span>
+                            <span class="nexafi-btn-label"><?php esc_html_e( 'Back to Website', 'nexafi-plugin' ); ?></span>
                             <span class="nexafi-btn-arrow" aria-hidden="true">&rarr;</span>
                         </a>
                     </div>

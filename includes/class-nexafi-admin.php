@@ -427,7 +427,7 @@ class NexaFi_Admin {
         update_option( 'nexafi_privacy_policy_url', esc_url_raw( wp_unslash( $_POST['nexafi_privacy_policy_url'] ?? '' ) ) );
 
         // Validate Return URL as an absolute HTTPS URL
-        $raw_return_url = trim( wp_unslash( $_POST['nexafi_return_url'] ?? '' ) );
+        $raw_return_url = trim( sanitize_text_field( wp_unslash( $_POST['nexafi_return_url'] ?? '' ) ) );
         if ( '' !== $raw_return_url ) {
             $is_valid_https = false;
             if ( 0 === strpos( $raw_return_url, 'https://' ) ) {
@@ -1380,7 +1380,7 @@ class NexaFi_Admin {
             __( 'Your self-reported declarations satisfy initial financing eligibility. A GDG representative will review your treatment plan to finalize your financing.', 'nexafi-plugin' )
         );
 
-        $privacy_url = get_option( 'nexafi_privacy_policy_url', home_url( '/privacy-policy/' ) );
+        $privacy_url = get_option( 'nexafi_privacy_policy_url', '' );
         $return_url  = get_option( 'nexafi_return_url', '' );
         $fallback_rep_text = get_option(
             'nexafi_contact_fallback_text',
@@ -1588,17 +1588,17 @@ class NexaFi_Admin {
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row"><label for="nexafi_privacy_policy_url">Privacy Policy URL</label></th>
+                            <th scope="row"><label for="nexafi_privacy_policy_url"><?php esc_html_e( 'Privacy Policy URL', 'nexafi-plugin' ); ?></label></th>
                             <td>
-                                <input type="url" name="nexafi_privacy_policy_url" id="nexafi_privacy_policy_url" value="<?php echo esc_attr( $privacy_url ); ?>" class="regular-text" />
-                                <p class="description">Destination for the "View Privacy Policy" link on Screen 3.</p>
+                                <input type="url" name="nexafi_privacy_policy_url" id="nexafi_privacy_policy_url" value="<?php echo esc_attr( $privacy_url ); ?>" class="regular-text" placeholder="https://..." />
+                                <p class="description"><?php esc_html_e( 'Destination for the "View Privacy Policy" link on Screen 3. Leave empty to hide the link.', 'nexafi-plugin' ); ?></p>
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row"><label for="nexafi_return_url">Return to GDG Smiles URL</label></th>
+                            <th scope="row"><label for="nexafi_return_url"><?php esc_html_e( 'Return to GDG Smiles URL', 'nexafi-plugin' ); ?></label></th>
                             <td>
-                                <input type="url" name="nexafi_return_url" id="nexafi_return_url" value="<?php echo esc_attr( $return_url ); ?>" class="regular-text" />
-                                <p class="description">Destination for the "Return to GDG Smiles" button on Screen 5.</p>
+                                <input type="url" name="nexafi_return_url" id="nexafi_return_url" value="<?php echo esc_attr( $return_url ); ?>" class="regular-text" placeholder="https://gdgsmiles.com/" />
+                                <p class="description"><?php esc_html_e( 'Destination for the "Back to Website" return button on outcome screens (Screen 4 ineligibility and Screen 5 confirmation).', 'nexafi-plugin' ); ?></p>
                             </td>
                         </tr>
                         <tr>

@@ -602,6 +602,8 @@ class NexaFi_Ajax {
             'formatted_booking_deposit'  => $calc['formatted_booking_deposit'] ?? '',
             'formatted_remaining_down'   => $calc['formatted_remaining_down'] ?? '',
             'booking_deposit_note'       => get_option( 'nexafi_booking_deposit_note', __( 'Any booking deposit you pay is credited toward your Required Down Payment. It does not replace it.', 'nexafi-plugin' ) ),
+            'return_url'                 => esc_url( get_option( 'nexafi_return_url', '' ) ),
+            'privacy_url'                => esc_url( get_option( 'nexafi_privacy_policy_url', '' ) ),
         );
     }
 
